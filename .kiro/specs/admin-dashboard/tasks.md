@@ -40,7 +40,7 @@
   - [x] 6.4 Implement top 5 meals bar chart using `fl_chart`
   - [x] 6.5 Implement real-time listener on `/analytics/summary` for auto-refresh
 
-- [ ] 7. User management (Admin)
+- [x] 7. User management (Admin)
   - [x] 7.1 Implement `AdminUserListScreen`: searchable user list (display name, email, registration date, order count)
   - [x] 7.2 Implement `AdminUserDetailScreen`: user profile, order history, coin balance
   - [x] 7.3 Implement `adminManageUser` Cloud Function: deactivate/reactivate via `admin.auth().updateUser(uid, { disabled })`

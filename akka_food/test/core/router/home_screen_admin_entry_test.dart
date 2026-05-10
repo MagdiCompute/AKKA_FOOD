@@ -123,9 +123,11 @@ void main() {
         await tester.tap(find.text('Admin'));
         await tester.pumpAndSettle();
 
-        // Should now be on the admin screen.
-        expect(find.text('Admin Home'), findsOneWidget);
-        expect(find.text('Home'), findsNothing);
+        // Should now be on AdminHomeScreen — identified by its 4 admin tab icons.
+        expect(find.byIcon(Icons.receipt_long), findsOneWidget);
+        expect(find.byIcon(Icons.restaurant_menu), findsOneWidget);
+        expect(find.byIcon(Icons.bar_chart), findsOneWidget);
+        expect(find.byIcon(Icons.people), findsOneWidget);
       },
     );
 

@@ -2,6 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../features/admin_dashboard/presentation/screens/admin_category_list_screen.dart';
+import '../../features/admin_dashboard/presentation/screens/admin_category_form_screen.dart';
+import '../../features/admin_dashboard/presentation/screens/admin_analytics_screen.dart';
+import '../../features/admin_dashboard/presentation/screens/admin_home_screen.dart';
+import '../../features/admin_dashboard/presentation/screens/admin_meal_form_screen.dart';
+import '../../features/admin_dashboard/presentation/screens/admin_meal_list_screen.dart';
+import '../../features/admin_dashboard/presentation/screens/admin_order_detail_screen.dart';
+import '../../features/admin_dashboard/presentation/screens/admin_order_list_screen.dart';
+import '../../features/admin_dashboard/presentation/screens/admin_placeholder_screens.dart';
 import '../../features/auth/domain/entities/app_user.dart';
 import '../../features/auth/presentation/notifiers/auth_notifier.dart';
 
@@ -12,7 +21,30 @@ import '../../features/auth/presentation/notifiers/auth_notifier.dart';
 /// Top-level route paths used throughout the app.
 abstract final class AppRoutes {
   static const home = '/home';
+
+  // Admin root
   static const adminPrefix = '/admin';
+
+  // Orders
+  static const adminOrders = '/admin/orders';
+  static const adminOrderDetail = '/admin/orders/:orderId';
+
+  // Meals
+  static const adminMeals = '/admin/meals';
+  static const adminMealNew = '/admin/meals/new';
+  static const adminMealEdit = '/admin/meals/:mealId/edit';
+
+  // Categories
+  static const adminCategories = '/admin/categories';
+  static const adminCategoryNew = '/admin/categories/new';
+  static const adminCategoryEdit = '/admin/categories/:categoryId/edit';
+
+  // Analytics
+  static const adminAnalytics = '/admin/analytics';
+
+  // Users
+  static const adminUsers = '/admin/users';
+  static const adminUserDetail = '/admin/users/:userId';
 }
 
 // ---------------------------------------------------------------------------
@@ -81,17 +113,6 @@ class HomeScreen extends ConsumerWidget {
   }
 }
 
-class _AdminHomeScreen extends StatelessWidget {
-  const _AdminHomeScreen();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(child: Text('Admin Home')),
-    );
-  }
-}
-
 // ---------------------------------------------------------------------------
 // Router provider
 // ---------------------------------------------------------------------------
@@ -111,10 +132,77 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: AppRoutes.adminPrefix,
-        builder: (context, state) => const _AdminHomeScreen(),
+        builder: (context, state) => const AdminHomeScreen(),
         routes: [
-          // Admin sub-routes will be added here as the dashboard is built out.
-          // e.g. GoRoute(path: 'orders', builder: ...),
+          // ── Orders ──────────────────────────────────────────────────────
+          GoRoute(
+            path: 'orders',
+            builder: (context, state) => const AdminOrderListScreen(),
+            routes: [
+              GoRoute(
+                path: ':orderId',
+                builder: (context, state) => AdminOrderDetailScreen(
+                  orderId: state.pathParameters['orderId']!,
+                ),
+              ),
+            ],
+          ),
+
+          // ── Meals ────────────────────────────────────────────────────────
+          GoRoute(
+            path: 'meals',
+            builder: (context, state) => const AdminMealListScreen(),
+            routes: [
+              GoRoute(
+                path: 'new',
+                builder: (context, state) => const AdminMealFormScreen(),
+              ),
+              GoRoute(
+                path: ':mealId/edit',
+                builder: (context, state) => AdminMealFormScreen(
+                  mealId: state.pathParameters['mealId'],
+                ),
+              ),
+            ],
+          ),
+
+          // ── Categories ───────────────────────────────────────────────────
+          GoRoute(
+            path: 'categories',
+            builder: (context, state) => const AdminCategoryListScreen(),
+            routes: [
+              GoRoute(
+                path: 'new',
+                builder: (context, state) => const AdminCategoryFormScreen(),
+              ),
+              GoRoute(
+                path: ':categoryId/edit',
+                builder: (context, state) => AdminCategoryFormScreen(
+                  categoryId: state.pathParameters['categoryId'],
+                ),
+              ),
+            ],
+          ),
+
+          // ── Analytics ────────────────────────────────────────────────────
+          GoRoute(
+            path: 'analytics',
+            builder: (context, state) => const AdminAnalyticsScreen(),
+          ),
+
+          // ── Users ────────────────────────────────────────────────────────
+          GoRoute(
+            path: 'users',
+            builder: (context, state) => const AdminUserListScreen(),
+            routes: [
+              GoRoute(
+                path: ':userId',
+                builder: (context, state) => AdminUserDetailScreen(
+                  userId: state.pathParameters['userId']!,
+                ),
+              ),
+            ],
+          ),
         ],
       ),
     ],

@@ -1,0 +1,13 @@
+{
+  "enabled": true,
+  "name": "Git Add & Commit All Changes",
+  "description": "After the agent stops, stages all modified files and commits them to the current git branch with a timestamped commit message.",
+  "version": "1",
+  "when": {
+    "type": "agentStop"
+  },
+  "then": {
+    "type": "runCommand",
+    "command": "cd \"c:\\Users\\LENOVO THINKPAD X1\\AKKA-FOOD\" && git add . && git commit -m \"chore: auto-commit agent changes\""
+  }
+}

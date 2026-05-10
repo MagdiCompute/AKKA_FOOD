@@ -189,7 +189,8 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Home'), findsOneWidget);
-      expect(find.text('Admin Home'), findsNothing);
+      // AdminHomeScreen tab icons should not be visible.
+      expect(find.byIcon(Icons.receipt_long), findsNothing);
     });
 
     testWidgets(
@@ -215,7 +216,8 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Home'), findsOneWidget);
-      expect(find.text('Admin Home'), findsNothing);
+      // AdminHomeScreen tab icons should not be visible.
+      expect(find.byIcon(Icons.receipt_long), findsNothing);
     });
 
     testWidgets('admin user navigating to /admin sees admin screen content',
@@ -239,8 +241,12 @@ void main() {
       router.go('/admin');
       await tester.pumpAndSettle();
 
-      expect(find.text('Admin Home'), findsOneWidget);
-      expect(find.text('Home'), findsNothing);
+      // AdminHomeScreen renders a BottomNavigationBar with 4 admin tabs.
+      expect(find.byType(BottomNavigationBar), findsOneWidget);
+      expect(find.byIcon(Icons.receipt_long), findsOneWidget);
+      expect(find.byIcon(Icons.restaurant_menu), findsOneWidget);
+      expect(find.byIcon(Icons.bar_chart), findsOneWidget);
+      expect(find.byIcon(Icons.people), findsOneWidget);
     });
 
     testWidgets(
@@ -274,7 +280,9 @@ void main() {
       // Now navigating to /admin should succeed.
       router.go('/admin');
       await tester.pumpAndSettle();
-      expect(find.text('Admin Home'), findsOneWidget);
+      // AdminHomeScreen bottom nav is now visible.
+      expect(find.byType(BottomNavigationBar), findsOneWidget);
+      expect(find.byIcon(Icons.receipt_long), findsOneWidget);
     });
   });
 }

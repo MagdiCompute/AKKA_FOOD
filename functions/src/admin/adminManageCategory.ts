@@ -82,7 +82,26 @@ export const adminManageCategory = onCall(async (request) => {
     const updates: Record<string, unknown> = {
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     };
-    if (name !== undefined) updates["name"] = name;
+
+    // Check for duplicate name when name is being changed
+    if (name !== undefined) {
+      const existing = await db
+        .collection("categories")
+        .where("name", "==", name)
+        .limit(1)
+        .get();
+
+      // Allow if the only match is the category being updated itself
+      if (!existing.empty && existing.docs[0].id !== categoryId) {
+        throw new HttpsError(
+          "already-exists",
+          `A category with the name "${name}" already exists.`
+        );
+      }
+
+      updates["name"] = name;
+    }
+
     if (imageUrl !== undefined) updates["imageUrl"] = imageUrl;
     if (isActive !== undefined) updates["isActive"] = isActive;
 
@@ -100,7 +119,7 @@ export const adminManageCategory = onCall(async (request) => {
 
     const mealsSnap = await db
       .collection("meals")
-      .where("categoryId", "==", categoryId)
+      .where("category", "==", categoryId)
       .get();
 
     mealsSnap.docs.forEach((mealDoc) => {

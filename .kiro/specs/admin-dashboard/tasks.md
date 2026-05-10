@@ -52,9 +52,9 @@
   - [x] 8.3 Write rules: `/users` readable by admin role (limited fields: no tokens)
   - [x] 8.4 Write rules: `/analytics` readable by admin role
 
-- [ ] 9. Integration testing
-  - [~] 9.1 Write integration test: non-admin user cannot access admin routes
-  - [~] 9.2 Write integration test: admin creates meal → appears in catalog
-  - [~] 9.3 Write integration test: admin updates order status → customer receives notification
-  - [~] 9.4 Write integration test: admin deactivates user → user cannot sign in
-  - [~] 9.5 Write integration test: analytics data refreshes within 5 minutes
+- [x] 9. Integration testing
+  - [x] 9.1 Write integration test: non-admin user cannot access admin routes
+  - [x] 9.2 Write integration test: admin creates meal → appears in catalog
+  - [x] 9.3 Write integration test: admin updates order status → customer receives notification
+  - [x] 9.4 Write integration test: admin deactivates user → user cannot sign in
+  - [x] 9.5 Write integration test: analytics data refreshes within 5 minutes

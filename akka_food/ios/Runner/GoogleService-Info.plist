@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  TODO: Replace this placeholder with the real GoogleService-Info.plist downloaded from the Firebase Console.
+
+  Instructions:
+  1. Go to https://console.firebase.google.com/
+  2. Select (or create) your Firebase project.
+  3. Add an iOS app with bundle ID matching your Runner target (check ios/Runner.xcodeproj).
+  4. Download the generated GoogleService-Info.plist.
+  5. Replace this file with the downloaded file.
+  6. Do NOT commit the real GoogleService-Info.plist to version control — add it to .gitignore.
+-->
+<plist version="1.0">
+<dict>
+  <key>TODO</key>
+  <string>Replace with real GoogleService-Info.plist from Firebase Console</string>
+</dict>
+</plist>

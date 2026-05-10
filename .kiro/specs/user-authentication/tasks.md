@@ -2,11 +2,11 @@
 
 ## Task List
 
-- [ ] 1. Project setup and dependencies
-  - [ ] 1.1 Initialize Flutter project `akka_food` with null safety
-  - [ ] 1.2 Add dependencies: `firebase_core`, `firebase_auth`, `cloud_firestore`, `flutter_secure_storage`, `google_sign_in`, `flutter_facebook_auth`, `riverpod`, `go_router`, `freezed`, `json_serializable`
-  - [ ] 1.3 Configure Firebase project (Android `google-services.json`, iOS `GoogleService-Info.plist`)
-  - [ ] 1.4 Set up project folder structure: `lib/features/auth/`, `lib/core/`, `lib/shared/`
+- [x] 1. Project setup and dependencies
+  - [x] 1.1 Initialize Flutter project `akka_food` with null safety
+  - [x] 1.2 Add dependencies: `firebase_core`, `firebase_auth`, `cloud_firestore`, `flutter_secure_storage`, `google_sign_in`, `flutter_facebook_auth`, `riverpod`, `go_router`, `freezed`, `json_serializable`
+  - [x] 1.3 Configure Firebase project (Android `google-services.json`, iOS `GoogleService-Info.plist`)
+  - [x] 1.4 Set up project folder structure: `lib/features/auth/`, `lib/core/`, `lib/shared/`
 
 - [ ] 2. Domain layer — Auth entities and interfaces
   - [ ] 2.1 Create `AppUser` entity with `uid`, `email`, `phoneNumber`, `displayName`, `isVerified`, `isDeactivated`, `linkedProviders`

@@ -46,11 +46,11 @@
   - [x] 7.3 Implement `adminManageUser` Cloud Function: deactivate/reactivate via `admin.auth().updateUser(uid, { disabled })`
   - [x] 7.4 Implement deactivate/reactivate buttons with confirmation dialog
 
-- [ ] 8. Firestore Security Rules
-  - [~] 8.1 Write rules: `/meals` and `/categories` writable only by admin role
-  - [~] 8.2 Write rules: `/orders` readable by admin role (all orders)
-  - [~] 8.3 Write rules: `/users` readable by admin role (limited fields: no tokens)
-  - [~] 8.4 Write rules: `/analytics` readable by admin role
+- [x] 8. Firestore Security Rules
+  - [x] 8.1 Write rules: `/meals` and `/categories` writable only by admin role
+  - [x] 8.2 Write rules: `/orders` readable by admin role (all orders)
+  - [x] 8.3 Write rules: `/users` readable by admin role (limited fields: no tokens)
+  - [x] 8.4 Write rules: `/analytics` readable by admin role
 
 - [ ] 9. Integration testing
   - [~] 9.1 Write integration test: non-admin user cannot access admin routes

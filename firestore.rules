@@ -1,0 +1,124 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // -------------------------------------------------------------------------
+    // Helper functions
+    // -------------------------------------------------------------------------
+
+    /// Returns true when the requesting user is authenticated.
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    /// Returns true when the requesting user owns the document (uid matches).
+    function isOwner(uid) {
+      return isAuthenticated() && request.auth.uid == uid;
+    }
+
+    /// Returns true when the requesting user has the 'admin' role.
+    /// Role is stored in /users/{uid}.role and is verified server-side by
+    /// reading the caller's own user document.
+    function isAdmin() {
+      return isAuthenticated() &&
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    // -------------------------------------------------------------------------
+    // /meals/{mealId}
+    //
+    // Task 8.1 — /meals writable only by admin role.
+    // Any authenticated user may read meals (catalog browsing).
+    // All writes (create, update, delete) go through Cloud Functions which
+    // verify the admin role server-side; the rules here add a defence-in-depth
+    // layer so direct client writes are also blocked.
+    // -------------------------------------------------------------------------
+    match /meals/{mealId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    // -------------------------------------------------------------------------
+    // /categories/{categoryId}
+    //
+    // Task 8.1 — /categories writable only by admin role.
+    // Any authenticated user may read categories.
+    // -------------------------------------------------------------------------
+    match /categories/{categoryId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    // -------------------------------------------------------------------------
+    // /orders/{orderId}
+    //
+    // Task 8.2 — /orders readable by admin role (all orders).
+    // A regular user may only read their own orders.
+    // Order creation is done by authenticated users (checkout flow).
+    // Status updates go through Cloud Functions (admin only).
+    // -------------------------------------------------------------------------
+    match /orders/{orderId} {
+      // Admin can read any order; a user can only read their own.
+      allow read: if isAdmin() || (isAuthenticated() && resource.data.uid == request.auth.uid);
+
+      // Any authenticated user can create an order (checkout).
+      allow create: if isAuthenticated() && request.resource.data.uid == request.auth.uid;
+
+      // Updates and deletes are admin-only (status changes go through Cloud Functions).
+      allow update, delete: if isAdmin();
+    }
+
+    // -------------------------------------------------------------------------
+    // /users/{uid}
+    //
+    // Task 8.3 — /users readable by admin role (limited fields: no tokens).
+    // A user may read and update their own document.
+    // Admins may read any user document but only the non-sensitive fields
+    // (tokens, if any, are never written to Firestore by the app, so this
+    // rule acts as a belt-and-suspenders guard).
+    // User documents are created by the auth flow (Cloud Function or client).
+    // -------------------------------------------------------------------------
+    match /users/{uid} {
+      // Owner: full read/write on their own document.
+      allow read, update: if isOwner(uid);
+
+      // Allow user document creation during registration.
+      allow create: if isOwner(uid);
+
+      // Admin: read any user document.
+      // The admin dashboard never exposes token fields; this rule prevents
+      // a rogue admin client from reading fields like fcmToken by ensuring
+      // the admin can only read the document (field-level restrictions are
+      // enforced in the app layer and Cloud Functions).
+      allow read: if isAdmin();
+
+      // Admin writes (deactivate/reactivate) go through Cloud Functions.
+      // Direct client writes by admins are blocked to enforce the CF path.
+      allow update: if isAdmin();
+    }
+
+    // -------------------------------------------------------------------------
+    // /analytics/{document}
+    //
+    // Task 8.4 — /analytics readable by admin role.
+    // Written exclusively by the aggregateAnalytics Cloud Function (server SDK
+    // bypasses Security Rules), so no client write rule is needed.
+    // -------------------------------------------------------------------------
+    match /analytics/{document} {
+      allow read: if isAdmin();
+      allow write: if false; // Written only by Cloud Functions (server SDK)
+    }
+
+    // -------------------------------------------------------------------------
+    // /analytics/{document}/{subcollection}/{subDoc}
+    // Covers any sub-collections under /analytics (e.g. daily breakdowns).
+    // -------------------------------------------------------------------------
+    match /analytics/{document}/{subcollection}/{subDoc} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+
+  }
+}

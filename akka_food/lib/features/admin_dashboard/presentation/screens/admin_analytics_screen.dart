@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/entities/analytics_summary.dart';
 import '../notifiers/admin_analytics_notifier.dart';
 import '../widgets/daily_orders_line_chart.dart';
-import '../widgets/daily_orders_line_chart.dart';
+import '../widgets/top_meals_bar_chart.dart';
 
 // ---------------------------------------------------------------------------
 // AdminAnalyticsScreen
@@ -62,12 +62,15 @@ class _AnalyticsBody extends ConsumerWidget {
         const SizedBox(height: 24),
 
         // Daily orders line chart (task 6.3)
-        DailyOrdersLineChart(dailyOrders: state.summary.dailyOrders),
+        _ChartCard(
+          title: 'Daily Orders (Last 30 Days)',
+          child: DailyOrdersLineChart(dailyOrders: state.summary.dailyOrders),
+        ),
         const SizedBox(height: 16),
-        // Chart placeholder for task 6.4
-        _ChartPlaceholder(
+        // Top 5 meals bar chart (task 6.4)
+        _ChartCard(
           title: 'Top 5 Best-Selling Meals',
-          icon: Icons.bar_chart,
+          child: TopMealsBarChart(topMeals: state.summary.topMeals),
         ),
       ],
     );
@@ -245,26 +248,19 @@ class _SummaryCard extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-// _ChartPlaceholder
+// _ChartCard
 // ---------------------------------------------------------------------------
 
-/// Placeholder widget for chart sections.
-///
-/// Will be replaced by real chart implementations in tasks 6.3 and 6.4.
-class _ChartPlaceholder extends StatelessWidget {
-  const _ChartPlaceholder({
-    required this.title,
-    required this.icon,
-  });
+/// A card wrapper for chart sections with a title.
+class _ChartCard extends StatelessWidget {
+  const _ChartCard({required this.title, required this.child});
 
   final String title;
-  final IconData icon;
+  final Widget child;
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-
     return Card(
       elevation: 1,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -280,32 +276,7 @@ class _ChartPlaceholder extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-            Container(
-              height: 160,
-              decoration: BoxDecoration(
-                color: colorScheme.surfaceContainerHighest,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      icon,
-                      size: 40,
-                      color: colorScheme.onSurfaceVariant.withAlpha(100),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Chart coming soon',
-                      style: textTheme.bodySmall?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+            child,
           ],
         ),
       ),

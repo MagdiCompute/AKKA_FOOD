@@ -79,4 +79,16 @@ class CloudFunctionAdminDataSource {
     };
     await callable.call<void>(payload);
   }
+
+  /// Calls the `adminManageUser` Cloud Function to deactivate a user.
+  Future<void> deactivateUser(String targetUid) async {
+    final callable = _functions.httpsCallable('adminManageUser');
+    await callable.call<void>({'action': 'deactivate', 'targetUid': targetUid});
+  }
+
+  /// Calls the `adminManageUser` Cloud Function to reactivate a user.
+  Future<void> reactivateUser(String targetUid) async {
+    final callable = _functions.httpsCallable('adminManageUser');
+    await callable.call<void>({'action': 'reactivate', 'targetUid': targetUid});
+  }
 }

@@ -10,7 +10,8 @@ import '../../features/admin_dashboard/presentation/screens/admin_meal_form_scre
 import '../../features/admin_dashboard/presentation/screens/admin_meal_list_screen.dart';
 import '../../features/admin_dashboard/presentation/screens/admin_order_detail_screen.dart';
 import '../../features/admin_dashboard/presentation/screens/admin_order_list_screen.dart';
-import '../../features/admin_dashboard/presentation/screens/admin_placeholder_screens.dart';
+import '../../features/admin_dashboard/presentation/screens/admin_user_detail_screen.dart';
+import '../../features/admin_dashboard/presentation/screens/admin_user_list_screen.dart';
 import '../../features/auth/domain/entities/app_user.dart';
 import '../../features/auth/presentation/notifiers/auth_notifier.dart';
 

@@ -33,18 +33,18 @@
   - [x] 5.4 Implement `adminUpdateOrderStatus` Cloud Function with transition validation
   - [x] 5.5 Implement order search by order ID or user name
 
-- [ ] 6. Analytics
+- [x] 6. Analytics
   - [x] 6.1 Implement `aggregateAnalytics` scheduled Cloud Function (every 5 min): compute totals, top meals, daily counts; write to `/analytics/summary`
   - [x] 6.2 Implement `AdminAnalyticsScreen`: summary cards (orders, revenue, active users), period selector (today/week/month)
-  - [ ] 6.3 Implement daily order count line chart using `fl_chart`
-  - [~] 6.4 Implement top 5 meals bar chart using `fl_chart`
-  - [~] 6.5 Implement real-time listener on `/analytics/summary` for auto-refresh
+  - [x] 6.3 Implement daily order count line chart using `fl_chart`
+  - [x] 6.4 Implement top 5 meals bar chart using `fl_chart`
+  - [x] 6.5 Implement real-time listener on `/analytics/summary` for auto-refresh
 
 - [ ] 7. User management (Admin)
-  - [~] 7.1 Implement `AdminUserListScreen`: searchable user list (display name, email, registration date, order count)
-  - [~] 7.2 Implement `AdminUserDetailScreen`: user profile, order history, coin balance
-  - [~] 7.3 Implement `adminManageUser` Cloud Function: deactivate/reactivate via `admin.auth().updateUser(uid, { disabled })`
-  - [~] 7.4 Implement deactivate/reactivate buttons with confirmation dialog
+  - [x] 7.1 Implement `AdminUserListScreen`: searchable user list (display name, email, registration date, order count)
+  - [x] 7.2 Implement `AdminUserDetailScreen`: user profile, order history, coin balance
+  - [x] 7.3 Implement `adminManageUser` Cloud Function: deactivate/reactivate via `admin.auth().updateUser(uid, { disabled })`
+  - [x] 7.4 Implement deactivate/reactivate buttons with confirmation dialog
 
 - [ ] 8. Firestore Security Rules
   - [~] 8.1 Write rules: `/meals` and `/categories` writable only by admin role

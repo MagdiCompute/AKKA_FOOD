@@ -4,23 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'admin_analytics_screen.dart';
 import 'admin_meal_list_screen.dart';
 import 'admin_order_list_screen.dart';
-
-/// Placeholder for the Users management screen.
-class AdminUserListScreen extends StatelessWidget {
-  const AdminUserListScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(
-        child: Text(
-          'Users',
-          style: TextStyle(fontSize: 24),
-        ),
-      ),
-    );
-  }
-}
+import 'admin_user_list_screen.dart';
 
 // ---------------------------------------------------------------------------
 // Tab index provider
@@ -37,13 +21,10 @@ final _adminTabIndexProvider = StateProvider<int>((ref) => 0);
 ///
 /// Hosts a [BottomNavigationBar] with four tabs:
 /// Orders | Meals | Analytics | Users
-///
-/// Each tab renders a placeholder screen until the real screens are
-/// implemented in subsequent tasks.
 class AdminHomeScreen extends ConsumerWidget {
   const AdminHomeScreen({super.key});
 
-  static final _tabs = const [
+  static const _tabs = [
     AdminOrderListScreen(),
     AdminMealListScreen(),
     AdminAnalyticsScreen(),

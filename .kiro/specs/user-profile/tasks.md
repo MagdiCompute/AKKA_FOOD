@@ -2,13 +2,13 @@
 
 ## Task List
 
-- [ ] 1. Domain layer — Profile entities and interfaces
-  - [ ] 1.1 Create `UserProfile` entity (uid, displayName, email, phoneNumber, avatarUrl, updatedAt)
-  - [ ] 1.2 Create `DeliveryAddress` entity (id, uid, label, streetAddress, city, lat, lng, isDefault, createdAt)
-  - [ ] 1.3 Create `NotificationPreference` entity (uid, orderUpdates, promotions, coinEvents)
-  - [ ] 1.4 Create `CoinTransaction` entity (id, uid, amount, reason, orderId, timestamp)
-  - [ ] 1.5 Create `OrderSummary` entity (orderId, orderDate, items, totalAmount, status, deliveryAddress, paymentMethod)
-  - [ ] 1.6 Define repository interfaces: `IProfileRepository`, `IAddressRepository`, `IOrderRepository`, `ICoinRepository`
+- [x] 1. Domain layer — Profile entities and interfaces
+  - [x] 1.1 Create `UserProfile` entity (uid, displayName, email, phoneNumber, avatarUrl, updatedAt)
+  - [x] 1.2 Create `DeliveryAddress` entity (id, uid, label, streetAddress, city, lat, lng, isDefault, createdAt)
+  - [x] 1.3 Create `NotificationPreference` entity (uid, orderUpdates, promotions, coinEvents)
+  - [x] 1.4 Create `CoinTransaction` entity (id, uid, amount, reason, orderId, timestamp)
+  - [x] 1.5 Create `OrderSummary` entity (orderId, orderDate, items, totalAmount, status, deliveryAddress, paymentMethod)
+  - [x] 1.6 Define repository interfaces: `IProfileRepository`, `IAddressRepository`, `IOrderRepository`, `ICoinRepository`
 
 - [ ] 2. Data layer — Firestore data sources
   - [ ] 2.1 Implement `FirestoreProfileDataSource`: read/write `/users/{uid}` document

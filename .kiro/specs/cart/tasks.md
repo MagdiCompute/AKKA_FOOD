@@ -2,12 +2,12 @@
 
 ## Task List
 
-- [ ] 1. Domain layer — Cart entities
-  - [ ] 1.1 Create `CartItem` entity (mealId, mealName, mealImageUrl, unitPrice, quantity, isAvailable)
-  - [ ] 1.2 Create `Cart` entity with computed properties: subtotal, deliveryFee, discount, total, itemCount
-  - [ ] 1.3 Create `CartSummary` DTO for handoff to Payment screen
-  - [ ] 1.4 Create `CartValidationResult` model
-  - [ ] 1.5 Define `ICartRepository` interface
+- [x] 1. Domain layer — Cart entities
+  - [x] 1.1 Create `CartItem` entity (mealId, mealName, mealImageUrl, unitPrice, quantity, isAvailable)
+  - [x] 1.2 Create `Cart` entity with computed properties: subtotal, deliveryFee, discount, total, itemCount
+  - [x] 1.3 Create `CartSummary` DTO for handoff to Payment screen
+  - [x] 1.4 Create `CartValidationResult` model
+  - [x] 1.5 Define `ICartRepository` interface
 
 - [ ] 2. Data layer — Hive persistence
   - [ ] 2.1 Set up Hive box `cart` with JSON serialization for Cart

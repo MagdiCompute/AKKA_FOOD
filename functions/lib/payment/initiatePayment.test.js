@@ -17,7 +17,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 // ── Mocks ─────────────────────────────────────────────────────────────────────
 const mockAdd = jest.fn();
 const mockUpdate = jest.fn().mockResolvedValue(undefined);
-const mockCollection = jest.fn(() => ({ add: mockAdd }));
+const mockSet = jest.fn().mockResolvedValue(undefined);
+// Subcollection mock: db.collection("transactions").doc(id).collection("cartSnapshot").doc("items").set(...)
+const mockSubDoc = jest.fn(() => ({ set: mockSet }));
+const mockSubCollection = jest.fn(() => ({ doc: mockSubDoc }));
+const mockDoc = jest.fn(() => ({ collection: mockSubCollection, update: mockUpdate }));
+const mockCollection = jest.fn(() => ({ add: mockAdd, doc: mockDoc }));
 const mockFirestore = Object.assign(jest.fn(() => ({ collection: mockCollection })), {
     FieldValue: { serverTimestamp: jest.fn(() => "SERVER_TIMESTAMP") },
 });
@@ -87,6 +92,7 @@ describe("initiatePayment", () => {
         jest.clearAllMocks();
         // Default: Firestore add returns a doc ref with an id
         mockAdd.mockResolvedValue({ id: "txn-123", update: mockUpdate });
+        mockSet.mockResolvedValue(undefined);
     });
     // ── Authentication ──────────────────────────────────────────────────────────
     describe("authentication", () => {
@@ -210,6 +216,62 @@ describe("initiatePayment", () => {
                 transactionId: "txn-123",
                 reference: mockUuid,
             });
+        });
+    });
+    // ── Cart snapshot saving (Task 6.2) ─────────────────────────────────────────
+    describe("cart snapshot saving", () => {
+        const cartItems = [
+            { mealId: "meal-1", mealName: "Riz au gras", unitPrice: 1500, quantity: 2 },
+            { mealId: "meal-2", mealName: "Jus de bissap", unitPrice: 500, quantity: 1 },
+        ];
+        it("saves cart snapshot to subcollection when cartItems are provided", async () => {
+            mockFetch.mockResolvedValueOnce({ ok: true, json: async () => ({}) });
+            await capturedHandler(makeRequest({
+                amount: 3500,
+                phoneNumber: "70123456",
+                cartItems,
+                subtotal: 3500,
+                deliveryFee: 500,
+                discount: 0,
+                redeemedCoins: 0,
+            }, { uid: "user-1" }));
+            // Verify the subcollection chain was called
+            expect(mockCollection).toHaveBeenCalledWith("transactions");
+            expect(mockDoc).toHaveBeenCalledWith("txn-123");
+            expect(mockSubCollection).toHaveBeenCalledWith("cartSnapshot");
+            expect(mockSubDoc).toHaveBeenCalledWith("items");
+            expect(mockSet).toHaveBeenCalledWith(expect.objectContaining({
+                items: [
+                    { mealId: "meal-1", mealName: "Riz au gras", unitPrice: 1500, quantity: 2 },
+                    { mealId: "meal-2", mealName: "Jus de bissap", unitPrice: 500, quantity: 1 },
+                ],
+                subtotal: 3500,
+                deliveryFee: 500,
+                discount: 0,
+                total: 3500,
+                redeemedCoins: 0,
+                savedAt: "SERVER_TIMESTAMP",
+            }));
+        });
+        it("does not save cart snapshot when cartItems is not provided", async () => {
+            mockFetch.mockResolvedValueOnce({ ok: true, json: async () => ({}) });
+            await capturedHandler(makeRequest({ amount: 2000, phoneNumber: "70123456" }, { uid: "user-1" }));
+            expect(mockSet).not.toHaveBeenCalled();
+        });
+        it("does not save cart snapshot when cartItems is empty", async () => {
+            mockFetch.mockResolvedValueOnce({ ok: true, json: async () => ({}) });
+            await capturedHandler(makeRequest({ amount: 2000, phoneNumber: "70123456", cartItems: [] }, { uid: "user-1" }));
+            expect(mockSet).not.toHaveBeenCalled();
+        });
+        it("uses amount as subtotal fallback when subtotal is not provided", async () => {
+            mockFetch.mockResolvedValueOnce({ ok: true, json: async () => ({}) });
+            await capturedHandler(makeRequest({ amount: 3000, phoneNumber: "70123456", cartItems }, { uid: "user-1" }));
+            expect(mockSet).toHaveBeenCalledWith(expect.objectContaining({
+                subtotal: 3000,
+                deliveryFee: 0,
+                discount: 0,
+                redeemedCoins: 0,
+            }));
         });
     });
 });

@@ -77,7 +77,7 @@ exports.initiatePayment = (0, https_1.onCall)({ secrets: [orangeMoneyApiKey, ora
     }
     const uid = request.auth.uid;
     // ── Validate request data ─────────────────────────────────────────────
-    const { amount, phoneNumber, orderId } = request.data;
+    const { amount, phoneNumber, orderId, cartItems, subtotal, deliveryFee, discount, redeemedCoins } = request.data;
     if (!amount || typeof amount !== "number" || amount <= 0) {
         throw new https_1.HttpsError("invalid-argument", "amount is required and must be a positive number (XOF).");
     }
@@ -117,6 +117,35 @@ exports.initiatePayment = (0, https_1.onCall)({ secrets: [orangeMoneyApiKey, ora
         status: "pending",
         timestamp: new Date().toISOString(),
     });
+    // ── Step 3b: Save cart snapshot to prevent cart changes mid-payment ────
+    if (cartItems && Array.isArray(cartItems) && cartItems.length > 0) {
+        const cartSnapshotData = {
+            items: cartItems.map((item) => ({
+                mealId: item.mealId,
+                mealName: item.mealName,
+                unitPrice: item.unitPrice,
+                quantity: item.quantity,
+            })),
+            subtotal: subtotal !== null && subtotal !== void 0 ? subtotal : amount,
+            deliveryFee: deliveryFee !== null && deliveryFee !== void 0 ? deliveryFee : 0,
+            discount: discount !== null && discount !== void 0 ? discount : 0,
+            total: amount,
+            redeemedCoins: redeemedCoins !== null && redeemedCoins !== void 0 ? redeemedCoins : 0,
+            savedAt: now,
+        };
+        await db
+            .collection("transactions")
+            .doc(transactionId)
+            .collection("cartSnapshot")
+            .doc("items")
+            .set(cartSnapshotData);
+        functions.logger.info("Cart snapshot saved", {
+            transactionId,
+            reference,
+            itemCount: cartItems.length,
+            timestamp: new Date().toISOString(),
+        });
+    }
     // ── Step 4: Call Orange Money Mali API ─────────────────────────────────
     const apiKey = orangeMoneyApiKey.value();
     const baseUrl = orangeMoneyBaseUrl.value();

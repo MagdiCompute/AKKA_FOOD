@@ -37,3 +37,6 @@ export { initiatePayment } from "./payment/initiatePayment";
 export { orangeMoneyCallback } from "./payment/orangeMoneyCallback";
 export { expireStaleTransactions } from "./payment/expireStaleTransactions";
 export { createOrder } from "./payment/createOrder";
+
+// Delivery System
+export { onOrderStatusChanged } from "./delivery/onOrderStatusChanged";

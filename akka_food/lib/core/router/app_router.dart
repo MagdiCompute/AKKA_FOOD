@@ -12,6 +12,7 @@ import '../../features/admin_dashboard/presentation/screens/admin_order_detail_s
 import '../../features/admin_dashboard/presentation/screens/admin_order_list_screen.dart';
 import '../../features/admin_dashboard/presentation/screens/admin_user_detail_screen.dart';
 import '../../features/admin_dashboard/presentation/screens/admin_user_list_screen.dart';
+import '../../features/delivery_system/presentation/screens/order_tracking_screen.dart';
 import '../../features/auth/domain/entities/app_user.dart';
 import '../../features/auth/presentation/notifiers/auth_notifier.dart';
 import '../../features/auth/presentation/notifiers/auth_state.dart';
@@ -60,6 +61,9 @@ abstract final class AppRoutes {
   static const orderDetail = '/profile/orders/:orderId';
   static const coinHistory = '/profile/coins';
   static const notificationPrefs = '/profile/notifications';
+
+  // Order Tracking
+  static const orderTracking = '/orders/:orderId/tracking';
 
   // Cart & Payment
   static const cart = '/cart';
@@ -326,6 +330,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.paymentFailure,
         builder: (context, state) => const PaymentFailureScreen(),
+      ),
+
+      // ── Order Tracking ─────────────────────────────────────────────────
+      GoRoute(
+        path: AppRoutes.orderTracking,
+        builder: (context, state) => OrderTrackingScreen(
+          orderId: state.pathParameters['orderId']!,
+        ),
       ),
 
       // ── User Profile ───────────────────────────────────────────────────

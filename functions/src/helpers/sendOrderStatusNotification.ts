@@ -1,16 +1,54 @@
 import * as admin from "firebase-admin";
 
 /**
- * Human-readable labels for each delivery status, used in push notification bodies.
+ * Builds the push notification payload for a given delivery status.
+ * Payloads match the design doc specification exactly.
+ *
+ * @param status - The new delivery status string.
+ * @param orderId - The Firestore order document ID.
+ * @param etaMinutes - Optional ETA in minutes (used for out_for_delivery).
+ * @returns Notification payload with title, body, and data, or null for unknown statuses.
  */
-const STATUS_LABELS: Record<string, string> = {
-  confirmed: "Your order has been confirmed!",
-  preparing: "Your order is being prepared.",
-  ready_for_pickup: "Your order is ready for pickup.",
-  out_for_delivery: "Your order is on its way!",
-  delivered: "Your order has been delivered. Enjoy!",
-  cancelled: "Your order has been cancelled.",
-};
+export function buildNotificationPayload(
+  status: string,
+  orderId: string,
+  etaMinutes?: number
+): { title: string; body: string; data: Record<string, string> } | null {
+  switch (status) {
+    case "confirmed":
+      return {
+        title: "Order confirmed",
+        body: "Your order has been confirmed!",
+        data: { orderId },
+      };
+    case "preparing":
+      return {
+        title: "Order update",
+        body: "Your order is being prepared.",
+        data: { orderId },
+      };
+    case "out_for_delivery":
+      return {
+        title: "Your order is on the way!",
+        body: `ETA: ${etaMinutes ?? "?"} minutes`,
+        data: { orderId },
+      };
+    case "delivered":
+      return {
+        title: "Order delivered!",
+        body: "Tap to rate your experience",
+        data: { orderId },
+      };
+    case "failed":
+      return {
+        title: "Delivery issue",
+        body: "We couldn't deliver your order. We'll contact you shortly.",
+        data: { orderId },
+      };
+    default:
+      return null;
+  }
+}
 
 /**
  * Sends a push notification to the customer when their order status changes.
@@ -18,6 +56,12 @@ const STATUS_LABELS: Record<string, string> = {
  * Looks up the customer's FCM token from `/users/{uid}.fcmToken`.
  * Silently skips if the user has no FCM token (e.g. they haven't granted
  * notification permission or the token hasn't been stored yet).
+ *
+ * The notification includes:
+ * - Per-status title and body matching the design doc
+ * - Data payload with orderId, status, and type for deep linking
+ * - Android notification channel ("order_updates") with high priority
+ * - iOS default sound
  *
  * @param orderId  - The Firestore order document ID.
  * @param uid      - The customer's Firebase Auth UID.
@@ -35,20 +79,28 @@ export async function sendOrderStatusNotification(
 
   if (!userSnap.exists) return;
 
-  const fcmToken = userSnap.data()?.["fcmToken"] as string | undefined;
+  const userData = userSnap.data();
+  const fcmToken = userData?.["fcmToken"] as string | undefined;
   if (!fcmToken) return;
 
-  const body = buildNotificationBody(newStatus, etaMinutes);
+  // Check user notification preferences — default to enabled if not explicitly set
+  const preferences = userData?.["preferences"] as Record<string, unknown> | undefined;
+  const notificationsEnabled = preferences?.notificationsEnabled !== false;
+  if (!notificationsEnabled) return;
+
+  const payload = buildNotificationPayload(newStatus, orderId, etaMinutes);
+  if (!payload) return;
 
   const message: admin.messaging.Message = {
     token: fcmToken,
     notification: {
-      title: "Order Update",
-      body,
+      title: payload.title,
+      body: payload.body,
     },
     data: {
-      orderId,
+      ...payload.data,
       status: newStatus,
+      type: "order_status_update",
     },
     android: {
       notification: {
@@ -74,11 +126,4 @@ export async function sendOrderStatusNotification(
       err
     );
   }
-}
-
-function buildNotificationBody(status: string, etaMinutes?: number): string {
-  if (status === "out_for_delivery" && typeof etaMinutes === "number") {
-    return `Your order is on its way! Estimated arrival: ${etaMinutes} minute${etaMinutes === 1 ? "" : "s"}.`;
-  }
-  return STATUS_LABELS[status] ?? `Your order status has been updated to: ${status}.`;
 }

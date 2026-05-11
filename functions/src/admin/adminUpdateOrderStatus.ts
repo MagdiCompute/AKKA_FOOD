@@ -4,44 +4,55 @@ import { verifyAdmin } from "../helpers/verifyAdmin";
 import { sendOrderStatusNotification } from "../helpers/sendOrderStatusNotification";
 
 /**
- * Valid delivery status values.
+ * Valid delivery status values per the design doc.
  */
 const VALID_STATUSES = new Set([
   "pending",
   "confirmed",
   "preparing",
-  "ready_for_pickup",
   "out_for_delivery",
   "delivered",
-  "cancelled",
+  "failed",
 ]);
 
 /**
- * Allowed status transitions.
- * Terminal states (delivered, cancelled) map to an empty set — no transitions allowed.
+ * Allowed status transitions per the design doc:
+ *   pending → confirmed → preparing → out_for_delivery → delivered
+ *                                                       → failed
+ *
+ * Terminal states (delivered, failed) have no outgoing transitions.
  */
 const ALLOWED_TRANSITIONS: Record<string, Set<string>> = {
-  pending: new Set(["confirmed", "cancelled"]),
-  confirmed: new Set(["preparing", "cancelled"]),
-  preparing: new Set(["ready_for_pickup", "cancelled"]),
-  ready_for_pickup: new Set(["out_for_delivery", "delivered", "cancelled"]),
-  out_for_delivery: new Set(["delivered", "cancelled"]),
+  pending: new Set(["confirmed"]),
+  confirmed: new Set(["preparing"]),
+  preparing: new Set(["out_for_delivery"]),
+  out_for_delivery: new Set(["delivered", "failed"]),
   delivered: new Set(),
-  cancelled: new Set(),
+  failed: new Set(),
 };
 
 /**
  * adminUpdateOrderStatus
  *
- * Updates the delivery status of an order.
- * Requires the caller to have the 'admin' role.
+ * HTTPS Callable Cloud Function that updates the delivery status of an order.
+ * Requires the caller to have the 'admin' role (checked via users/{uid}.role).
  *
  * Request data:
- *   - orderId: string
- *   - status: string  (new delivery status)
- *   - etaMinutes?: number  (required when status == 'out_for_delivery')
+ *   - orderId: string        — the order document ID
+ *   - status: string         — the new delivery status
+ *   - etaMinutes?: number    — required when status is 'out_for_delivery'
+ *
+ * Returns: { success: true } on success.
+ *
+ * Error codes:
+ *   - unauthenticated    — caller is not authenticated
+ *   - permission-denied  — caller is not an admin
+ *   - invalid-argument   — missing/invalid fields or etaMinutes not provided for out_for_delivery
+ *   - not-found          — order does not exist
+ *   - failed-precondition — illegal status transition
  */
 export const adminUpdateOrderStatus = onCall(async (request) => {
+  // 1. Validate admin role
   await verifyAdmin(request.auth);
 
   const { orderId, status, etaMinutes } = request.data as {
@@ -50,7 +61,7 @@ export const adminUpdateOrderStatus = onCall(async (request) => {
     etaMinutes?: number;
   };
 
-  // ── Field validation ──────────────────────────────────────────────────────
+  // 2. Field validation
   if (!orderId || typeof orderId !== "string") {
     throw new HttpsError("invalid-argument", "orderId is required.");
   }
@@ -70,7 +81,7 @@ export const adminUpdateOrderStatus = onCall(async (request) => {
     );
   }
 
-  // ── Order existence check ─────────────────────────────────────────────────
+  // 3. Order existence check
   const db = admin.firestore();
   const orderRef = db.doc(`orders/${orderId}`);
   const orderSnap = await orderRef.get();
@@ -82,7 +93,7 @@ export const adminUpdateOrderStatus = onCall(async (request) => {
   const orderData = orderSnap.data() as Record<string, unknown>;
   const currentStatus = orderData["status"] as string | undefined;
 
-  // ── Status transition validation ──────────────────────────────────────────
+  // 4. Status transition validation
   if (!currentStatus || !ALLOWED_TRANSITIONS[currentStatus]) {
     throw new HttpsError(
       "failed-precondition",
@@ -97,18 +108,19 @@ export const adminUpdateOrderStatus = onCall(async (request) => {
     );
   }
 
-  // ── Persist the update ────────────────────────────────────────────────────
+  // 5. Persist the update
   const updateData: Record<string, unknown> = {
     status,
     updatedAt: admin.firestore.FieldValue.serverTimestamp(),
   };
+
   if (status === "out_for_delivery" && etaMinutes !== undefined) {
     updateData["etaMinutes"] = etaMinutes;
   }
 
   await orderRef.update(updateData);
 
-  // ── Push notification to customer (Requirement 4.3) ───────────────────────
+  // 6. Send push notification to customer
   const uid = orderData["uid"] as string | undefined;
   if (uid) {
     await sendOrderStatusNotification(orderId, uid, status, etaMinutes);

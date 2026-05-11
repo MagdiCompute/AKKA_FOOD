@@ -129,25 +129,39 @@ service cloud.firestore {
     //   • Non-owners / unauthenticated: all access denied.
     //
     // SECURITY NOTE — server-only fields:
-    //   `failedLoginAttempts` and `lockedUntil` are written exclusively by
-    //   Cloud Functions using the Admin SDK (which bypasses Security Rules).
-    //   Client SDKs must NOT write these fields directly. The rules below do
-    //   not enforce field-level restrictions (Firestore rules cannot easily
-    //   block individual fields on update), so the Cloud Function path is the
-    //   authoritative guard. The app layer must never send these fields in
-    //   client-side update calls.
+    //   `failedLoginAttempts`, `lockedUntil`, and `coinBalance` are written
+    //   exclusively by Cloud Functions using the Admin SDK (which bypasses
+    //   Security Rules). Client SDKs must NOT write these fields directly.
+    //
+    //   `coinBalance` is enforced at the rule level: the update rule ensures
+    //   clients cannot modify it (Task 7.2, coins spec). The field must either
+    //   be absent from the write or unchanged from the existing value.
+    //
+    //   `failedLoginAttempts` and `lockedUntil` are guarded by the Cloud
+    //   Function path as the authoritative guard.
     //
     //   Admin writes (deactivate/reactivate) also go through Cloud Functions
     //   to enforce the server-side path; direct client writes by admins are
     //   blocked here as a defence-in-depth measure.
     // -------------------------------------------------------------------------
     match /users/{uid} {
-      // Owner: read and update their own document.
+      // Owner: read their own document.
       // Satisfies Requirement 11.2: only the matching uid may access the doc.
-      allow read, update: if isOwner(uid);
+      allow read: if isOwner(uid);
+
+      // Owner: update their own document, but cannot modify server-managed fields.
+      // `coinBalance` is a denormalized cache maintained exclusively by Cloud
+      // Functions (Admin SDK bypasses rules). Client writes must not alter it.
+      // Satisfies Coins Requirement 5 AC1: balance never stored as a mutable
+      // field that can be set directly without a transaction record.
+      allow update: if isOwner(uid) &&
+        (!('coinBalance' in request.resource.data) ||
+          request.resource.data.coinBalance == resource.data.coinBalance);
 
       // Allow user document creation during registration (owner creates own doc).
-      allow create: if isOwner(uid);
+      // coinBalance must not be set by the client on creation (defaults to 0 via CF).
+      allow create: if isOwner(uid) &&
+        !('coinBalance' in request.resource.data);
 
       // Admin: read any user document (dashboard).
       // Field-level sensitivity (failedLoginAttempts, lockedUntil) is enforced
@@ -180,14 +194,17 @@ service cloud.firestore {
       // -----------------------------------------------------------------------
       // /users/{uid}/coinTransactions/{txId}
       //
-      // Task 8.1 (user-profile spec) — Coin transaction history.
+      // Task 7.1 (coins spec) — Coin transaction history.
       // Owner may read their own coin transactions.
-      // Coin transactions are written by Cloud Functions (server SDK bypasses
-      // rules), so client writes are blocked.
+      // Coin transactions are written exclusively by Cloud Functions (Admin SDK
+      // bypasses rules), so all client writes are denied.
+      //
+      // Satisfies Coins Requirement 5 AC1: balance integrity — transactions
+      // are the source of truth and cannot be tampered with by clients.
       // -----------------------------------------------------------------------
       match /coinTransactions/{txId} {
         allow read: if isOwner(uid);
-        allow write: if false; // Written only by Cloud Functions (server SDK)
+        allow write: if false; // Only Cloud Functions (Admin SDK) can write
       }
     }
 

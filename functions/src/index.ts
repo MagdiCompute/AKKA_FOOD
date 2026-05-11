@@ -45,3 +45,7 @@ export { onOrderStatusChanged } from "./delivery/onOrderStatusChanged";
 export { computeRecommendations } from "./recommendations/computeRecommendations";
 export { onOrderCompletedRecommendations } from "./recommendations/onOrderCompleted";
 export { refreshPopularityRankings } from "./recommendations/refreshPopularityRankings";
+
+// Coins — Loyalty System
+export { onPaymentSuccess } from "./coins/onPaymentSuccess";
+export { redeemCoins } from "./coins/redeemCoins";

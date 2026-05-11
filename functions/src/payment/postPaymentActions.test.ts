@@ -207,15 +207,16 @@ describe("postPaymentActions", () => {
       );
     });
 
-    it("credits coins using FieldValue.increment", async () => {
+    it("does not directly credit coins (handled by onPaymentSuccess trigger)", async () => {
       setupMocks();
 
       await executePostPaymentActions(defaultParams);
 
-      // coins = floor(2000 * 0.05) = 100
-      expect(mockUpdate).toHaveBeenCalledWith(
+      // Coin crediting is now handled by the onPaymentSuccess Firestore trigger
+      // postPaymentActions no longer calls FieldValue.increment for coins
+      expect(mockUpdate).not.toHaveBeenCalledWith(
         expect.objectContaining({
-          coins: "INCREMENT_100",
+          coins: expect.anything(),
         })
       );
     });
@@ -260,15 +261,16 @@ describe("postPaymentActions", () => {
       );
     });
 
-    it("does not credit coins when amount is too small", async () => {
+    it("does not log coin credit messages (handled by onPaymentSuccess trigger)", async () => {
       setupMocks();
 
       await executePostPaymentActions({ ...defaultParams, amount: 10 });
 
-      // coins = floor(10 * 0.05) = 0, so no increment call for coins
-      expect(mockLoggerInfo).toHaveBeenCalledWith(
+      // Coin crediting is now handled by the onPaymentSuccess trigger,
+      // so postPaymentActions no longer logs coin-related messages
+      expect(mockLoggerInfo).not.toHaveBeenCalledWith(
         "No coins to credit (amount too small)",
-        expect.objectContaining({ uid: "user-456", coins: 0 })
+        expect.anything()
       );
     });
 

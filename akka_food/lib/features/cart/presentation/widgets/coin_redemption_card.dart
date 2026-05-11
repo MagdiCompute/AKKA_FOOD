@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:akka_food/features/cart/presentation/notifiers/cart_notifier.dart';
-import 'package:akka_food/features/user_profile/presentation/notifiers/coin_history_notifier.dart';
+import 'package:akka_food/features/coins/presentation/notifiers/coin_notifier.dart';
 
 /// Displays a coin redemption toggle card on the Cart screen.
 ///
@@ -43,13 +43,11 @@ class CoinRedemptionCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Watch the real-time coin balance stream (Req 7.1, 7.6).
-    final coinBalanceAsync = ref.watch(coinBalanceProvider);
+    // Watch the computed CoinBalance from CoinNotifier (Req 2 AC1, 7.1, 7.6).
+    final coinBalanceObj = ref.watch(coinBalanceProvider);
+    final coinBalance = coinBalanceObj.total;
 
-    // While loading or on error, hide the card gracefully.
-    final coinBalance = coinBalanceAsync.valueOrNull ?? 0;
-
-    // Req 7.1 / 7.6 — only show when balance ≥ 1 000.
+    // Req 2 AC1 / 7.1 / 7.6 — only show when balance ≥ 1 000.
     if (coinBalance < 1000) return const SizedBox.shrink();
 
     final cart = ref.watch(cartNotifierProvider);

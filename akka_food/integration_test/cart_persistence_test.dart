@@ -12,8 +12,6 @@
 //
 // Follows the same pattern as cart_flow_test.dart.
 
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -28,7 +26,8 @@ import 'package:akka_food/features/cart/presentation/screens/cart_screen.dart';
 import 'package:akka_food/features/meal_catalog/domain/entities/meal.dart';
 import 'package:akka_food/features/user_profile/domain/entities/delivery_address.dart';
 import 'package:akka_food/features/user_profile/presentation/notifiers/address_notifier.dart';
-import 'package:akka_food/features/user_profile/presentation/notifiers/coin_history_notifier.dart';
+import 'package:akka_food/features/coins/presentation/notifiers/coin_notifier.dart';
+import 'package:akka_food/features/coins/domain/entities/coin_balance.dart';
 
 // =============================================================================
 // Test fixtures
@@ -120,12 +119,9 @@ Widget _buildCartApp({
     overrides: [
       cartRepositoryProvider.overrideWith((_) async => fakeRepo),
       currentUserProvider.overrideWith((ref) => user),
-      coinBalanceProvider.overrideWith((ref) {
-        final controller = StreamController<int>();
-        controller.add(0);
-        ref.onDispose(controller.close);
-        return controller.stream;
-      }),
+      coinBalanceProvider.overrideWithValue(
+        CoinBalance.fromTotal(0),
+      ),
       addressNotifierProvider.overrideWith(() => _FakeAddressNotifier()),
     ],
     child: const MaterialApp(

@@ -10,8 +10,6 @@
 // item as unavailable, then verifies the checkout button is disabled,
 // the unavailable item is highlighted, and removing it re-enables checkout.
 
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -27,7 +25,8 @@ import 'package:akka_food/features/cart/presentation/screens/cart_screen.dart';
 import 'package:akka_food/features/meal_catalog/domain/entities/meal.dart';
 import 'package:akka_food/features/user_profile/domain/entities/delivery_address.dart';
 import 'package:akka_food/features/user_profile/presentation/notifiers/address_notifier.dart';
-import 'package:akka_food/features/user_profile/presentation/notifiers/coin_history_notifier.dart';
+import 'package:akka_food/features/coins/presentation/notifiers/coin_notifier.dart';
+import 'package:akka_food/features/coins/domain/entities/coin_balance.dart';
 
 // =============================================================================
 // Test fixtures
@@ -127,12 +126,9 @@ Widget _buildCartApp({
       // Override current user so auth guards don't interfere.
       currentUserProvider.overrideWith((ref) => user),
       // Override coin balance to 0 (no coin redemption in this test).
-      coinBalanceProvider.overrideWith((ref) {
-        final controller = StreamController<int>();
-        controller.add(0);
-        ref.onDispose(controller.close);
-        return controller.stream;
-      }),
+      coinBalanceProvider.overrideWithValue(
+        CoinBalance.fromTotal(0),
+      ),
       // Override address notifier to return an empty list.
       addressNotifierProvider.overrideWith(() => _FakeAddressNotifier()),
     ],

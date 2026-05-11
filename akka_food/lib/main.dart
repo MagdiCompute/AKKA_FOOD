@@ -1,9 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 import 'core/router/app_router.dart';
+import 'features/user_profile/data/datasources/hive_profile_cache.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialise Hive and open all user-profile cache boxes.
+  await Hive.initFlutter();
+  await Hive.openBox<String>(kProfileCacheBox);
+  await Hive.openBox<String>(kAddressCacheBox);
+  await Hive.openBox<String>(kOrderHistoryCacheBox);
+  await Hive.openBox<String>(kCoinHistoryCacheBox);
+
   runApp(
     // ProviderScope is required for Riverpod to work.
     const ProviderScope(child: AkkaFoodApp()),

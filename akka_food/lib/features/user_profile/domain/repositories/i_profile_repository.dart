@@ -41,4 +41,15 @@ abstract class IProfileRepository {
   ///
   /// Throws on network error.
   Future<void> updateNotificationPrefs(NotificationPreference prefs);
+
+  /// Returns a stale-while-revalidate stream of [UserProfile] for [uid].
+  ///
+  /// Emits the cached profile immediately (if available), then fetches fresh
+  /// data from Firestore in the background and emits the updated profile.
+  ///
+  /// On network error:
+  /// - If cached data was emitted, the stream completes silently (caller
+  ///   should display a connectivity banner).
+  /// - If no cached data was available, the stream emits an error.
+  Stream<UserProfile> watchProfile(String uid);
 }

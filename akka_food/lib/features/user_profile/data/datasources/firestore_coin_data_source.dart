@@ -6,10 +6,10 @@ import '../../domain/entities/coin_transaction.dart';
 /// `/users/{uid}/coinTransactions` subcollection.
 ///
 /// Provides:
-/// - [getCoinBalance] — one-shot fetch that sums all transaction amounts.
-/// - [getCoinTransactions] — paginated list ordered by timestamp descending.
+/// - [getCoinTransactions] — cursor-based paginated list ordered by timestamp
+///   descending (Requirement 6.2, default page size 20).
 /// - [watchCoinBalance] — real-time [Stream] that emits the running balance
-///   whenever the subcollection changes.
+///   whenever the subcollection changes (Requirement 6.6, updates within 5 s).
 ///
 /// Accepts an optional [FirebaseFirestore] instance for testability;
 /// defaults to [FirebaseFirestore.instance] in production.
@@ -27,64 +27,38 @@ class FirestoreCoinDataSource {
       _firestore.collection('users').doc(uid).collection('coinTransactions');
 
   // ---------------------------------------------------------------------------
-  // Coin balance (one-shot)
-  // ---------------------------------------------------------------------------
-
-  /// Returns the current coin balance for [uid] by fetching all transactions
-  /// and summing their [CoinTransaction.amount] fields.
-  ///
-  /// Positive amounts are credits; negative amounts are debits.
-  /// Returns `0` when the user has no transactions.
-  Future<int> getCoinBalance(String uid) async {
-    final snapshot = await _coinTransactions(uid).get();
-
-    if (snapshot.docs.isEmpty) return 0;
-
-    return snapshot.docs.fold<int>(0, (acc, doc) {
-      final amount = (doc.data()['amount'] as num?)?.toInt() ?? 0;
-      return acc + amount;
-    });
-  }
-
-  // ---------------------------------------------------------------------------
-  // Paginated transaction list
+  // Paginated transaction list — cursor-based
   // ---------------------------------------------------------------------------
 
   /// Returns a paginated list of [CoinTransaction] records for [uid], ordered
   /// by `timestamp` descending.
   ///
-  /// [page] is 1-indexed; [pageSize] defaults to 20.
+  /// [pageSize] defaults to 20 (per Requirement 6.2).
   ///
-  /// Implementation note: fetches `pageSize * page` documents from Firestore
-  /// and slices the result in Dart. This is a simple approach suitable for
-  /// moderate transaction histories. For very large histories, cursor-based
-  /// pagination (using [DocumentSnapshot] cursors) would be more efficient.
+  /// [lastDocument] is the last [DocumentSnapshot] from the previous page.
+  /// Pass `null` (or omit it) to fetch the first page. Pass the last document
+  /// of the current page to fetch the next page. This cursor-based approach
+  /// avoids re-reading already-seen documents and scales to large histories.
+  ///
+  /// Returns an empty list when there are no more results.
   Future<List<CoinTransaction>> getCoinTransactions(
     String uid, {
-    int page = 1,
     int pageSize = 20,
+    DocumentSnapshot? lastDocument,
   }) async {
-    assert(page >= 1, 'page must be >= 1');
     assert(pageSize >= 1, 'pageSize must be >= 1');
 
-    final totalToFetch = pageSize * page;
-
-    final snapshot = await _coinTransactions(uid)
+    Query<Map<String, dynamic>> query = _coinTransactions(uid)
         .orderBy('timestamp', descending: true)
-        .limit(totalToFetch)
-        .get();
+        .limit(pageSize);
 
-    final allDocs = snapshot.docs;
-
-    // Skip the first (page - 1) * pageSize results to get the current page.
-    final startIndex = (page - 1) * pageSize;
-    if (startIndex >= allDocs.length) {
-      return const [];
+    if (lastDocument != null) {
+      query = query.startAfterDocument(lastDocument);
     }
 
-    final pageDocs = allDocs.sublist(startIndex);
+    final snapshot = await query.get();
 
-    return pageDocs.map((doc) {
+    return snapshot.docs.map((doc) {
       final data = <String, dynamic>{
         'id': doc.id,
         'uid': uid,
@@ -102,8 +76,10 @@ class FirestoreCoinDataSource {
   /// and pushes a new value whenever the subcollection changes.
   ///
   /// The balance is computed by summing all [CoinTransaction.amount] fields
-  /// in each snapshot. The stream never closes unless the caller cancels the
-  /// subscription.
+  /// in each snapshot. Emits `0` when the user has no transactions
+  /// (Requirement 6.5). The stream never closes unless the caller cancels
+  /// the subscription. Updates are delivered within 5 seconds of a new
+  /// transaction being written to Firestore (Requirement 6.6).
   Stream<int> watchCoinBalance(String uid) {
     return _coinTransactions(uid).snapshots().map((snapshot) {
       if (snapshot.docs.isEmpty) return 0;

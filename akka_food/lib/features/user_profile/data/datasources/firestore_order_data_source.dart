@@ -26,45 +26,39 @@ class FirestoreOrderDataSource {
       _firestore.collection('orders');
 
   // ---------------------------------------------------------------------------
-  // Order history
+  // Order history — cursor-based pagination
   // ---------------------------------------------------------------------------
 
   /// Returns a paginated list of [OrderSummary] records for [uid], ordered
   /// by `createdAt` descending.
   ///
-  /// [page] is 1-indexed; [pageSize] defaults to 20.
+  /// [pageSize] defaults to 20 (per Requirement 5.1).
   ///
-  /// Implementation note: fetches `pageSize * page` documents from Firestore
-  /// and slices the result in Dart. This is a simple approach suitable for
-  /// moderate history sizes. For very large histories, cursor-based pagination
-  /// (using [DocumentSnapshot] cursors) would be more efficient.
-  Future<List<OrderSummary>> getOrderHistory(
+  /// [lastDocument] is the last [DocumentSnapshot] from the previous page.
+  /// Pass `null` (or omit it) to fetch the first page. Pass the last document
+  /// of the current page to fetch the next page. This cursor-based approach
+  /// avoids re-reading already-seen documents and scales to large histories.
+  ///
+  /// Returns an empty list when there are no more results.
+  Future<List<OrderSummary>> getOrders(
     String uid, {
-    int page = 1,
     int pageSize = 20,
+    DocumentSnapshot? lastDocument,
   }) async {
-    assert(page >= 1, 'page must be >= 1');
     assert(pageSize >= 1, 'pageSize must be >= 1');
 
-    final totalToFetch = pageSize * page;
-
-    final snapshot = await _ordersCollection
+    Query<Map<String, dynamic>> query = _ordersCollection
         .where('uid', isEqualTo: uid)
         .orderBy('createdAt', descending: true)
-        .limit(totalToFetch)
-        .get();
+        .limit(pageSize);
 
-    final allDocs = snapshot.docs;
-
-    // Skip the first (page - 1) * pageSize results to get the current page.
-    final startIndex = (page - 1) * pageSize;
-    if (startIndex >= allDocs.length) {
-      return const [];
+    if (lastDocument != null) {
+      query = query.startAfterDocument(lastDocument);
     }
 
-    final pageDocs = allDocs.sublist(startIndex);
+    final snapshot = await query.get();
 
-    return pageDocs.map((doc) {
+    return snapshot.docs.map((doc) {
       final data = <String, dynamic>{
         'orderId': doc.id,
         ...doc.data(),
@@ -74,13 +68,13 @@ class FirestoreOrderDataSource {
   }
 
   // ---------------------------------------------------------------------------
-  // Order detail
+  // Single order fetch
   // ---------------------------------------------------------------------------
 
   /// Returns the full [OrderSummary] for the given [orderId].
   ///
   /// Throws a [StateError] if the document does not exist.
-  Future<OrderSummary> getOrderDetail(String orderId) async {
+  Future<OrderSummary> getOrderById(String orderId) async {
     final snapshot = await _ordersCollection.doc(orderId).get();
 
     if (!snapshot.exists || snapshot.data() == null) {

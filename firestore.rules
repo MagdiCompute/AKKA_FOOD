@@ -109,6 +109,39 @@ service cloud.firestore {
 
       // Admin writes go through Cloud Functions only — block direct client writes.
       // allow update: if isAdmin();  // intentionally omitted — use CF path
+
+      // -----------------------------------------------------------------------
+      // /users/{uid}/addresses/{addressId}
+      //
+      // Task 8.1 (user-profile spec) — User profile subcollections.
+      // Owner may read and write their own addresses.
+      // -----------------------------------------------------------------------
+      match /addresses/{addressId} {
+        allow read, write: if isOwner(uid);
+      }
+
+      // -----------------------------------------------------------------------
+      // /users/{uid}/notificationPrefs
+      //
+      // Task 8.1 (user-profile spec) — Notification preferences.
+      // Owner may read and write their own notification preferences.
+      // -----------------------------------------------------------------------
+      match /notificationPrefs {
+        allow read, write: if isOwner(uid);
+      }
+
+      // -----------------------------------------------------------------------
+      // /users/{uid}/coinTransactions/{txId}
+      //
+      // Task 8.1 (user-profile spec) — Coin transaction history.
+      // Owner may read their own coin transactions.
+      // Coin transactions are written by Cloud Functions (server SDK bypasses
+      // rules), so client writes are blocked.
+      // -----------------------------------------------------------------------
+      match /coinTransactions/{txId} {
+        allow read: if isOwner(uid);
+        allow write: if false; // Written only by Cloud Functions (server SDK)
+      }
     }
 
     // -------------------------------------------------------------------------

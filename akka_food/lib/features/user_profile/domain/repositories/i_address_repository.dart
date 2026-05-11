@@ -34,4 +34,16 @@ abstract class IAddressRepository {
   ///
   /// Throws if the address does not exist or the caller is unauthorised.
   Future<void> setDefaultAddress(String uid, String addressId);
+
+  /// Returns a stale-while-revalidate stream of [DeliveryAddress] records for
+  /// [uid].
+  ///
+  /// Emits the cached address list immediately (if available), then fetches
+  /// fresh data from Firestore in the background and emits the updated list.
+  ///
+  /// On network error:
+  /// - If cached data was emitted, the stream completes silently (caller
+  ///   should display a connectivity banner).
+  /// - If no cached data was available, the stream emits an error.
+  Stream<List<DeliveryAddress>> watchAddresses(String uid);
 }

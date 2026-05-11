@@ -21,4 +21,19 @@ abstract class IOrderRepository {
   ///
   /// Throws if the order does not exist or the caller is unauthorised.
   Future<OrderSummary> getOrderDetail(String orderId);
+
+  /// Returns a stale-while-revalidate stream of the first page of
+  /// [OrderSummary] records for [uid], ordered by order date descending.
+  ///
+  /// Emits the cached first page immediately (if available), then fetches
+  /// fresh data from Firestore in the background and emits the updated list.
+  ///
+  /// On network error:
+  /// - If cached data was emitted, the stream completes silently (caller
+  ///   should display a connectivity banner).
+  /// - If no cached data was available, the stream emits an error.
+  Stream<List<OrderSummary>> watchOrderHistory(
+    String uid, {
+    int pageSize = 20,
+  });
 }

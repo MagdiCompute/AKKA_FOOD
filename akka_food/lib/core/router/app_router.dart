@@ -20,6 +20,14 @@ import '../../features/auth/presentation/screens/forgot_password_screen.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/otp_verification_screen.dart';
 import '../../features/auth/presentation/screens/sign_up_screen.dart';
+import '../../features/user_profile/presentation/screens/address_form_screen.dart';
+import '../../features/user_profile/presentation/screens/address_list_screen.dart';
+import '../../features/user_profile/presentation/screens/coin_history_screen.dart';
+import '../../features/user_profile/presentation/screens/edit_profile_screen.dart';
+import '../../features/user_profile/presentation/screens/notification_prefs_screen.dart';
+import '../../features/user_profile/presentation/screens/order_detail_screen.dart';
+import '../../features/user_profile/presentation/screens/order_history_screen.dart';
+import '../../features/user_profile/presentation/screens/profile_screen.dart';
 
 // ---------------------------------------------------------------------------
 // Route path constants
@@ -35,6 +43,17 @@ abstract final class AppRoutes {
   static const otp = '/otp';
   static const forgotPassword = '/forgot-password';
   static const changePassword = '/change-password';
+
+  // User Profile
+  static const profile = '/profile';
+  static const editProfile = '/profile/edit';
+  static const addresses = '/profile/addresses';
+  static const addressNew = '/profile/addresses/new';
+  static const addressEdit = '/profile/addresses/:addressId/edit';
+  static const orderHistory = '/profile/orders';
+  static const orderDetail = '/profile/orders/:orderId';
+  static const coinHistory = '/profile/coins';
+  static const notificationPrefs = '/profile/notifications';
 
   // Admin root
   static const adminPrefix = '/admin';
@@ -236,6 +255,48 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.home,
         builder: (context, state) => const HomeScreen(),
+      ),
+
+      // ── User Profile ───────────────────────────────────────────────────
+      GoRoute(
+        path: AppRoutes.profile,
+        builder: (context, state) => const ProfileScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.editProfile,
+        builder: (context, state) => const EditProfileScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.addresses,
+        builder: (context, state) => const AddressListScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.addressNew,
+        builder: (context, state) => const AddressFormScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.addressEdit,
+        builder: (context, state) => AddressFormScreen(
+          addressId: state.pathParameters['addressId'],
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.orderHistory,
+        builder: (context, state) => const OrderHistoryScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.orderDetail,
+        builder: (context, state) => OrderDetailScreen(
+          orderId: state.pathParameters['orderId']!,
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.coinHistory,
+        builder: (context, state) => const CoinHistoryScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.notificationPrefs,
+        builder: (context, state) => const NotificationPrefsScreen(),
       ),
       GoRoute(
         path: AppRoutes.adminPrefix,

@@ -1,0 +1,60 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // -------------------------------------------------------------------------
+    // Helper functions
+    // -------------------------------------------------------------------------
+
+    /// Returns true when the requesting user is authenticated.
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    /// Returns true when the requesting user owns the path (uid matches).
+    function isOwner(uid) {
+      return isAuthenticated() && request.auth.uid == uid;
+    }
+
+    // -------------------------------------------------------------------------
+    // /avatars/{uid}/**
+    //
+    // Task 8.3 (user-profile spec) — Avatar storage rules.
+    //
+    // Access model:
+    //   • Read:  publicly accessible — no authentication required.
+    //            Avatars are displayed in the app and potentially in order
+    //            history / leaderboard views where the viewer may not be
+    //            the owner.
+    //   • Write: only the matching authenticated user may upload or delete
+    //            their own avatar files.
+    //            Satisfies Requirement 3.1: Profile_Service stores the image
+    //            and generates a publicly accessible URL.
+    //
+    // Path convention: /avatars/{uid}/{timestamp}.jpg
+    // -------------------------------------------------------------------------
+    match /avatars/{uid}/{allPaths=**} {
+      // Publicly readable — avatar URLs are embedded in Firestore and rendered
+      // by any user viewing a profile, order, or leaderboard entry.
+      allow read: if true;
+
+      // Only the owner may upload or delete their own avatar files.
+      // Validates: file size ≤ 5 MB and content type is JPEG or PNG.
+      allow write: if isOwner(uid)
+        && request.resource.size <= 5 * 1024 * 1024
+        && request.resource.contentType.matches('image/(jpeg|png)');
+
+      // Allow delete without resource metadata check (no request.resource on delete).
+      allow delete: if isOwner(uid);
+    }
+
+    // -------------------------------------------------------------------------
+    // Default deny — all other paths are blocked unless explicitly allowed.
+    // -------------------------------------------------------------------------
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+
+  }
+}

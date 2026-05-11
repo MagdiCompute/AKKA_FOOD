@@ -59,11 +59,21 @@ dependencies:
   # Image picking
   image_picker: ^1.1.2
 
+  # Image compression
+  flutter_image_compress: ^2.3.0
+
+  # Path utilities
+  path: ^1.9.1
+  path_provider: ^2.1.5
+
   # Charts (analytics screen)
   fl_chart: ^0.69.0
 
   # Local caching
   hive_flutter: ^1.1.0
+
+  # Internationalisation / date & number formatting
+  intl: ^0.20.2
 
 dev_dependencies:
   flutter_test:
@@ -79,6 +89,9 @@ dev_dependencies:
   freezed: ^3.1.0
   json_serializable: ^6.9.5
   riverpod_generator: ^2.6.5
+
+  # Testing
+  fake_cloud_firestore: ^3.1.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

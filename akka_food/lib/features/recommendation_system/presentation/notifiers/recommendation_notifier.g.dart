@@ -53,7 +53,7 @@ final catalogCacheProvider = AutoDisposeProvider<HiveCatalogCache>.internal(
 // ignore: unused_element
 typedef CatalogCacheRef = AutoDisposeProviderRef<HiveCatalogCache>;
 String _$recommendationNotifierHash() =>
-    r'a32039214f6630529c4d03b37c7831b2081d011e';
+    r'04ca263bc11c34c742667de822c18c297ab201bd';
 
 /// Manages the recommendation state for the "Recommended for You" section.
 ///

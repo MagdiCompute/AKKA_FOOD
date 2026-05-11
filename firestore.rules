@@ -54,20 +54,56 @@ service cloud.firestore {
     // -------------------------------------------------------------------------
     // /orders/{orderId}
     //
-    // Task 8.2 — /orders readable by admin role (all orders).
-    // A regular user may only read their own orders.
-    // Order creation is done by authenticated users (checkout flow).
-    // Status updates go through Cloud Functions (admin only).
+    // Task 7.2 (payment-processing spec) — Order security rules.
+    //
+    // Access model:
+    //   • Read: An authenticated user whose uid matches the order's uid field
+    //     may read the document (order history, confirmation). Admins may read
+    //     any order (dashboard / support use).
+    //   • Write: All client writes are denied. Orders are created exclusively
+    //     by Cloud Functions (Admin SDK) after successful payment confirmation
+    //     in the orangeMoneyCallback function. The Admin SDK bypasses Security
+    //     Rules entirely.
+    //
+    // Satisfies Requirement 2.2: Order created by Order_Service (Cloud Function)
+    // upon payment-success event.
     // -------------------------------------------------------------------------
     match /orders/{orderId} {
-      // Admin can read any order; a user can only read their own.
-      allow read: if isAdmin() || (isAuthenticated() && resource.data.uid == request.auth.uid);
+      allow read: if isAuthenticated() &&
+        (request.auth.uid == resource.data.uid || isAdmin());
+      allow write: if false; // Only Cloud Functions (Admin SDK) can write
+    }
 
-      // Any authenticated user can create an order (checkout).
-      allow create: if isAuthenticated() && request.resource.data.uid == request.auth.uid;
+    // -------------------------------------------------------------------------
+    // /transactions/{transactionId}
+    //
+    // Task 7.1 (payment-processing spec) — Transaction security rules.
+    //
+    // Access model:
+    //   • Read: Only the authenticated user whose uid matches the transaction's
+    //     uid field may read the document (payment history, real-time status).
+    //   • Write: All client writes are denied. Transaction documents are created
+    //     and updated exclusively by Cloud Functions using the Admin SDK (which
+    //     bypasses Security Rules entirely).
+    //
+    // Satisfies Requirement 6: Security and Compliance — payment data handled
+    // securely; users can only read their own transactions.
+    // -------------------------------------------------------------------------
+    match /transactions/{transactionId} {
+      allow read: if isAuthenticated() && request.auth.uid == resource.data.uid;
+      allow write: if false; // Only Cloud Functions (Admin SDK) can write
 
-      // Updates and deletes are admin-only (status changes go through Cloud Functions).
-      allow update, delete: if isAdmin();
+      // ---------------------------------------------------------------------
+      // /transactions/{transactionId}/cartSnapshot/{doc}
+      //
+      // Cart snapshot subcollection — stores the cart state at payment
+      // initiation time. Same access model as the parent transaction.
+      // ---------------------------------------------------------------------
+      match /cartSnapshot/{doc} {
+        allow read: if isAuthenticated() &&
+          request.auth.uid == get(/databases/$(database)/documents/transactions/$(transactionId)).data.uid;
+        allow write: if false; // Only Cloud Functions (Admin SDK) can write
+      }
     }
 
     // -------------------------------------------------------------------------

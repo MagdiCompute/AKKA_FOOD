@@ -22,6 +22,10 @@ import '../../features/auth/presentation/screens/forgot_password_screen.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/otp_verification_screen.dart';
 import '../../features/auth/presentation/screens/sign_up_screen.dart';
+import '../../features/payment_processing/presentation/screens/checkout_screen.dart';
+import '../../features/payment_processing/presentation/screens/order_confirmation_screen.dart';
+import '../../features/payment_processing/presentation/screens/payment_failure_screen.dart';
+import '../../features/payment_processing/presentation/screens/payment_processing_screen.dart';
 import '../../features/user_profile/presentation/screens/address_form_screen.dart';
 import '../../features/user_profile/presentation/screens/address_list_screen.dart';
 import '../../features/user_profile/presentation/screens/coin_history_screen.dart';
@@ -60,6 +64,9 @@ abstract final class AppRoutes {
   // Cart & Payment
   static const cart = '/cart';
   static const payment = '/payment';
+  static const paymentProcessing = '/payment/processing';
+  static const paymentConfirmation = '/payment/confirmation';
+  static const paymentFailure = '/payment/failure';
 
   // Admin root
   static const adminPrefix = '/admin';
@@ -301,6 +308,24 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.cart,
         builder: (context, state) => const CartScreen(),
+      ),
+
+      // ── Payment ────────────────────────────────────────────────────────
+      GoRoute(
+        path: AppRoutes.payment,
+        builder: (context, state) => const CheckoutScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.paymentProcessing,
+        builder: (context, state) => const PaymentProcessingScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.paymentConfirmation,
+        builder: (context, state) => const OrderConfirmationScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.paymentFailure,
+        builder: (context, state) => const PaymentFailureScreen(),
       ),
 
       // ── User Profile ───────────────────────────────────────────────────

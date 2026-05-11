@@ -33,7 +33,7 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.onNutritionalInfoValidationUpdated = exports.onNutritionalInfoValidationCreated = exports.onMealWriteValidationUpdated = exports.onMealWriteValidationCreated = exports.onCategoryDeactivated = exports.onMealDeleted = exports.onMealUpdated = exports.onMealCreated = exports.checkOtpRateLimit = exports.resetLoginAttempts = exports.recordFailedLoginAttempt = exports.checkAccountLock = exports.onUserDeleted = exports.onUserCreated = exports.aggregateAnalytics = exports.adminManageUser = exports.adminManageCategory = exports.adminDeleteMeal = exports.adminUpdateMeal = exports.adminCreateMeal = exports.adminUpdateOrderStatus = void 0;
+exports.initiatePayment = exports.onNutritionalInfoValidationUpdated = exports.onNutritionalInfoValidationCreated = exports.onMealWriteValidationUpdated = exports.onMealWriteValidationCreated = exports.onCategoryDeactivated = exports.onMealDeleted = exports.onMealUpdated = exports.onMealCreated = exports.checkOtpRateLimit = exports.resetLoginAttempts = exports.recordFailedLoginAttempt = exports.checkAccountLock = exports.onUserDeleted = exports.onUserCreated = exports.aggregateAnalytics = exports.adminManageUser = exports.adminManageCategory = exports.adminDeleteMeal = exports.adminUpdateMeal = exports.adminCreateMeal = exports.adminUpdateOrderStatus = void 0;
 const admin = __importStar(require("firebase-admin"));
 // Initialize Firebase Admin SDK once
 if (!admin.apps.length) {
@@ -77,4 +77,7 @@ Object.defineProperty(exports, "onMealWriteValidationCreated", { enumerable: tru
 Object.defineProperty(exports, "onMealWriteValidationUpdated", { enumerable: true, get: function () { return meal_validation_1.onMealWriteValidationUpdated; } });
 Object.defineProperty(exports, "onNutritionalInfoValidationCreated", { enumerable: true, get: function () { return meal_validation_1.onNutritionalInfoValidationCreated; } });
 Object.defineProperty(exports, "onNutritionalInfoValidationUpdated", { enumerable: true, get: function () { return meal_validation_1.onNutritionalInfoValidationUpdated; } });
+// Payment Processing
+var initiatePayment_1 = require("./payment/initiatePayment");
+Object.defineProperty(exports, "initiatePayment", { enumerable: true, get: function () { return initiatePayment_1.initiatePayment; } });
 //# sourceMappingURL=index.js.map

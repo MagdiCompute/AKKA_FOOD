@@ -31,3 +31,9 @@ export {
   onNutritionalInfoValidationCreated,
   onNutritionalInfoValidationUpdated,
 } from "./meal_catalog/meal_validation";
+
+// Payment Processing
+export { initiatePayment } from "./payment/initiatePayment";
+export { orangeMoneyCallback } from "./payment/orangeMoneyCallback";
+export { expireStaleTransactions } from "./payment/expireStaleTransactions";
+export { createOrder } from "./payment/createOrder";

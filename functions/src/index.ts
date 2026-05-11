@@ -17,3 +17,17 @@ export { onUserCreated } from "./auth/onUserCreated";
 export { onUserDeleted } from "./auth/onUserDeleted";
 export { checkAccountLock, recordFailedLoginAttempt, resetLoginAttempts } from "./auth/checkAccountLock";
 export { checkOtpRateLimit } from "./auth/otpRateLimit";
+
+// Meal Catalog — Algolia sync
+export { onMealCreated, onMealUpdated, onMealDeleted } from "./meal_catalog/algolia_sync";
+
+// Meal Catalog — Category deactivation cascade
+export { onCategoryDeactivated } from "./meal_catalog/category_deactivated";
+
+// Meal Catalog — Meal validation (price, name uniqueness, nutritional info)
+export {
+  onMealWriteValidationCreated,
+  onMealWriteValidationUpdated,
+  onNutritionalInfoValidationCreated,
+  onNutritionalInfoValidationUpdated,
+} from "./meal_catalog/meal_validation";

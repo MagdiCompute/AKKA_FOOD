@@ -72,6 +72,9 @@ dependencies:
   # Local caching
   hive_flutter: ^1.1.0
 
+  # Search
+  algoliasearch: ^1.49.1
+
   # Internationalisation / date & number formatting
   intl: ^0.20.2
 

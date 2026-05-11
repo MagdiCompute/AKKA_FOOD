@@ -50,6 +50,30 @@ service firebase.storage {
     }
 
     // -------------------------------------------------------------------------
+    // /meals/{allPaths=**}
+    //
+    // Task 9.2 (meal-catalog spec) — Meal image storage rules.
+    //
+    // Access model:
+    //   • Read:  publicly accessible — no authentication required.
+    //            Meal images are displayed in the catalog and detail screens
+    //            for all users, including unauthenticated browsing.
+    //   • Write: only admin role may upload or delete meal images.
+    //            Admin role is verified by reading /users/{uid}.role from
+    //            Firestore (server-side cross-service check).
+    //
+    // Path convention: /meals/{mealId}/{index}.jpg
+    // -------------------------------------------------------------------------
+    match /meals/{allPaths=**} {
+      // Publicly readable — meal images are shown to all catalog viewers.
+      allow read: if true;
+
+      // Only admin may write (upload, update, delete) meal images.
+      allow write: if request.auth != null
+        && firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    // -------------------------------------------------------------------------
     // Default deny — all other paths are blocked unless explicitly allowed.
     // -------------------------------------------------------------------------
     match /{allPaths=**} {

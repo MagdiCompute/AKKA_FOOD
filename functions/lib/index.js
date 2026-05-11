@@ -33,7 +33,7 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.checkOtpRateLimit = exports.resetLoginAttempts = exports.recordFailedLoginAttempt = exports.checkAccountLock = exports.onUserDeleted = exports.onUserCreated = exports.aggregateAnalytics = exports.adminManageUser = exports.adminManageCategory = exports.adminDeleteMeal = exports.adminUpdateMeal = exports.adminCreateMeal = exports.adminUpdateOrderStatus = void 0;
+exports.onNutritionalInfoValidationUpdated = exports.onNutritionalInfoValidationCreated = exports.onMealWriteValidationUpdated = exports.onMealWriteValidationCreated = exports.onCategoryDeactivated = exports.onMealDeleted = exports.onMealUpdated = exports.onMealCreated = exports.checkOtpRateLimit = exports.resetLoginAttempts = exports.recordFailedLoginAttempt = exports.checkAccountLock = exports.onUserDeleted = exports.onUserCreated = exports.aggregateAnalytics = exports.adminManageUser = exports.adminManageCategory = exports.adminDeleteMeal = exports.adminUpdateMeal = exports.adminCreateMeal = exports.adminUpdateOrderStatus = void 0;
 const admin = __importStar(require("firebase-admin"));
 // Initialize Firebase Admin SDK once
 if (!admin.apps.length) {
@@ -63,4 +63,18 @@ Object.defineProperty(exports, "recordFailedLoginAttempt", { enumerable: true, g
 Object.defineProperty(exports, "resetLoginAttempts", { enumerable: true, get: function () { return checkAccountLock_1.resetLoginAttempts; } });
 var otpRateLimit_1 = require("./auth/otpRateLimit");
 Object.defineProperty(exports, "checkOtpRateLimit", { enumerable: true, get: function () { return otpRateLimit_1.checkOtpRateLimit; } });
+// Meal Catalog — Algolia sync
+var algolia_sync_1 = require("./meal_catalog/algolia_sync");
+Object.defineProperty(exports, "onMealCreated", { enumerable: true, get: function () { return algolia_sync_1.onMealCreated; } });
+Object.defineProperty(exports, "onMealUpdated", { enumerable: true, get: function () { return algolia_sync_1.onMealUpdated; } });
+Object.defineProperty(exports, "onMealDeleted", { enumerable: true, get: function () { return algolia_sync_1.onMealDeleted; } });
+// Meal Catalog — Category deactivation cascade
+var category_deactivated_1 = require("./meal_catalog/category_deactivated");
+Object.defineProperty(exports, "onCategoryDeactivated", { enumerable: true, get: function () { return category_deactivated_1.onCategoryDeactivated; } });
+// Meal Catalog — Meal validation (price, name uniqueness, nutritional info)
+var meal_validation_1 = require("./meal_catalog/meal_validation");
+Object.defineProperty(exports, "onMealWriteValidationCreated", { enumerable: true, get: function () { return meal_validation_1.onMealWriteValidationCreated; } });
+Object.defineProperty(exports, "onMealWriteValidationUpdated", { enumerable: true, get: function () { return meal_validation_1.onMealWriteValidationUpdated; } });
+Object.defineProperty(exports, "onNutritionalInfoValidationCreated", { enumerable: true, get: function () { return meal_validation_1.onNutritionalInfoValidationCreated; } });
+Object.defineProperty(exports, "onNutritionalInfoValidationUpdated", { enumerable: true, get: function () { return meal_validation_1.onNutritionalInfoValidationUpdated; } });
 //# sourceMappingURL=index.js.map

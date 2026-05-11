@@ -1,0 +1,29 @@
+{
+  "indexName": "meals",
+  "settings": {
+    "searchableAttributes": ["name", "description", "dietaryTags"],
+    "attributesForFaceting": [
+      "filterOnly(categoryId)",
+      "filterOnly(isAvailable)",
+      "filterOnly(dietaryTags)",
+      "filterOnly(price)"
+    ],
+    "customRanking": ["desc(popularityScore)"],
+    "replicas": [
+      "meals_price_asc",
+      "meals_price_desc",
+      "meals_newest_first"
+    ]
+  },
+  "replicaSettings": {
+    "meals_price_asc": {
+      "ranking": ["asc(price)"]
+    },
+    "meals_price_desc": {
+      "ranking": ["desc(price)"]
+    },
+    "meals_newest_first": {
+      "ranking": ["desc(createdAt)"]
+    }
+  }
+}

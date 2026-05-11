@@ -30,14 +30,25 @@ service cloud.firestore {
     // /meals/{mealId}
     //
     // Task 8.1 — /meals writable only by admin role.
+    // Task 7.2 (recommendation-system) — popularityScore protection.
+    //
     // Any authenticated user may read meals (catalog browsing).
-    // All writes (create, update, delete) go through Cloud Functions which
-    // verify the admin role server-side; the rules here add a defence-in-depth
-    // layer so direct client writes are also blocked.
+    // Admin may create/update/delete meals via client SDK, but the
+    // `popularityScore` field is protected:
+    //   • On create: must be 0 (Cloud Functions will increment it later)
+    //   • On update: must remain unchanged (only Cloud Functions using the
+    //     Admin SDK — which bypasses Security Rules — can increment it)
+    //
+    // This ensures popularity scores are exclusively managed by the
+    // `onOrderCompletedRecommendations` Cloud Function trigger.
     // -------------------------------------------------------------------------
     match /meals/{mealId} {
       allow read: if isAuthenticated();
-      allow write: if isAdmin();
+      allow create: if isAdmin() &&
+        request.resource.data.popularityScore == 0;
+      allow update: if isAdmin() &&
+        request.resource.data.popularityScore == resource.data.popularityScore;
+      allow delete: if isAdmin();
     }
 
     // -------------------------------------------------------------------------

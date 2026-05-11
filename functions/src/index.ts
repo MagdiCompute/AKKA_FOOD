@@ -40,3 +40,8 @@ export { createOrder } from "./payment/createOrder";
 
 // Delivery System
 export { onOrderStatusChanged } from "./delivery/onOrderStatusChanged";
+
+// Recommendation System
+export { computeRecommendations } from "./recommendations/computeRecommendations";
+export { onOrderCompletedRecommendations } from "./recommendations/onOrderCompleted";
+export { refreshPopularityRankings } from "./recommendations/refreshPopularityRankings";

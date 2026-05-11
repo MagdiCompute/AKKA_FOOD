@@ -33,19 +33,54 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.buildNotificationPayload = buildNotificationPayload;
 exports.sendOrderStatusNotification = sendOrderStatusNotification;
 const admin = __importStar(require("firebase-admin"));
 /**
- * Human-readable labels for each delivery status, used in push notification bodies.
+ * Builds the push notification payload for a given delivery status.
+ * Payloads match the design doc specification exactly.
+ *
+ * @param status - The new delivery status string.
+ * @param orderId - The Firestore order document ID.
+ * @param etaMinutes - Optional ETA in minutes (used for out_for_delivery).
+ * @returns Notification payload with title, body, and data, or null for unknown statuses.
  */
-const STATUS_LABELS = {
-    confirmed: "Your order has been confirmed!",
-    preparing: "Your order is being prepared.",
-    ready_for_pickup: "Your order is ready for pickup.",
-    out_for_delivery: "Your order is on its way!",
-    delivered: "Your order has been delivered. Enjoy!",
-    cancelled: "Your order has been cancelled.",
-};
+function buildNotificationPayload(status, orderId, etaMinutes) {
+    switch (status) {
+        case "confirmed":
+            return {
+                title: "Order confirmed",
+                body: "Your order has been confirmed!",
+                data: { orderId },
+            };
+        case "preparing":
+            return {
+                title: "Order update",
+                body: "Your order is being prepared.",
+                data: { orderId },
+            };
+        case "out_for_delivery":
+            return {
+                title: "Your order is on the way!",
+                body: `ETA: ${etaMinutes !== null && etaMinutes !== void 0 ? etaMinutes : "?"} minutes`,
+                data: { orderId },
+            };
+        case "delivered":
+            return {
+                title: "Order delivered!",
+                body: "Tap to rate your experience",
+                data: { orderId },
+            };
+        case "failed":
+            return {
+                title: "Delivery issue",
+                body: "We couldn't deliver your order. We'll contact you shortly.",
+                data: { orderId },
+            };
+        default:
+            return null;
+    }
+}
 /**
  * Sends a push notification to the customer when their order status changes.
  *
@@ -53,31 +88,41 @@ const STATUS_LABELS = {
  * Silently skips if the user has no FCM token (e.g. they haven't granted
  * notification permission or the token hasn't been stored yet).
  *
+ * The notification includes:
+ * - Per-status title and body matching the design doc
+ * - Data payload with orderId, status, and type for deep linking
+ * - Android notification channel ("order_updates") with high priority
+ * - iOS default sound
+ *
  * @param orderId  - The Firestore order document ID.
  * @param uid      - The customer's Firebase Auth UID.
  * @param newStatus - The new delivery status string.
  * @param etaMinutes - Optional ETA in minutes (only relevant for out_for_delivery).
  */
 async function sendOrderStatusNotification(orderId, uid, newStatus, etaMinutes) {
-    var _a;
     const db = admin.firestore();
     const userSnap = await db.doc(`users/${uid}`).get();
     if (!userSnap.exists)
         return;
-    const fcmToken = (_a = userSnap.data()) === null || _a === void 0 ? void 0 : _a["fcmToken"];
+    const userData = userSnap.data();
+    const fcmToken = userData === null || userData === void 0 ? void 0 : userData["fcmToken"];
     if (!fcmToken)
         return;
-    const body = buildNotificationBody(newStatus, etaMinutes);
+    // Check user notification preferences — default to enabled if not explicitly set
+    const preferences = userData === null || userData === void 0 ? void 0 : userData["preferences"];
+    const notificationsEnabled = (preferences === null || preferences === void 0 ? void 0 : preferences.notificationsEnabled) !== false;
+    if (!notificationsEnabled)
+        return;
+    const payload = buildNotificationPayload(newStatus, orderId, etaMinutes);
+    if (!payload)
+        return;
     const message = {
         token: fcmToken,
         notification: {
-            title: "Order Update",
-            body,
+            title: payload.title,
+            body: payload.body,
         },
-        data: {
-            orderId,
-            status: newStatus,
-        },
+        data: Object.assign(Object.assign({}, payload.data), { status: newStatus, type: "order_status_update" }),
         android: {
             notification: {
                 channelId: "order_updates",
@@ -99,12 +144,5 @@ async function sendOrderStatusNotification(orderId, uid, newStatus, etaMinutes) 
         // Log but don't fail the status update if notification delivery fails.
         console.error(`[sendOrderStatusNotification] Failed to send FCM message for order ${orderId}:`, err);
     }
-}
-function buildNotificationBody(status, etaMinutes) {
-    var _a;
-    if (status === "out_for_delivery" && typeof etaMinutes === "number") {
-        return `Your order is on its way! Estimated arrival: ${etaMinutes} minute${etaMinutes === 1 ? "" : "s"}.`;
-    }
-    return (_a = STATUS_LABELS[status]) !== null && _a !== void 0 ? _a : `Your order status has been updated to: ${status}.`;
 }
 //# sourceMappingURL=sendOrderStatusNotification.js.map

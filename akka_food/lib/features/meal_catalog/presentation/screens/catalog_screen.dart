@@ -195,13 +195,8 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
                 ),
 
               // ── Recommended section ────────────────────────────────────
-              // Uses popularityScore as a proxy for recommendations until
-              // the Cloud Function endpoint is wired up (task 6.5).
-              SliverToBoxAdapter(
-                child: RecommendedSection(
-                  recommendedMeals: _buildRecommendedList(state.allMeals),
-                  onMealTap: (meal) => _navigateToMealDetail(context, meal),
-                ),
+              const SliverToBoxAdapter(
+                child: RecommendedSection(),
               ),
 
               // ── Section header ─────────────────────────────────────────
@@ -434,16 +429,7 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
     );
   }
 
-  // ---------------------------------------------------------------------------
-  // Recommended list — proxy using popularity until Cloud Function is wired.
-  // ---------------------------------------------------------------------------
 
-  List<Meal> _buildRecommendedList(List<Meal> allMeals) {
-    final sorted = List<Meal>.from(allMeals)
-      ..sort((a, b) => b.popularityScore.compareTo(a.popularityScore));
-    // Return top 10, but only if there are at least 3 (hidden otherwise).
-    return sorted.take(10).toList();
-  }
 
   // ---------------------------------------------------------------------------
   // Error states

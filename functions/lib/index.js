@@ -33,7 +33,7 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.onOrderStatusChanged = exports.createOrder = exports.expireStaleTransactions = exports.orangeMoneyCallback = exports.initiatePayment = exports.onNutritionalInfoValidationUpdated = exports.onNutritionalInfoValidationCreated = exports.onMealWriteValidationUpdated = exports.onMealWriteValidationCreated = exports.onCategoryDeactivated = exports.onMealDeleted = exports.onMealUpdated = exports.onMealCreated = exports.checkOtpRateLimit = exports.resetLoginAttempts = exports.recordFailedLoginAttempt = exports.checkAccountLock = exports.onUserDeleted = exports.onUserCreated = exports.aggregateAnalytics = exports.adminManageUser = exports.adminManageCategory = exports.adminDeleteMeal = exports.adminUpdateMeal = exports.adminCreateMeal = exports.adminUpdateOrderStatus = void 0;
+exports.computeRecommendations = exports.onOrderStatusChanged = exports.createOrder = exports.expireStaleTransactions = exports.orangeMoneyCallback = exports.initiatePayment = exports.onNutritionalInfoValidationUpdated = exports.onNutritionalInfoValidationCreated = exports.onMealWriteValidationUpdated = exports.onMealWriteValidationCreated = exports.onCategoryDeactivated = exports.onMealDeleted = exports.onMealUpdated = exports.onMealCreated = exports.checkOtpRateLimit = exports.resetLoginAttempts = exports.recordFailedLoginAttempt = exports.checkAccountLock = exports.onUserDeleted = exports.onUserCreated = exports.aggregateAnalytics = exports.adminManageUser = exports.adminManageCategory = exports.adminDeleteMeal = exports.adminUpdateMeal = exports.adminCreateMeal = exports.adminUpdateOrderStatus = void 0;
 const admin = __importStar(require("firebase-admin"));
 // Initialize Firebase Admin SDK once
 if (!admin.apps.length) {
@@ -89,4 +89,7 @@ Object.defineProperty(exports, "createOrder", { enumerable: true, get: function 
 // Delivery System
 var onOrderStatusChanged_1 = require("./delivery/onOrderStatusChanged");
 Object.defineProperty(exports, "onOrderStatusChanged", { enumerable: true, get: function () { return onOrderStatusChanged_1.onOrderStatusChanged; } });
+// Recommendation System
+var computeRecommendations_1 = require("./recommendations/computeRecommendations");
+Object.defineProperty(exports, "computeRecommendations", { enumerable: true, get: function () { return computeRecommendations_1.computeRecommendations; } });
 //# sourceMappingURL=index.js.map

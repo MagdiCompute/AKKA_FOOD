@@ -2,48 +2,48 @@
 
 ## Task List
 
-- [ ] 1. Domain layer — Payment entities
-  - [ ] 1.1 Create `Transaction` entity (id, reference, uid, amount, status, orderId, createdAt, updatedAt)
-  - [ ] 1.2 Create `PaymentRequest` DTO (cartSummary, phoneNumber)
-  - [ ] 1.3 Create `PaymentResult` model (transactionId, status, orderId)
-  - [ ] 1.4 Define `PaymentStatus` enum: pending, processing, success, failed, cancelled, refunded
-  - [ ] 1.5 Define `IPaymentRepository` interface
+- [x] 1. Domain layer — Payment entities
+  - [x] 1.1 Create `Transaction` entity (id, reference, uid, amount, status, orderId, createdAt, updatedAt)
+  - [x] 1.2 Create `PaymentRequest` DTO (cartSummary, phoneNumber)
+  - [x] 1.3 Create `PaymentResult` model (transactionId, status, orderId)
+  - [x] 1.4 Define `PaymentStatus` enum: pending, processing, success, failed, cancelled, refunded
+  - [x] 1.5 Define `IPaymentRepository` interface
 
 - [ ] 2. Cloud Functions — Payment orchestration
-  - [ ] 2.1 Implement `initiatePayment` HTTPS Callable: validate auth, generate UUID reference, create `/transactions/{id}` with status `pending`, call Orange Money Mali API
-  - [ ] 2.2 Implement `orangeMoneyCallback` HTTPS trigger: validate HMAC signature, idempotency check, update transaction status
-  - [ ] 2.3 Implement post-success actions in callback: create Order, credit coins, clear cart, send FCM notification
-  - [ ] 2.4 Implement `expireStaleTransactions` scheduled function: mark `pending` transactions older than 5 min as `failed`
-  - [ ] 2.5 Store Orange Money API credentials in Firebase Secret Manager
-  - [ ] 2.6 Write unit tests for Cloud Functions (mock Orange Money API)
+  - [~] 2.1 Implement `initiatePayment` HTTPS Callable: validate auth, generate UUID reference, create `/transactions/{id}` with status `pending`, call Orange Money Mali API
+  - [~] 2.2 Implement `orangeMoneyCallback` HTTPS trigger: validate HMAC signature, idempotency check, update transaction status
+  - [~] 2.3 Implement post-success actions in callback: create Order, credit coins, clear cart, send FCM notification
+  - [~] 2.4 Implement `expireStaleTransactions` scheduled function: mark `pending` transactions older than 5 min as `failed`
+  - [~] 2.5 Store Orange Money API credentials in Firebase Secret Manager
+  - [~] 2.6 Write unit tests for Cloud Functions (mock Orange Money API)
 
 - [ ] 3. Data layer — PaymentRepository
-  - [ ] 3.1 Implement `CloudFunctionPaymentDataSource`: call `initiatePayment` Cloud Function
-  - [ ] 3.2 Implement `FirestoreTransactionDataSource`: real-time listener on `/transactions/{id}`
-  - [ ] 3.3 Implement `PaymentRepository` composing both data sources
+  - [~] 3.1 Implement `CloudFunctionPaymentDataSource`: call `initiatePayment` Cloud Function
+  - [~] 3.2 Implement `FirestoreTransactionDataSource`: real-time listener on `/transactions/{id}`
+  - [~] 3.3 Implement `PaymentRepository` composing both data sources
 
 - [ ] 4. State management — PaymentNotifier
-  - [ ] 4.1 Implement `PaymentNotifier` (Riverpod): initiatePayment, cancelPayment, watchTransaction
-  - [ ] 4.2 Implement Firestore real-time listener driving `PaymentUIState` machine
-  - [ ] 4.3 Implement 5-minute client-side timeout fallback
-  - [ ] 4.4 Write unit tests for PaymentNotifier
+  - [~] 4.1 Implement `PaymentNotifier` (Riverpod): initiatePayment, cancelPayment, watchTransaction
+  - [~] 4.2 Implement Firestore real-time listener driving `PaymentUIState` machine
+  - [~] 4.3 Implement 5-minute client-side timeout fallback
+  - [~] 4.4 Write unit tests for PaymentNotifier
 
 - [ ] 5. Presentation layer — Payment screens
-  - [ ] 5.1 Implement `CheckoutScreen`: order summary, phone number input, "Pay with Orange Money" button
-  - [ ] 5.2 Implement `PaymentProcessingScreen`: animated loading indicator, status message, cancel button
-  - [ ] 5.3 Implement `OrderConfirmationScreen`: order ID, items, total paid, ETA, "Track Order" button
-  - [ ] 5.4 Implement `PaymentFailureScreen`: failure reason, "Retry" and "Cancel" buttons
+  - [~] 5.1 Implement `CheckoutScreen`: order summary, phone number input, "Pay with Orange Money" button
+  - [~] 5.2 Implement `PaymentProcessingScreen`: animated loading indicator, status message, cancel button
+  - [~] 5.3 Implement `OrderConfirmationScreen`: order ID, items, total paid, ETA, "Track Order" button
+  - [~] 5.4 Implement `PaymentFailureScreen`: failure reason, "Retry" and "Cancel" buttons
 
 - [ ] 6. Order creation (Cloud Function)
-  - [ ] 6.1 Implement `createOrder` Cloud Function: create `/orders/{orderId}` from CartSummary snapshot stored at payment initiation
-  - [ ] 6.2 Implement CartSummary snapshot: save cart state to Firestore at payment initiation to prevent cart changes mid-payment
+  - [~] 6.1 Implement `createOrder` Cloud Function: create `/orders/{orderId}` from CartSummary snapshot stored at payment initiation
+  - [~] 6.2 Implement CartSummary snapshot: save cart state to Firestore at payment initiation to prevent cart changes mid-payment
 
 - [ ] 7. Firestore Security Rules
-  - [ ] 7.1 Write rules: `/transactions/{id}` readable only by matching uid; writable only by Cloud Functions (service account)
-  - [ ] 7.2 Write rules: `/orders/{id}` readable by matching uid and admin role
+  - [~] 7.1 Write rules: `/transactions/{id}` readable only by matching uid; writable only by Cloud Functions (service account)
+  - [~] 7.2 Write rules: `/orders/{id}` readable by matching uid and admin role
 
 - [ ] 8. Integration testing
-  - [ ] 8.1 Write integration test: successful payment flow → order created → coins credited → cart cleared
-  - [ ] 8.2 Write integration test: payment failure → cart retained → retry creates new transaction
-  - [ ] 8.3 Write integration test: duplicate callback idempotency (no double order/coins)
-  - [ ] 8.4 Write integration test: payment timeout after 5 minutes
+  - [~] 8.1 Write integration test: successful payment flow → order created → coins credited → cart cleared
+  - [~] 8.2 Write integration test: payment failure → cart retained → retry creates new transaction
+  - [~] 8.3 Write integration test: duplicate callback idempotency (no double order/coins)
+  - [~] 8.4 Write integration test: payment timeout after 5 minutes

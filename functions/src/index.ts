@@ -11,3 +11,9 @@ export { adminCreateMeal, adminUpdateMeal, adminDeleteMeal } from "./admin/admin
 export { adminManageCategory } from "./admin/adminManageCategory";
 export { adminManageUser } from "./admin/adminManageUser";
 export { aggregateAnalytics } from "./admin/aggregateAnalytics";
+
+// Auth Cloud Functions
+export { onUserCreated } from "./auth/onUserCreated";
+export { onUserDeleted } from "./auth/onUserDeleted";
+export { checkAccountLock, recordFailedLoginAttempt, resetLoginAttempts } from "./auth/checkAccountLock";
+export { checkOtpRateLimit } from "./auth/otpRateLimit";

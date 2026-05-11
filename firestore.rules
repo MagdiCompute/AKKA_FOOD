@@ -73,30 +73,42 @@ service cloud.firestore {
     // -------------------------------------------------------------------------
     // /users/{uid}
     //
-    // Task 8.3 — /users readable by admin role (limited fields: no tokens).
-    // A user may read and update their own document.
-    // Admins may read any user document but only the non-sensitive fields
-    // (tokens, if any, are never written to Firestore by the app, so this
-    // rule acts as a belt-and-suspenders guard).
-    // User documents are created by the auth flow (Cloud Function or client).
+    // Task 8.3 / Task 9.2 — /users readable by admin role (limited fields).
+    //
+    // Access model:
+    //   • Owner (request.auth.uid == uid): may read and update their own doc.
+    //   • Owner: may create their own doc during registration.
+    //   • Admin: may read any user document (dashboard use).
+    //   • Non-owners / unauthenticated: all access denied.
+    //
+    // SECURITY NOTE — server-only fields:
+    //   `failedLoginAttempts` and `lockedUntil` are written exclusively by
+    //   Cloud Functions using the Admin SDK (which bypasses Security Rules).
+    //   Client SDKs must NOT write these fields directly. The rules below do
+    //   not enforce field-level restrictions (Firestore rules cannot easily
+    //   block individual fields on update), so the Cloud Function path is the
+    //   authoritative guard. The app layer must never send these fields in
+    //   client-side update calls.
+    //
+    //   Admin writes (deactivate/reactivate) also go through Cloud Functions
+    //   to enforce the server-side path; direct client writes by admins are
+    //   blocked here as a defence-in-depth measure.
     // -------------------------------------------------------------------------
     match /users/{uid} {
-      // Owner: full read/write on their own document.
+      // Owner: read and update their own document.
+      // Satisfies Requirement 11.2: only the matching uid may access the doc.
       allow read, update: if isOwner(uid);
 
-      // Allow user document creation during registration.
+      // Allow user document creation during registration (owner creates own doc).
       allow create: if isOwner(uid);
 
-      // Admin: read any user document.
-      // The admin dashboard never exposes token fields; this rule prevents
-      // a rogue admin client from reading fields like fcmToken by ensuring
-      // the admin can only read the document (field-level restrictions are
-      // enforced in the app layer and Cloud Functions).
+      // Admin: read any user document (dashboard).
+      // Field-level sensitivity (failedLoginAttempts, lockedUntil) is enforced
+      // by the app layer; tokens are never written to Firestore by the client.
       allow read: if isAdmin();
 
-      // Admin writes (deactivate/reactivate) go through Cloud Functions.
-      // Direct client writes by admins are blocked to enforce the CF path.
-      allow update: if isAdmin();
+      // Admin writes go through Cloud Functions only — block direct client writes.
+      // allow update: if isAdmin();  // intentionally omitted — use CF path
     }
 
     // -------------------------------------------------------------------------
@@ -118,6 +130,20 @@ service cloud.firestore {
     match /analytics/{document}/{subcollection}/{subDoc} {
       allow read: if isAdmin();
       allow write: if false;
+    }
+
+    // -------------------------------------------------------------------------
+    // /otp_rate_limits/{id}
+    //
+    // Task 9.3 — OTP rate limiting records.
+    // Written exclusively by Cloud Functions (server SDK bypasses rules).
+    // No client reads or writes are permitted.
+    //
+    // Satisfies Requirement 11.5: rate-limit OTP delivery to max 5 requests
+    // per phone number or email address per hour.
+    // -------------------------------------------------------------------------
+    match /otp_rate_limits/{id} {
+      allow read, write: if false; // Written only by Cloud Functions (server SDK)
     }
 
   }

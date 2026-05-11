@@ -1,8 +1,19 @@
-/// Represents the authenticated user in the AKKA Food app.
+/// Domain entity representing an authenticated application user.
 ///
-/// The [role] field controls access to admin features.
-/// Values: 'user' (default) | 'admin'
+/// Pure Dart — no Flutter or Firebase imports.
+/// Implements [==], [hashCode], [toString], and [copyWith] manually
+/// per project conventions (not yet using freezed).
 class AppUser {
+  final String uid;
+  final String? email;
+  final String? phoneNumber;
+  final String displayName;
+  final bool isVerified;
+  final bool isDeactivated;
+  final DateTime createdAt;
+  final List<String> linkedProviders; // e.g. ['password', 'google.com', 'facebook.com']
+  final String role; // 'user' | 'admin'
+
   const AppUser({
     required this.uid,
     this.email,
@@ -12,29 +23,21 @@ class AppUser {
     required this.isDeactivated,
     required this.createdAt,
     required this.linkedProviders,
-    required this.role,
+    this.role = 'user',
   });
 
-  final String uid;
-  final String? email;
-  final String? phoneNumber;
-  final String displayName;
-  final bool isVerified;
-  final bool isDeactivated;
-  final DateTime createdAt;
+  // ---------------------------------------------------------------------------
+  // Computed properties
+  // ---------------------------------------------------------------------------
 
-  /// Authentication providers linked to this account.
-  /// e.g. ['password', 'google.com', 'facebook.com']
-  final List<String> linkedProviders;
-
-  /// Role controlling access to admin features.
-  /// Valid values: 'user' | 'admin'
-  final String role;
-
-  /// Returns true when this user has admin privileges.
+  /// Returns `true` when this user has the admin role.
+  /// Always use this getter — never compare [role] directly.
   bool get isAdmin => role == 'admin';
 
-  /// Creates an [AppUser] from a Firestore document map.
+  // ---------------------------------------------------------------------------
+  // Firestore serialization
+  // ---------------------------------------------------------------------------
+
   factory AppUser.fromMap(Map<String, dynamic> map) {
     return AppUser(
       uid: map['uid'] as String,
@@ -43,37 +46,36 @@ class AppUser {
       displayName: map['displayName'] as String? ?? '',
       isVerified: map['isVerified'] as bool? ?? false,
       isDeactivated: map['isDeactivated'] as bool? ?? false,
-      createdAt: map['createdAt'] != null
-          ? _parseDateTime(map['createdAt'])
-          : DateTime.now(),
+      createdAt: _parseDateTime(map['createdAt']),
       linkedProviders: List<String>.from(
-        (map['linkedProviders'] as List<dynamic>?) ?? [],
+        (map['linkedProviders'] as List<dynamic>?) ?? <dynamic>[],
       ),
-      // Default to 'user' if the field is missing (backwards compatibility)
       role: map['role'] as String? ?? 'user',
     );
   }
 
-  /// Serializes this [AppUser] to a Firestore document map.
   Map<String, dynamic> toMap() {
-    return {
+    return <String, dynamic>{
       'uid': uid,
       'email': email,
       'phoneNumber': phoneNumber,
       'displayName': displayName,
       'isVerified': isVerified,
       'isDeactivated': isDeactivated,
-      'createdAt': createdAt,
+      'createdAt': createdAt.toIso8601String(),
       'linkedProviders': linkedProviders,
       'role': role,
     };
   }
 
-  /// Returns a copy of this [AppUser] with the given fields replaced.
+  // ---------------------------------------------------------------------------
+  // copyWith
+  // ---------------------------------------------------------------------------
+
   AppUser copyWith({
     String? uid,
-    String? email,
-    String? phoneNumber,
+    Object? email = _sentinel,
+    Object? phoneNumber = _sentinel,
     String? displayName,
     bool? isVerified,
     bool? isDeactivated,
@@ -83,8 +85,9 @@ class AppUser {
   }) {
     return AppUser(
       uid: uid ?? this.uid,
-      email: email ?? this.email,
-      phoneNumber: phoneNumber ?? this.phoneNumber,
+      email: email == _sentinel ? this.email : email as String?,
+      phoneNumber:
+          phoneNumber == _sentinel ? this.phoneNumber : phoneNumber as String?,
       displayName: displayName ?? this.displayName,
       isVerified: isVerified ?? this.isVerified,
       isDeactivated: isDeactivated ?? this.isDeactivated,
@@ -94,43 +97,88 @@ class AppUser {
     );
   }
 
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is AppUser &&
-          runtimeType == other.runtimeType &&
-          uid == other.uid &&
-          email == other.email &&
-          phoneNumber == other.phoneNumber &&
-          displayName == other.displayName &&
-          isVerified == other.isVerified &&
-          isDeactivated == other.isDeactivated &&
-          createdAt == other.createdAt &&
-          role == other.role;
+  // ---------------------------------------------------------------------------
+  // Equality & hashing
+  // ---------------------------------------------------------------------------
 
   @override
-  int get hashCode =>
-      uid.hashCode ^
-      email.hashCode ^
-      phoneNumber.hashCode ^
-      displayName.hashCode ^
-      isVerified.hashCode ^
-      isDeactivated.hashCode ^
-      createdAt.hashCode ^
-      role.hashCode;
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! AppUser) return false;
+    if (uid != other.uid) return false;
+    if (email != other.email) return false;
+    if (phoneNumber != other.phoneNumber) return false;
+    if (displayName != other.displayName) return false;
+    if (isVerified != other.isVerified) return false;
+    if (isDeactivated != other.isDeactivated) return false;
+    if (createdAt != other.createdAt) return false;
+    if (role != other.role) return false;
+    if (linkedProviders.length != other.linkedProviders.length) return false;
+    for (var i = 0; i < linkedProviders.length; i++) {
+      if (linkedProviders[i] != other.linkedProviders[i]) return false;
+    }
+    return true;
+  }
 
   @override
-  String toString() =>
-      'AppUser(uid: $uid, displayName: $displayName, role: $role, '
-      'isVerified: $isVerified, isDeactivated: $isDeactivated)';
+  int get hashCode => Object.hash(
+        uid,
+        email,
+        phoneNumber,
+        displayName,
+        isVerified,
+        isDeactivated,
+        createdAt,
+        role,
+        Object.hashAll(linkedProviders),
+      );
+
+  // ---------------------------------------------------------------------------
+  // toString
+  // ---------------------------------------------------------------------------
+
+  @override
+  String toString() {
+    return 'AppUser('
+        'uid: $uid, '
+        'email: $email, '
+        'phoneNumber: $phoneNumber, '
+        'displayName: $displayName, '
+        'isVerified: $isVerified, '
+        'isDeactivated: $isDeactivated, '
+        'createdAt: $createdAt, '
+        'linkedProviders: $linkedProviders, '
+        'role: $role'
+        ')';
+  }
 }
 
-/// Converts a Firestore [Timestamp] or a plain [DateTime] to [DateTime].
+// ---------------------------------------------------------------------------
+// Private helpers
+// ---------------------------------------------------------------------------
+
+/// Sentinel object used by [AppUser.copyWith] to distinguish between
+/// "caller passed null explicitly" and "caller omitted the argument".
+const Object _sentinel = Object();
+
+/// Converts a Firestore timestamp-like value to [DateTime].
 ///
-/// Firestore returns `Timestamp` objects; plain `DateTime` values appear
-/// in unit tests and local serialization.
+/// Accepts:
+/// - A [DateTime] directly.
+/// - Any object with a `.toDate()` method (e.g. `Timestamp` from
+///   `cloud_firestore`) — handled via duck-typing so the domain layer
+///   stays free of Firebase imports.
+/// - An ISO-8601 [String].
+/// - `null` — falls back to [DateTime.now].
 DateTime _parseDateTime(dynamic value) {
+  if (value == null) return DateTime.now();
   if (value is DateTime) return value;
-  // Firestore Timestamp has a .toDate() method
-  return (value as dynamic).toDate() as DateTime;
+  if (value is String) return DateTime.parse(value);
+  // Duck-type Firestore Timestamp without importing cloud_firestore.
+  try {
+    // ignore: avoid_dynamic_calls
+    return (value.toDate()) as DateTime;
+  } catch (_) {
+    return DateTime.now();
+  }
 }

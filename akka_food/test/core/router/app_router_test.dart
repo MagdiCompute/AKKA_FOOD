@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:akka_food/core/router/app_router.dart';
 import 'package:akka_food/features/auth/domain/entities/app_user.dart';
 import 'package:akka_food/features/auth/presentation/notifiers/auth_notifier.dart';
+import 'package:akka_food/features/auth/presentation/notifiers/auth_state.dart';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -27,6 +28,222 @@ AppUser _makeUser({String role = 'user'}) => AppUser(
 // ---------------------------------------------------------------------------
 
 void main() {
+  group('evaluateAuthGuard — pure redirect logic', () {
+    // ── AuthStatus.initial (session restore in progress) ───────────────────
+
+    test('returns null for initial status on /login (no redirect during restore)',
+        () {
+      expect(
+        evaluateAuthGuard(
+          location: AppRoutes.login,
+          authStatus: AuthStatus.initial,
+        ),
+        isNull,
+      );
+    });
+
+    test('returns null for initial status on /home (no redirect during restore)',
+        () {
+      expect(
+        evaluateAuthGuard(
+          location: AppRoutes.home,
+          authStatus: AuthStatus.initial,
+        ),
+        isNull,
+      );
+    });
+
+    // ── 8.2 — Unauthenticated users redirected to /login ───────────────────
+
+    test('returns /login for unauthenticated user on /home', () {
+      expect(
+        evaluateAuthGuard(
+          location: AppRoutes.home,
+          authStatus: AuthStatus.unauthenticated,
+        ),
+        equals(AppRoutes.login),
+      );
+    });
+
+    test('returns /login for unauthenticated user on /change-password', () {
+      expect(
+        evaluateAuthGuard(
+          location: AppRoutes.changePassword,
+          authStatus: AuthStatus.unauthenticated,
+        ),
+        equals(AppRoutes.login),
+      );
+    });
+
+    test('returns /login for unauthenticated user on /admin', () {
+      expect(
+        evaluateAuthGuard(
+          location: AppRoutes.adminPrefix,
+          authStatus: AuthStatus.unauthenticated,
+        ),
+        equals(AppRoutes.login),
+      );
+    });
+
+    test('returns /login for unauthenticated user on /admin/orders', () {
+      expect(
+        evaluateAuthGuard(
+          location: AppRoutes.adminOrders,
+          authStatus: AuthStatus.unauthenticated,
+        ),
+        equals(AppRoutes.login),
+      );
+    });
+
+    test('returns null for unauthenticated user on /login (allow access)', () {
+      expect(
+        evaluateAuthGuard(
+          location: AppRoutes.login,
+          authStatus: AuthStatus.unauthenticated,
+        ),
+        isNull,
+      );
+    });
+
+    test('returns null for unauthenticated user on /signup (allow access)', () {
+      expect(
+        evaluateAuthGuard(
+          location: AppRoutes.signup,
+          authStatus: AuthStatus.unauthenticated,
+        ),
+        isNull,
+      );
+    });
+
+    test('returns null for unauthenticated user on /otp (allow access)', () {
+      expect(
+        evaluateAuthGuard(
+          location: AppRoutes.otp,
+          authStatus: AuthStatus.unauthenticated,
+        ),
+        isNull,
+      );
+    });
+
+    test(
+        'returns null for unauthenticated user on /forgot-password (allow access)',
+        () {
+      expect(
+        evaluateAuthGuard(
+          location: AppRoutes.forgotPassword,
+          authStatus: AuthStatus.unauthenticated,
+        ),
+        isNull,
+      );
+    });
+
+    // ── 8.3 — Authenticated users redirected away from auth screens ─────────
+
+    test('returns /home for authenticated user on /login', () {
+      expect(
+        evaluateAuthGuard(
+          location: AppRoutes.login,
+          authStatus: AuthStatus.authenticated,
+        ),
+        equals(AppRoutes.home),
+      );
+    });
+
+    test('returns /home for authenticated user on /signup', () {
+      expect(
+        evaluateAuthGuard(
+          location: AppRoutes.signup,
+          authStatus: AuthStatus.authenticated,
+        ),
+        equals(AppRoutes.home),
+      );
+    });
+
+    test('returns /home for authenticated user on /otp', () {
+      expect(
+        evaluateAuthGuard(
+          location: AppRoutes.otp,
+          authStatus: AuthStatus.authenticated,
+        ),
+        equals(AppRoutes.home),
+      );
+    });
+
+    test('returns /home for authenticated user on /forgot-password', () {
+      expect(
+        evaluateAuthGuard(
+          location: AppRoutes.forgotPassword,
+          authStatus: AuthStatus.authenticated,
+        ),
+        equals(AppRoutes.home),
+      );
+    });
+
+    test('returns null for authenticated user on /home (allow access)', () {
+      expect(
+        evaluateAuthGuard(
+          location: AppRoutes.home,
+          authStatus: AuthStatus.authenticated,
+        ),
+        isNull,
+      );
+    });
+
+    test(
+        'returns null for authenticated user on /change-password (allow access)',
+        () {
+      expect(
+        evaluateAuthGuard(
+          location: AppRoutes.changePassword,
+          authStatus: AuthStatus.authenticated,
+        ),
+        isNull,
+      );
+    });
+
+    test('returns null for authenticated user on /admin (allow access)', () {
+      expect(
+        evaluateAuthGuard(
+          location: AppRoutes.adminPrefix,
+          authStatus: AuthStatus.authenticated,
+        ),
+        isNull,
+      );
+    });
+
+    // ── Error / loading states treated as unauthenticated ──────────────────
+
+    test('returns /login for error status on /home', () {
+      expect(
+        evaluateAuthGuard(
+          location: AppRoutes.home,
+          authStatus: AuthStatus.error,
+        ),
+        equals(AppRoutes.login),
+      );
+    });
+
+    test('returns /login for loading status on /home', () {
+      expect(
+        evaluateAuthGuard(
+          location: AppRoutes.home,
+          authStatus: AuthStatus.loading,
+        ),
+        equals(AppRoutes.login),
+      );
+    });
+
+    test('returns null for loading status on /login (allow access)', () {
+      expect(
+        evaluateAuthGuard(
+          location: AppRoutes.login,
+          authStatus: AuthStatus.loading,
+        ),
+        isNull,
+      );
+    });
+  });
+
   group('evaluateAdminGuard — pure redirect logic', () {
     // ── Unauthenticated user ────────────────────────────────────────────────
 

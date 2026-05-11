@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Android Network Security Config — AKKA Food
+  ============================================
+  This file pins TLS certificates for Firebase / Google API domains used by
+  the Firebase Auth SDK and other Firebase services.
+
+  IMPORTANT: The SHA-256 pins below are PLACEHOLDERS. You MUST replace them
+  with the real SPKI fingerprints before releasing to production, otherwise
+  the app will fail to connect to Firebase services.
+
+  How to obtain real pins:
+    openssl s_client -connect googleapis.com:443 2>/dev/null | \
+      openssl x509 -pubkey -noout | \
+      openssl pkey -pubin -outform DER | \
+      openssl dgst -sha256 -binary | base64
+
+  Keep at least two pins (primary + backup) per domain to avoid bricking the
+  app if the primary certificate rotates.
+
+  References:
+    https://developer.android.com/training/articles/security-config
+    https://owasp.org/www-community/controls/Certificate_and_Public_Key_Pinning
+-->
+<network-security-config>
+
+    <!--
+      Trust system CAs for all domains by default (required for Firebase
+      services not listed below and for general network traffic).
+    -->
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+
+    <!-- *.googleapis.com — Firebase Auth, Firestore, Storage, Cloud Functions -->
+    <domain-config>
+        <domain includeSubdomains="true">googleapis.com</domain>
+        <pin-set expiration="2026-01-01">
+            <!-- TODO: Replace with real SHA-256 SPKI fingerprints -->
+            <pin digest="SHA-256">AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</pin><!-- primary (placeholder) -->
+            <pin digest="SHA-256">BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB=</pin><!-- backup  (placeholder) -->
+        </pin-set>
+    </domain-config>
+
+    <!-- *.firebaseio.com — Firebase Realtime Database / legacy endpoints -->
+    <domain-config>
+        <domain includeSubdomains="true">firebaseio.com</domain>
+        <pin-set expiration="2026-01-01">
+            <!-- TODO: Replace with real SHA-256 SPKI fingerprints -->
+            <pin digest="SHA-256">CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC=</pin><!-- primary (placeholder) -->
+            <pin digest="SHA-256">DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD=</pin><!-- backup  (placeholder) -->
+        </pin-set>
+    </domain-config>
+
+    <!-- *.firebase.com — Firebase Hosting and other Firebase services -->
+    <domain-config>
+        <domain includeSubdomains="true">firebase.com</domain>
+        <pin-set expiration="2026-01-01">
+            <!-- TODO: Replace with real SHA-256 SPKI fingerprints -->
+            <pin digest="SHA-256">EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE=</pin><!-- primary (placeholder) -->
+            <pin digest="SHA-256">FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF=</pin><!-- backup  (placeholder) -->
+        </pin-set>
+    </domain-config>
+
+</network-security-config>

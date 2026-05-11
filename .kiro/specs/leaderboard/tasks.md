@@ -2,10 +2,10 @@
 
 ## Task List
 
-- [ ] 1. Domain layer — Leaderboard entities
-  - [ ] 1.1 Create `LeaderboardEntry` entity (rank, uid, displayName, avatarUrl, score, isCurrentUser)
-  - [ ] 1.2 Create `LeaderboardPeriod` enum (allTime, monthly, weekly)
-  - [ ] 1.3 Define `ILeaderboardRepository` interface
+- [x] 1. Domain layer — Leaderboard entities
+  - [x] 1.1 Create `LeaderboardEntry` entity (rank, uid, displayName, avatarUrl, score, isCurrentUser)
+  - [x] 1.2 Create `LeaderboardPeriod` enum (allTime, monthly, weekly)
+  - [x] 1.3 Define `ILeaderboardRepository` interface
 
 - [ ] 2. Firestore structure
   - [ ] 2.1 Create `/leaderboard/all_time` document schema (entries array, updatedAt)

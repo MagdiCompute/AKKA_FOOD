@@ -6,7 +6,8 @@ part of 'notification_handler.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$notificationHandlerHash() => r'notification_handler_hash';
+String _$notificationHandlerHash() =>
+    r'e06c00655f5e35f2717349b1c9a9a3eef48d488c';
 
 /// Riverpod provider for [NotificationHandler].
 ///

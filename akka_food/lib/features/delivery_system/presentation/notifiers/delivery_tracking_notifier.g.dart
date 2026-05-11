@@ -214,13 +214,17 @@ class _TrackingUpdatesProviderElement
 }
 
 String _$deliveryTrackingNotifierHash() =>
-    r'e7d7be47cd0b93a21c7830775424e9b294598018';
+    r'eadde0ba0f5152c0f9dc7829ecbb5a2c1300e0f5';
 
 /// Manages real-time delivery tracking state for a single order.
 ///
 /// Subscribes to the [IDeliveryRepository.watchOrder] stream and updates
 /// the notifier state ([AsyncData], [AsyncLoading], [AsyncError]) based on
 /// stream events.
+///
+/// When a stream error occurs after data has been received, the notifier
+/// preserves the last known [Order] in [lastKnownOrder] so the UI can
+/// display it alongside a "Reconnecting..." indicator.
 ///
 /// Usage:
 /// ```dart

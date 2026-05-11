@@ -31,7 +31,7 @@ final paymentRepositoryProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef PaymentRepositoryRef = AutoDisposeProviderRef<IPaymentRepository>;
-String _$paymentNotifierHash() => r'7f15db067dfc63271d60862c6fc1464c828f1221';
+String _$paymentNotifierHash() => r'94965dadf7fdc4005c2085c4fec0d3c0550cbbfb';
 
 /// Manages the payment UI state machine via Riverpod.
 ///
@@ -42,6 +42,9 @@ String _$paymentNotifierHash() => r'7f15db067dfc63271d60862c6fc1464c828f1221';
 ///
 /// The Firestore real-time listener on the transaction document drives
 /// state transitions from [processing] → [success] / [failed].
+///
+/// A client-side timeout of 5 minutes acts as a fallback in case the
+/// server-side `expireStaleTransactions` function hasn't run yet (Req 3 AC1).
 ///
 /// Copied from [PaymentNotifier].
 @ProviderFor(PaymentNotifier)

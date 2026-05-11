@@ -2,9 +2,9 @@
 
 ## Task List
 
-- [ ] 1. Domain layer — Recommendation entities
-  - [ ] 1.1 Create `RecommendationResult` entity (mealIds, isPersonalized, computedAt)
-  - [ ] 1.2 Define `IRecommendationRepository` interface
+- [x] 1. Domain layer — Recommendation entities
+  - [x] 1.1 Create `RecommendationResult` entity (mealIds, isPersonalized, computedAt)
+  - [x] 1.2 Define `IRecommendationRepository` interface
 
 - [ ] 2. Firestore structure
   - [ ] 2.1 Create `/recommendations/{uid}` document schema (mealIds, isPersonalized, computedAt)

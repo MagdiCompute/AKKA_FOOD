@@ -6,7 +6,7 @@ part of 'fcm_service.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$fcmServiceHash() => r'fcm_service_hash';
+String _$fcmServiceHash() => r'4d7ad7c8d229619097b9b899fc99699a0c7fe560';
 
 /// Riverpod provider for [FCMService].
 ///
@@ -15,8 +15,9 @@ String _$fcmServiceHash() => r'fcm_service_hash';
 final fcmServiceProvider = Provider<FCMService>.internal(
   fcmService,
   name: r'fcmServiceProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$fcmServiceHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$fcmServiceHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );

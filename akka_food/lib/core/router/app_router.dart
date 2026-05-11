@@ -15,6 +15,8 @@ import '../../features/admin_dashboard/presentation/screens/admin_user_list_scre
 import '../../features/auth/domain/entities/app_user.dart';
 import '../../features/auth/presentation/notifiers/auth_notifier.dart';
 import '../../features/auth/presentation/notifiers/auth_state.dart';
+import '../../features/cart/presentation/notifiers/cart_notifier.dart';
+import '../../features/cart/presentation/screens/cart_screen.dart';
 import '../../features/auth/presentation/screens/change_password_screen.dart';
 import '../../features/auth/presentation/screens/forgot_password_screen.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
@@ -54,6 +56,10 @@ abstract final class AppRoutes {
   static const orderDetail = '/profile/orders/:orderId';
   static const coinHistory = '/profile/coins';
   static const notificationPrefs = '/profile/notifications';
+
+  // Cart & Payment
+  static const cart = '/cart';
+  static const payment = '/payment';
 
   // Admin root
   static const adminPrefix = '/admin';
@@ -167,10 +173,14 @@ class RouterNotifier extends ChangeNotifier {
 // Placeholder screens (replace with real screens as they are implemented)
 // ---------------------------------------------------------------------------
 
-/// Home screen placeholder.
+/// Home screen shell.
 ///
-/// Displays an "Admin Dashboard" entry point in the navigation when the
-/// currently signed-in user has the `admin` role (Requirement 1.1).
+/// Displays a Material 3 [NavigationBar] with:
+/// - Home tab (index 0) → [AppRoutes.home]
+/// - Cart tab (index 1) → [AppRoutes.cart] with a badge showing the item
+///   count (Requirement 2.4)
+/// - Profile tab (index 2) → [AppRoutes.profile]
+/// - Admin tab (index 3, admin users only) → [AppRoutes.adminPrefix]
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
@@ -178,30 +188,60 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final currentUser = ref.watch(currentUserProvider);
     final isAdmin = currentUser?.isAdmin ?? false;
+    final cart = ref.watch(cartNotifierProvider);
+    final itemCount = cart.itemCount;
+
+    // Build navigation destinations dynamically based on user role.
+    final destinations = <NavigationDestination>[
+      const NavigationDestination(
+        icon: Icon(Icons.home_outlined),
+        selectedIcon: Icon(Icons.home),
+        label: 'Home',
+      ),
+      NavigationDestination(
+        icon: Badge(
+          isLabelVisible: itemCount > 0,
+          label: Text(itemCount > 99 ? '99+' : '$itemCount'),
+          child: const Icon(Icons.shopping_cart_outlined),
+        ),
+        selectedIcon: Badge(
+          isLabelVisible: itemCount > 0,
+          label: Text(itemCount > 99 ? '99+' : '$itemCount'),
+          child: const Icon(Icons.shopping_cart),
+        ),
+        label: 'Cart',
+      ),
+      const NavigationDestination(
+        icon: Icon(Icons.person_outline),
+        selectedIcon: Icon(Icons.person),
+        label: 'Profile',
+      ),
+      if (isAdmin)
+        const NavigationDestination(
+          icon: Icon(Icons.admin_panel_settings_outlined),
+          selectedIcon: Icon(Icons.admin_panel_settings),
+          label: 'Admin',
+        ),
+    ];
 
     return Scaffold(
-      body: Center(child: Text('Home')),
-      // The admin entry point is only shown to users with the admin role.
-      bottomNavigationBar: isAdmin
-          ? BottomNavigationBar(
-              currentIndex: 0,
-              items: const [
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.home),
-                  label: 'Home',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.admin_panel_settings),
-                  label: 'Admin',
-                ),
-              ],
-              onTap: (index) {
-                if (index == 1) {
-                  context.go(AppRoutes.adminPrefix);
-                }
-              },
-            )
-          : null,
+      body: const Center(child: Text('Home')),
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: 0,
+        destinations: destinations,
+        onDestinationSelected: (index) {
+          switch (index) {
+            case 0:
+              context.go(AppRoutes.home);
+            case 1:
+              context.go(AppRoutes.cart);
+            case 2:
+              context.go(AppRoutes.profile);
+            case 3:
+              if (isAdmin) context.go(AppRoutes.adminPrefix);
+          }
+        },
+      ),
     );
   }
 }
@@ -255,6 +295,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.home,
         builder: (context, state) => const HomeScreen(),
+      ),
+
+      // ── Cart ───────────────────────────────────────────────────────────
+      GoRoute(
+        path: AppRoutes.cart,
+        builder: (context, state) => const CartScreen(),
       ),
 
       // ── User Profile ───────────────────────────────────────────────────

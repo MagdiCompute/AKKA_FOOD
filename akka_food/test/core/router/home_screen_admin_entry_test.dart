@@ -82,8 +82,8 @@ void main() {
 
         await _pumpApp(tester, container);
 
-        // No bottom nav bar and no "Admin" label for regular users.
-        expect(find.byType(BottomNavigationBar), findsNothing);
+        // Regular users see the bottom nav bar (Home + Cart) but NOT the Admin tab.
+        expect(find.byType(BottomNavigationBar), findsOneWidget);
         expect(find.text('Admin'), findsNothing);
         expect(find.byIcon(Icons.admin_panel_settings), findsNothing);
       },
@@ -101,8 +101,8 @@ void main() {
 
         await _pumpApp(tester, container);
 
-        expect(find.byType(BottomNavigationBar), findsNothing);
         expect(find.text('Admin'), findsNothing);
+        expect(find.byIcon(Icons.admin_panel_settings), findsNothing);
       },
     );
 
@@ -144,8 +144,9 @@ void main() {
 
         await _pumpApp(tester, container);
 
-        // Regular user: no admin entry point.
-        expect(find.byType(BottomNavigationBar), findsNothing);
+        // Regular user: bottom nav is visible (Home + Cart) but no admin tab.
+        expect(find.byType(BottomNavigationBar), findsOneWidget);
+        expect(find.text('Admin'), findsNothing);
 
         // Promote to admin.
         container.read(currentUserProvider.notifier).state =

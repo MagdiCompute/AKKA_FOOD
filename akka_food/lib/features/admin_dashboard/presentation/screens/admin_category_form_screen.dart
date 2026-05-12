@@ -300,26 +300,38 @@ class _AdminCategoryFormScreenState
                     },
                   ),
                   const SizedBox(height: 12),
-                  // Live image preview
-                  if (formState.imageUrl != null && formState.imageUrl!.isNotEmpty)
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
+                  // Live image preview (only when URL starts with http)
+                  if (formState.imageUrl != null &&
+                      formState.imageUrl!.startsWith('http'))
+                    Container(
+                      height: 120,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
+                      ),
+                      clipBehavior: Clip.antiAlias,
                       child: Image.network(
                         formState.imageUrl!,
-                        height: 120,
-                        width: double.infinity,
                         fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => Container(
-                          height: 120,
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.errorContainer,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: const Center(
-                            child: Text('Failed to load image. Check the URL.'),
+                        errorBuilder: (_, error, ___) => Center(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.broken_image, color: Theme.of(context).colorScheme.error),
+                              const SizedBox(height: 4),
+                              Text(
+                                'Cannot preview (CORS). Image will still be saved.',
+                                style: Theme.of(context).textTheme.bodySmall,
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
                           ),
                         ),
+                        loadingBuilder: (_, child, progress) {
+                          if (progress == null) return child;
+                          return const Center(child: CircularProgressIndicator(strokeWidth: 2));
+                        },
                       ),
                     )
                   else

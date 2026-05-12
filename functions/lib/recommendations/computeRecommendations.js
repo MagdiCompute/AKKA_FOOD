@@ -35,6 +35,7 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.computeRecommendations = void 0;
 exports.getCompletedOrders = getCompletedOrders;
+exports.weightedScore = weightedScore;
 exports.computePersonalized = computePersonalized;
 exports.getPopularMeals = getPopularMeals;
 const admin = __importStar(require("firebase-admin"));
@@ -55,37 +56,140 @@ async function getCompletedOrders(uid) {
     return ordersSnap.docs.map((doc) => (Object.assign({ id: doc.id }, doc.data())));
 }
 /**
+ * Computes the weighted score for a single meal across all orders.
+ * - Each order containing the meal contributes to the score
+ * - Orders in the last 30 days get a 1.5x recency boost
+ * - Orders in the last 24 hours are excluded (to encourage variety)
+ *
+ * Validates: Requirements 1.2, 1.4
+ */
+function weightedScore(mealId, orders) {
+    const now = Date.now();
+    const thirtyDaysAgo = now - 30 * 24 * 60 * 60 * 1000;
+    const oneDayAgo = now - 24 * 60 * 60 * 1000;
+    let score = 0;
+    for (const order of orders) {
+        const items = order.items;
+        if (!items || !Array.isArray(items))
+            continue;
+        const hasMeal = items.some((item) => item.mealId === mealId);
+        if (!hasMeal)
+            continue;
+        // Get completedAt timestamp in milliseconds
+        const completedAt = getCompletedAtMillis(order);
+        if (completedAt === null)
+            continue;
+        // Exclude orders from the last 24 hours
+        if (completedAt > oneDayAgo)
+            continue;
+        // Apply recency boost for orders in the last 30 days
+        const recencyBoost = completedAt > thirtyDaysAgo ? 1.5 : 1.0;
+        score += recencyBoost;
+    }
+    return score;
+}
+/**
+ * Extracts the completedAt timestamp in milliseconds from an order document.
+ * Handles both Firestore Timestamp objects and plain numbers.
+ */
+function getCompletedAtMillis(order) {
+    const completedAt = order.completedAt;
+    if (!completedAt)
+        return null;
+    // Firestore Timestamp has a toMillis() method
+    if (typeof completedAt.toMillis === "function") {
+        return completedAt.toMillis();
+    }
+    // If it's already a number (milliseconds)
+    if (typeof completedAt === "number") {
+        return completedAt;
+    }
+    // If it has _seconds (Firestore Timestamp serialized form)
+    if (typeof completedAt._seconds === "number") {
+        return completedAt._seconds * 1000;
+    }
+    return null;
+}
+/**
  * Computes personalized meal recommendations based on order history.
- * Stub — full implementation in task 3.2.
+ *
+ * Algorithm:
+ * 1. Build a weighted score map from all orders (frequency + recency boost)
+ * 2. Exclude meals ordered in the last 24 hours (score will be 0)
+ * 3. Check meal availability by reading /meals/{mealId} documents
+ * 4. Sort by weighted score descending
+ * 5. Return top 10 meal IDs
+ *
+ * Validates: Requirements 1.1, 1.2, 1.3, 1.4
  *
  * @param orders - Array of completed order documents
  * @returns Array of up to 10 meal IDs sorted by weighted score
  */
 async function computePersonalized(orders) {
-    // Stub: extract unique mealIds from orders, return up to 10
-    // Full algorithm (frequency map, recency boost, exclusions) implemented in task 3.2
-    const mealIdSet = new Set();
+    const db = admin.firestore();
+    // Step 1 & 2: Build weighted score map (excludes last-24h meals via scoring)
+    const scoreMap = new Map();
     for (const order of orders) {
         const items = order.items;
-        if (items && Array.isArray(items)) {
-            for (const item of items) {
-                if (item.mealId) {
-                    mealIdSet.add(item.mealId);
-                }
+        if (!items || !Array.isArray(items))
+            continue;
+        for (const item of items) {
+            if (!item.mealId)
+                continue;
+            if (!scoreMap.has(item.mealId)) {
+                scoreMap.set(item.mealId, 0);
             }
         }
     }
-    return Array.from(mealIdSet).slice(0, 10);
+    // Calculate weighted score for each unique meal
+    const mealIds = Array.from(scoreMap.keys());
+    for (const mealId of mealIds) {
+        scoreMap.set(mealId, weightedScore(mealId, orders));
+    }
+    // Remove meals with score 0 (only ordered in last 24h or no valid orders)
+    const entries = Array.from(scoreMap.entries());
+    for (const [mealId, score] of entries) {
+        if (score === 0) {
+            scoreMap.delete(mealId);
+        }
+    }
+    // Step 3: Check meal availability by reading /meals/{mealId} documents
+    const candidateMealIds = Array.from(scoreMap.keys());
+    if (candidateMealIds.length === 0) {
+        return [];
+    }
+    // Batch-read meal documents to check availability
+    const mealRefs = candidateMealIds.map((id) => db.doc(`meals/${id}`));
+    const mealDocs = await db.getAll(...mealRefs);
+    const availableMealIds = new Set();
+    for (const doc of mealDocs) {
+        if (doc.exists) {
+            const data = doc.data();
+            if ((data === null || data === void 0 ? void 0 : data.isAvailable) === true) {
+                availableMealIds.add(doc.id);
+            }
+        }
+    }
+    // Filter to only available meals
+    const availableCandidates = candidateMealIds.filter((id) => availableMealIds.has(id));
+    // Step 4: Sort by weighted score descending
+    availableCandidates.sort((a, b) => {
+        const scoreA = scoreMap.get(a) || 0;
+        const scoreB = scoreMap.get(b) || 0;
+        return scoreB - scoreA;
+    });
+    // Step 5: Return top 10
+    return availableCandidates.slice(0, 10);
 }
 /**
  * Returns popular meals for cold-start users (< 3 orders).
- * Stub — full implementation in task 3.3.
+ * Queries the top 10 available meals ordered by popularityScore descending.
+ *
+ * Validates: Requirements 2.1, 2.2
  *
  * @returns Array of up to 10 meal IDs sorted by popularity score
  */
 async function getPopularMeals() {
-    // Stub: query top 10 meals by popularityScore where isAvailable == true
-    // Full implementation in task 3.3
     const db = admin.firestore();
     const mealsSnap = await db
         .collection("meals")
@@ -152,6 +256,15 @@ exports.computeRecommendations = (0, https_1.onCall)(async (request) => {
     let mealIds;
     if (orders.length >= 3) {
         mealIds = await computePersonalized(orders);
+        // Fill-up logic: if personalized results < 3, fill remaining slots
+        // with popularity-based meals up to 10 total (Req 1 AC5)
+        if (mealIds.length < 3) {
+            const popularMeals = await getPopularMeals();
+            const existingIds = new Set(mealIds);
+            const fillMeals = popularMeals.filter((id) => !existingIds.has(id));
+            const slotsRemaining = 10 - mealIds.length;
+            mealIds = [...mealIds, ...fillMeals.slice(0, slotsRemaining)];
+        }
     }
     else {
         mealIds = await getPopularMeals();

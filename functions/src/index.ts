@@ -49,3 +49,10 @@ export { refreshPopularityRankings } from "./recommendations/refreshPopularityRa
 // Coins — Loyalty System
 export { onPaymentSuccess } from "./coins/onPaymentSuccess";
 export { redeemCoins } from "./coins/redeemCoins";
+
+// Leaderboard
+export { onOrderCompletedLeaderboard } from "./leaderboard/onOrderCompleted";
+export { rebuildLeaderboard } from "./leaderboard/rebuildLeaderboard";
+export { onVisibilityChanged } from "./leaderboard/onVisibilityChanged";
+export { resetWeeklyScores } from "./leaderboard/resetWeeklyScores";
+export { resetMonthlyScores } from "./leaderboard/resetMonthlyScores";

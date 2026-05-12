@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../notifiers/leaderboard_visibility_notifier.dart';
 import '../notifiers/notification_prefs_notifier.dart';
 
 /// Screen that lets the authenticated user toggle each notification
@@ -110,6 +111,12 @@ class NotificationPrefsScreen extends ConsumerWidget {
                         .updateCoinEvents(value),
               ),
 
+              // ── Privacy section ────────────────────────────────────────
+              const _SectionHeader(title: 'Privacy'),
+
+              // ── Leaderboard Visibility ─────────────────────────────────
+              _LeaderboardVisibilityTile(isSaving: isSaving),
+
               // ── Saving indicator ───────────────────────────────────────
               if (isSaving)
                 const Padding(
@@ -170,6 +177,85 @@ class _ErrorView extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+
+
+// ---------------------------------------------------------------------------
+// _SectionHeader
+// ---------------------------------------------------------------------------
+
+class _SectionHeader extends StatelessWidget {
+  const _SectionHeader({required this.title});
+
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
+      child: Text(
+        title,
+        style: Theme.of(context).textTheme.titleSmall?.copyWith(
+              color: Theme.of(context).colorScheme.primary,
+              fontWeight: FontWeight.w600,
+            ),
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// _LeaderboardVisibilityTile
+// ---------------------------------------------------------------------------
+
+/// A [ConsumerWidget] that renders the leaderboard visibility toggle.
+///
+/// Reads from [leaderboardVisibilityNotifierProvider] and writes updates
+/// to `/userScores/{uid}.leaderboardVisible` in Firestore.
+///
+/// Defaults to `true` (opted in) per Requirement 4 AC1.
+class _LeaderboardVisibilityTile extends ConsumerWidget {
+  const _LeaderboardVisibilityTile({required this.isSaving});
+
+  /// Whether the parent notification prefs are currently saving.
+  /// Used to disable this toggle during concurrent saves.
+  final bool isSaving;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final visibilityAsync = ref.watch(leaderboardVisibilityNotifierProvider);
+
+    // Listen for save errors and show a snackbar.
+    ref.listen<AsyncValue<bool?>>(
+      leaderboardVisibilityNotifierProvider,
+      (previous, next) {
+        if (next is AsyncError && next.hasValue) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text(
+                  'Failed to update leaderboard visibility. Please try again.'),
+              backgroundColor: Theme.of(context).colorScheme.error,
+            ),
+          );
+        }
+      },
+    );
+
+    final isToggleSaving = visibilityAsync.isLoading;
+    final value = visibilityAsync.valueOrNull ?? true;
+
+    return SwitchListTile(
+      title: const Text('Leaderboard Visibility'),
+      subtitle: const Text('Show your profile on the leaderboard'),
+      value: value,
+      onChanged: (isSaving || isToggleSaving)
+          ? null
+          : (newValue) => ref
+              .read(leaderboardVisibilityNotifierProvider.notifier)
+              .toggle(newValue),
     );
   }
 }

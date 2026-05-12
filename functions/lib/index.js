@@ -33,7 +33,7 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.computeRecommendations = exports.onOrderStatusChanged = exports.createOrder = exports.expireStaleTransactions = exports.orangeMoneyCallback = exports.initiatePayment = exports.onNutritionalInfoValidationUpdated = exports.onNutritionalInfoValidationCreated = exports.onMealWriteValidationUpdated = exports.onMealWriteValidationCreated = exports.onCategoryDeactivated = exports.onMealDeleted = exports.onMealUpdated = exports.onMealCreated = exports.checkOtpRateLimit = exports.resetLoginAttempts = exports.recordFailedLoginAttempt = exports.checkAccountLock = exports.onUserDeleted = exports.onUserCreated = exports.aggregateAnalytics = exports.adminManageUser = exports.adminManageCategory = exports.adminDeleteMeal = exports.adminUpdateMeal = exports.adminCreateMeal = exports.adminUpdateOrderStatus = void 0;
+exports.resetWeeklyScores = exports.rebuildLeaderboard = exports.onOrderCompletedLeaderboard = exports.redeemCoins = exports.onPaymentSuccess = exports.refreshPopularityRankings = exports.onOrderCompletedRecommendations = exports.computeRecommendations = exports.onOrderStatusChanged = exports.createOrder = exports.expireStaleTransactions = exports.orangeMoneyCallback = exports.initiatePayment = exports.onNutritionalInfoValidationUpdated = exports.onNutritionalInfoValidationCreated = exports.onMealWriteValidationUpdated = exports.onMealWriteValidationCreated = exports.onCategoryDeactivated = exports.onMealDeleted = exports.onMealUpdated = exports.onMealCreated = exports.checkOtpRateLimit = exports.resetLoginAttempts = exports.recordFailedLoginAttempt = exports.checkAccountLock = exports.onUserDeleted = exports.onUserCreated = exports.aggregateAnalytics = exports.adminManageUser = exports.adminManageCategory = exports.adminDeleteMeal = exports.adminUpdateMeal = exports.adminCreateMeal = exports.adminUpdateOrderStatus = void 0;
 const admin = __importStar(require("firebase-admin"));
 // Initialize Firebase Admin SDK once
 if (!admin.apps.length) {
@@ -92,4 +92,20 @@ Object.defineProperty(exports, "onOrderStatusChanged", { enumerable: true, get: 
 // Recommendation System
 var computeRecommendations_1 = require("./recommendations/computeRecommendations");
 Object.defineProperty(exports, "computeRecommendations", { enumerable: true, get: function () { return computeRecommendations_1.computeRecommendations; } });
+var onOrderCompleted_1 = require("./recommendations/onOrderCompleted");
+Object.defineProperty(exports, "onOrderCompletedRecommendations", { enumerable: true, get: function () { return onOrderCompleted_1.onOrderCompletedRecommendations; } });
+var refreshPopularityRankings_1 = require("./recommendations/refreshPopularityRankings");
+Object.defineProperty(exports, "refreshPopularityRankings", { enumerable: true, get: function () { return refreshPopularityRankings_1.refreshPopularityRankings; } });
+// Coins — Loyalty System
+var onPaymentSuccess_1 = require("./coins/onPaymentSuccess");
+Object.defineProperty(exports, "onPaymentSuccess", { enumerable: true, get: function () { return onPaymentSuccess_1.onPaymentSuccess; } });
+var redeemCoins_1 = require("./coins/redeemCoins");
+Object.defineProperty(exports, "redeemCoins", { enumerable: true, get: function () { return redeemCoins_1.redeemCoins; } });
+// Leaderboard
+var onOrderCompleted_2 = require("./leaderboard/onOrderCompleted");
+Object.defineProperty(exports, "onOrderCompletedLeaderboard", { enumerable: true, get: function () { return onOrderCompleted_2.onOrderCompletedLeaderboard; } });
+var rebuildLeaderboard_1 = require("./leaderboard/rebuildLeaderboard");
+Object.defineProperty(exports, "rebuildLeaderboard", { enumerable: true, get: function () { return rebuildLeaderboard_1.rebuildLeaderboard; } });
+var resetWeeklyScores_1 = require("./leaderboard/resetWeeklyScores");
+Object.defineProperty(exports, "resetWeeklyScores", { enumerable: true, get: function () { return resetWeeklyScores_1.resetWeeklyScores; } });
 //# sourceMappingURL=index.js.map

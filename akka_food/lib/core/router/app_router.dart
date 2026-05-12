@@ -13,6 +13,7 @@ import '../../features/admin_dashboard/presentation/screens/admin_order_list_scr
 import '../../features/admin_dashboard/presentation/screens/admin_user_detail_screen.dart';
 import '../../features/admin_dashboard/presentation/screens/admin_user_list_screen.dart';
 import '../../features/delivery_system/presentation/screens/order_tracking_screen.dart';
+import '../../features/leaderboard/presentation/screens/leaderboard_screen.dart';
 import '../../features/auth/domain/entities/app_user.dart';
 import '../../features/auth/presentation/notifiers/auth_notifier.dart';
 import '../../features/auth/presentation/notifiers/auth_state.dart';
@@ -64,6 +65,9 @@ abstract final class AppRoutes {
 
   // Order Tracking
   static const orderTracking = '/orders/:orderId/tracking';
+
+  // Leaderboard
+  static const leaderboard = '/leaderboard';
 
   // Cart & Payment
   static const cart = '/cart';
@@ -312,6 +316,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.cart,
         builder: (context, state) => const CartScreen(),
+      ),
+
+      // ── Leaderboard ────────────────────────────────────────────────────
+      GoRoute(
+        path: AppRoutes.leaderboard,
+        builder: (context, state) => const LeaderboardScreen(),
       ),
 
       // ── Payment ────────────────────────────────────────────────────────

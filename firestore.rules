@@ -243,5 +243,57 @@ service cloud.firestore {
       allow read, write: if false; // Written only by Cloud Functions (server SDK)
     }
 
+    // -------------------------------------------------------------------------
+    // /userScores/{uid}
+    //
+    // Task 7.3 (leaderboard spec) — User score documents.
+    //
+    // Access model:
+    //   • Read: Only the matching authenticated user may read their own score
+    //     document (to display rank/score in the UI).
+    //   • Update: The user may update ONLY the `leaderboardVisible` field on
+    //     their own document. Score fields (allTimeScore, monthlyScore,
+    //     weeklyScore) are written exclusively by Cloud Functions (Admin SDK
+    //     bypasses Security Rules).
+    //   • Create/Delete: Only Cloud Functions (Admin SDK) — all client
+    //     create/delete operations are denied.
+    //
+    // Satisfies Leaderboard Requirement 4: Privacy — user can toggle
+    // leaderboard visibility on their own document.
+    // -------------------------------------------------------------------------
+    match /userScores/{uid} {
+      allow read: if isOwner(uid);
+
+      // Allow user to update ONLY leaderboardVisible on their own document.
+      // Score fields must remain unchanged — enforced by comparing values.
+      allow update: if isOwner(uid) &&
+        request.resource.data.allTimeScore == resource.data.allTimeScore &&
+        request.resource.data.monthlyScore == resource.data.monthlyScore &&
+        request.resource.data.weeklyScore == resource.data.weeklyScore;
+
+      // Create and delete are Cloud Functions only (Admin SDK bypasses rules).
+      allow create, delete: if false;
+    }
+
+    // -------------------------------------------------------------------------
+    // /leaderboard/{docId}
+    //
+    // Task 7.3 (leaderboard spec) — Public leaderboard documents.
+    //
+    // Access model:
+    //   • Read: Any authenticated user may read leaderboard documents
+    //     (public ranking data displayed on the Leaderboard screen).
+    //   • Write: All client writes are denied. Leaderboard documents are
+    //     written exclusively by the `rebuildLeaderboard` Cloud Function
+    //     (Admin SDK bypasses Security Rules).
+    //
+    // Satisfies Leaderboard Requirement 1: Display Leaderboard — any
+    // authenticated user can view the top 100 rankings.
+    // -------------------------------------------------------------------------
+    match /leaderboard/{docId} {
+      allow read: if isAuthenticated();
+      allow write: if false; // Only Cloud Functions (Admin SDK) can write
+    }
+
   }
 }

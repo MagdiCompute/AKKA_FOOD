@@ -65,9 +65,11 @@ async function executePostPaymentActions(params) {
         reference,
         timestamp: new Date().toISOString(),
     });
-    // ── 2. Credit coins — 5% of amount (Req 2 AC3) ───────────────────────────
-    const coins = calculateCoins(amount);
-    await creditCoins(db, uid, coins, transactionId);
+    // ── 2. Credit coins — handled by onPaymentSuccess Firestore trigger ──────
+    // Coin crediting is now handled by the `onPaymentSuccess` trigger on
+    // `/transactions/{id}` which fires when status changes to 'success'.
+    // It provides idempotency (orderId check) and atomic transactions.
+    // See: functions/src/coins/onPaymentSuccess.ts
     // ── 3. Clear user's cart (Req 2 AC4) ──────────────────────────────────────
     await clearCart(db, uid, transactionId);
     // ── 4. Send FCM push notification (Req 2 AC6) ────────────────────────────
@@ -124,30 +126,6 @@ async function createOrder(db, transactionId, uid, amount) {
         timestamp: new Date().toISOString(),
     });
     return orderRef.id;
-}
-/**
- * Credits loyalty coins to the user's account.
- * Uses FieldValue.increment for atomic updates.
- */
-async function creditCoins(db, uid, coins, transactionId) {
-    if (coins <= 0) {
-        functions.logger.info("No coins to credit (amount too small)", {
-            uid,
-            coins,
-            transactionId,
-            timestamp: new Date().toISOString(),
-        });
-        return;
-    }
-    await db.collection("users").doc(uid).update({
-        coins: admin.firestore.FieldValue.increment(coins),
-    });
-    functions.logger.info("Coins credited", {
-        uid,
-        coins,
-        transactionId,
-        timestamp: new Date().toISOString(),
-    });
 }
 /**
  * Clears the user's cart after successful payment.

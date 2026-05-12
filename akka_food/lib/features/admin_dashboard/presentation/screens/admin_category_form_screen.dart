@@ -48,6 +48,7 @@ class _AdminCategoryFormScreenState
   late final String _effectiveCategoryId;
 
   late final TextEditingController _nameController;
+  late final TextEditingController _imageUrlController;
 
   bool _controllersInitialised = false;
 
@@ -62,6 +63,7 @@ class _AdminCategoryFormScreenState
         'temp_${DateTime.now().millisecondsSinceEpoch}';
 
     _nameController = TextEditingController();
+    _imageUrlController = TextEditingController();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (widget.categoryId != null) {
@@ -77,6 +79,7 @@ class _AdminCategoryFormScreenState
   @override
   void dispose() {
     _nameController.dispose();
+    _imageUrlController.dispose();
     super.dispose();
   }
 
@@ -88,6 +91,7 @@ class _AdminCategoryFormScreenState
     if (formState.isEditMode && formState.name.isEmpty) return;
 
     _nameController.text = formState.name;
+    _imageUrlController.text = formState.imageUrl ?? '';
     _controllersInitialised = true;
   }
 
@@ -280,15 +284,16 @@ class _AdminCategoryFormScreenState
                   const SizedBox(height: 8),
                   // Image URL text field with live preview
                   TextFormField(
-                    initialValue: formState.imageUrl ?? '',
+                    controller: _imageUrlController,
                     decoration: InputDecoration(
                       labelText: 'Image URL',
                       border: const OutlineInputBorder(),
                       hintText: 'https://images.unsplash.com/...',
-                      suffixIcon: formState.imageUrl != null && formState.imageUrl!.isNotEmpty
+                      suffixIcon: _imageUrlController.text.isNotEmpty
                           ? IconButton(
                               icon: const Icon(Icons.clear),
                               onPressed: () {
+                                _imageUrlController.clear();
                                 notifier.setImageUrl(null);
                               },
                             )

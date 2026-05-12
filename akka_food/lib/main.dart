@@ -15,6 +15,7 @@ import 'features/cart/data/datasources/remote_config_service.dart';
 import 'features/delivery_system/data/datasources/fcm_service.dart';
 import 'features/delivery_system/data/datasources/notification_handler.dart'
     show rootScaffoldMessengerKey, notificationHandlerProvider;
+import 'features/meal_catalog/data/datasources/hive_catalog_cache.dart';
 import 'features/user_profile/data/datasources/hive_profile_cache.dart';
 import 'firebase_options.dart';
 
@@ -35,6 +36,9 @@ Future<void> main() async {
 
   // Open cart box for cart persistence.
   await Hive.openBox<String>(kCartBox);
+
+  // Open catalog cache boxes (meals, categories, featured).
+  await HiveCatalogCache.openBoxes();
 
   // Fetch and cache Remote Config values (delivery fee, etc.).
   // The SDK caches locally with a 1-hour minimum fetch interval.

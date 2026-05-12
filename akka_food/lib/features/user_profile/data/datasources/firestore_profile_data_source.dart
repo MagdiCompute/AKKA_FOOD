@@ -37,12 +37,32 @@ class FirestoreProfileDataSource {
 
   /// Reads `/users/{uid}` and returns a [UserProfile].
   ///
-  /// Throws a [StateError] if the document does not exist.
+  /// If the document does not exist, creates a default profile from the
+  /// provided [uid] and returns it. This handles the case where a user
+  /// signs in via Firebase Auth but has no Firestore profile document yet.
   Future<UserProfile> getProfile(String uid) async {
     final snapshot = await _userDoc(uid).get();
 
     if (!snapshot.exists || snapshot.data() == null) {
-      throw StateError('Profile document not found for uid: $uid');
+      // Auto-create a minimal profile document for new users.
+      final now = DateTime.now();
+      final defaultProfile = UserProfile(
+        uid: uid,
+        displayName: 'User',
+        updatedAt: now,
+      );
+      await _userDoc(uid).set({
+        'displayName': 'User',
+        'email': null,
+        'phoneNumber': null,
+        'avatarUrl': null,
+        'role': 'user',
+        'coinBalance': 0,
+        'isDeactivated': false,
+        'createdAt': FieldValue.serverTimestamp(),
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+      return defaultProfile;
     }
 
     return UserProfile.fromMap({'uid': uid, ...snapshot.data()!});

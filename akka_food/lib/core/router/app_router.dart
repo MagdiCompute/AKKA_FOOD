@@ -254,7 +254,7 @@ class HomeScreen extends ConsumerWidget {
             icon: Icons.restaurant_menu,
             title: 'Browse Meals',
             subtitle: 'Explore our meal catalog',
-            onTap: () => context.push('/leaderboard'), // placeholder — catalog route
+            onTap: () => context.push('/leaderboard'), // TODO: add catalog route
           ),
           _HomeNavCard(
             icon: Icons.leaderboard,

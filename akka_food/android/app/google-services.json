@@ -1,11 +1,29 @@
 {
-  "TODO": "Replace this placeholder with the real google-services.json downloaded from the Firebase Console.",
-  "Instructions": [
-    "1. Go to https://console.firebase.google.com/",
-    "2. Select (or create) your Firebase project.",
-    "3. Add an Android app with package name: com.akkafood.akka_food",
-    "4. Download the generated google-services.json.",
-    "5. Replace this file with the downloaded file.",
-    "6. Do NOT commit the real google-services.json to version control — add it to .gitignore."
-  ]
+  "project_info": {
+    "project_number": "497736524789",
+    "project_id": "akka-food",
+    "storage_bucket": "akka-food.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:497736524789:android:2aa3b4af63b3ffe4ad76bc",
+        "android_client_info": {
+          "package_name": "com.akkafood.akka_food"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDM3j3MDD6Gjsgd9ZAs8t3B2v9-d7po3mg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
 }

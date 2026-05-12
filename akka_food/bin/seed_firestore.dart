@@ -188,7 +188,7 @@ Future<void> main() async {
 
   // Get all users from Firebase Auth (we'll create a profile for a test UID)
   // Since we can't list auth users from client SDK, create a known test profile.
-  const testUid = 'REPLACE_WITH_YOUR_UID';
+  const testUid = 'mkgzbtUkChSdUwC285KNaDpQZX02';
   await firestore.collection('users').doc(testUid).set({
     'displayName': 'Test User',
     'email': 'test@example.com',

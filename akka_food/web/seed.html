@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>AKKA Food - Seed Firestore</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 700px; margin: 40px auto; padding: 0 20px; background: #1a1a2e; color: #eee; }
+    h1 { color: #ff6b35; }
+    button { background: #ff6b35; color: white; border: none; padding: 12px 24px; border-radius: 8px; font-size: 16px; cursor: pointer; margin: 8px 4px; }
+    button:hover { background: #e55a2b; }
+    button:disabled { background: #666; cursor: not-allowed; }
+    #log { background: #0f0f23; padding: 16px; border-radius: 8px; white-space: pre-wrap; font-family: monospace; font-size: 13px; max-height: 500px; overflow-y: auto; margin-top: 16px; }
+    .success { color: #4caf50; }
+    .error { color: #f44336; }
+    .info { color: #64b5f6; }
+  </style>
+</head>
+<body>
+  <h1>🌱 AKKA Food — Firestore Seeder</h1>
+  <p>This page seeds your Firestore database with test data (categories, meals, user profiles, leaderboard entries).</p>
+  <div>
+    <button id="seedBtn" onclick="seedAll()">Seed All Data</button>
+    <button id="clearBtn" onclick="clearAll()">Clear All Data</button>
+  </div>
+  <div id="log"></div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, doc, setDoc, getDocs, collection, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyB63_cUGvrW7uN_96mNTae7VPX9YxUfEW8",
+      authDomain: "akka-food.firebaseapp.com",
+      projectId: "akka-food",
+      storageBucket: "akka-food.firebasestorage.app",
+      messagingSenderId: "497736524789",
+      appId: "1:497736524789:web:c6c16f2d7ebe0517ad76bc",
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const logEl = document.getElementById('log');
+    function log(msg, cls = '') {
+      logEl.innerHTML += `<span class="${cls}">${msg}</span>\n`;
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+
+    // ── Categories ──────────────────────────────────────────────────────
+    const categories = [
+      { id: 'cat-burgers', name: 'Burgers', imageUrl: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400', isActive: true },
+      { id: 'cat-pizza', name: 'Pizza', imageUrl: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400', isActive: true },
+      { id: 'cat-chicken', name: 'Chicken', imageUrl: 'https://images.unsplash.com/photo-1626645738196-c2a7c87a8f58?w=400', isActive: true },
+      { id: 'cat-salads', name: 'Salads', imageUrl: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400', isActive: true },
+      { id: 'cat-drinks', name: 'Drinks', imageUrl: 'https://images.unsplash.com/photo-1544145945-f90425340c7e?w=400', isActive: true },
+    ];
+
+    // ── Meals ───────────────────────────────────────────────────────────
+    const meals = [
+      { id: 'meal-classic-burger', name: 'Classic Burger', description: 'Juicy beef patty with lettuce, tomato, and our special sauce.', price: 3500, categoryId: 'cat-burgers', imageUrls: ['https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600'], isAvailable: true, isFeatured: true, featuredOrder: 1, calories: 650, preparationTime: 15 },
+      { id: 'meal-cheese-burger', name: 'Double Cheese Burger', description: 'Two beef patties with melted cheddar, pickles, and onions.', price: 4500, categoryId: 'cat-burgers', imageUrls: ['https://images.unsplash.com/photo-1553979459-d2229ba7433b?w=600'], isAvailable: true, isFeatured: false, featuredOrder: 0, calories: 850, preparationTime: 18 },
+      { id: 'meal-margherita', name: 'Margherita Pizza', description: 'Fresh mozzarella, basil, and tomato sauce on thin crust.', price: 5000, categoryId: 'cat-pizza', imageUrls: ['https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=600'], isAvailable: true, isFeatured: true, featuredOrder: 2, calories: 750, preparationTime: 20 },
+      { id: 'meal-pepperoni', name: 'Pepperoni Pizza', description: 'Loaded with pepperoni, mozzarella, and oregano.', price: 5500, categoryId: 'cat-pizza', imageUrls: ['https://images.unsplash.com/photo-1628840042765-356cda07504e?w=600'], isAvailable: true, isFeatured: false, featuredOrder: 0, calories: 900, preparationTime: 22 },
+      { id: 'meal-grilled-chicken', name: 'Grilled Chicken', description: 'Tender grilled chicken breast with herbs and spices.', price: 4000, categoryId: 'cat-chicken', imageUrls: ['https://images.unsplash.com/photo-1626645738196-c2a7c87a8f58?w=600'], isAvailable: true, isFeatured: true, featuredOrder: 3, calories: 450, preparationTime: 25 },
+      { id: 'meal-fried-chicken', name: 'Crispy Fried Chicken', description: 'Golden crispy fried chicken with coleslaw.', price: 3800, categoryId: 'cat-chicken', imageUrls: ['https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600'], isAvailable: true, isFeatured: false, featuredOrder: 0, calories: 700, preparationTime: 20 },
+      { id: 'meal-caesar-salad', name: 'Caesar Salad', description: 'Romaine lettuce, croutons, parmesan, and Caesar dressing.', price: 2500, categoryId: 'cat-salads', imageUrls: ['https://images.unsplash.com/photo-1546793665-c74683f339c1?w=600'], isAvailable: true, isFeatured: false, featuredOrder: 0, calories: 350, preparationTime: 10 },
+      { id: 'meal-greek-salad', name: 'Greek Salad', description: 'Cucumber, tomato, olives, feta cheese with olive oil.', price: 2800, categoryId: 'cat-salads', imageUrls: ['https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=600'], isAvailable: true, isFeatured: false, featuredOrder: 0, calories: 300, preparationTime: 8 },
+      { id: 'meal-mango-smoothie', name: 'Mango Smoothie', description: 'Fresh mango blended with yogurt and honey.', price: 1500, categoryId: 'cat-drinks', imageUrls: ['https://images.unsplash.com/photo-1546173159-315724a31696?w=600'], isAvailable: true, isFeatured: true, featuredOrder: 4, calories: 200, preparationTime: 5 },
+      { id: 'meal-iced-coffee', name: 'Iced Coffee', description: 'Cold brew coffee with milk and caramel syrup.', price: 1200, categoryId: 'cat-drinks', imageUrls: ['https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=600'], isAvailable: true, isFeatured: false, featuredOrder: 0, calories: 150, preparationTime: 5 },
+      { id: 'meal-unavailable', name: 'Seasonal Special (Sold Out)', description: 'This item is currently unavailable.', price: 6000, categoryId: 'cat-burgers', imageUrls: ['https://images.unsplash.com/photo-1571091718767-18b5b1457add?w=600'], isAvailable: false, isFeatured: false, featuredOrder: 0, calories: 500, preparationTime: 30 },
+    ];
+
+    // ── User profiles ───────────────────────────────────────────────────
+    const testUid = 'mkgzbtUkChSdUwC285KNaDpQZX02';
+    const leaderboardUsers = [
+      { uid: 'user-1', displayName: 'Alice', coinBalance: 12500, totalOrders: 25 },
+      { uid: 'user-2', displayName: 'Bob', coinBalance: 9800, totalOrders: 20 },
+      { uid: 'user-3', displayName: 'Charlie', coinBalance: 7200, totalOrders: 15 },
+      { uid: 'user-4', displayName: 'Diana', coinBalance: 5500, totalOrders: 11 },
+      { uid: 'user-5', displayName: 'Eve', coinBalance: 3000, totalOrders: 6 },
+    ];
+
+    // ── Seed function ───────────────────────────────────────────────────
+    window.seedAll = async function() {
+      const btn = document.getElementById('seedBtn');
+      btn.disabled = true;
+      logEl.innerHTML = '';
+
+      try {
+        // Categories
+        log('📂 Creating categories...', 'info');
+        for (const cat of categories) {
+          const { id, ...data } = cat;
+          await setDoc(doc(db, 'categories', id), { ...data, createdAt: serverTimestamp() });
+        }
+        log(`   ✅ ${categories.length} categories created`, 'success');
+
+        // Meals
+        log('🍔 Creating meals...', 'info');
+        for (const meal of meals) {
+          const { id, ...data } = meal;
+          await setDoc(doc(db, 'meals', id), { ...data, createdAt: serverTimestamp() });
+        }
+        log(`   ✅ ${meals.length} meals created`, 'success');
+
+        // Test user profile (admin)
+        log('👤 Creating test user profile...', 'info');
+        await setDoc(doc(db, 'users', testUid), {
+          displayName: 'Test User',
+          email: 'test@example.com',
+          phoneNumber: null,
+          avatarUrl: null,
+          role: 'admin',
+          coinBalance: 5000,
+          isDeactivated: false,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        });
+        log(`   ✅ User profile created (UID: ${testUid}, role: admin)`, 'success');
+
+        // Leaderboard users
+        log('🏆 Creating leaderboard entries...', 'info');
+        for (const user of leaderboardUsers) {
+          await setDoc(doc(db, 'users', user.uid), {
+            displayName: user.displayName,
+            email: `${user.displayName.toLowerCase()}@example.com`,
+            coinBalance: user.coinBalance,
+            totalOrders: user.totalOrders,
+            role: 'user',
+            isDeactivated: false,
+            createdAt: serverTimestamp(),
+          });
+        }
+        log(`   ✅ ${leaderboardUsers.length} leaderboard users created`, 'success');
+
+        log('\n✅ Seeding complete! Refresh your Flutter app to see the data.', 'success');
+        log('\n📋 Your user has admin role — you can access the Admin panel.', 'info');
+      } catch (e) {
+        log(`\n❌ Error: ${e.message}`, 'error');
+        log('Make sure Firestore rules allow writes (test mode).', 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    };
+
+    // ── Clear function ──────────────────────────────────────────────────
+    window.clearAll = async function() {
+      const btn = document.getElementById('clearBtn');
+      btn.disabled = true;
+      log('\n🗑️ Clearing all data...', 'info');
+
+      try {
+        for (const col of ['categories', 'meals', 'users', 'orders']) {
+          const snapshot = await getDocs(collection(db, col));
+          let count = 0;
+          for (const d of snapshot.docs) {
+            await deleteDoc(d.ref);
+            count++;
+          }
+          if (count > 0) log(`   Deleted ${count} docs from '${col}'`, 'info');
+        }
+        log('   ✅ All data cleared', 'success');
+      } catch (e) {
+        log(`   ❌ Error: ${e.message}`, 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    };
+  </script>
+</body>
+</html>

@@ -24,12 +24,18 @@ class FirebaseAuthDataSource {
     GoogleSignIn? googleSignIn,
     FacebookAuth? facebookAuth,
   })  : _auth = firebaseAuth ?? FirebaseAuth.instance,
-        _googleSignIn = googleSignIn ?? GoogleSignIn(),
+        _googleSignInOverride = googleSignIn,
         _facebookAuth = facebookAuth ?? FacebookAuth.instance;
 
   final FirebaseAuth _auth;
-  final GoogleSignIn _googleSignIn;
+  final GoogleSignIn? _googleSignInOverride;
   final FacebookAuth _facebookAuth;
+
+  /// Lazily initialized GoogleSignIn to avoid assertion on web when
+  /// no client ID is configured (only needed for actual Google sign-in).
+  GoogleSignIn get _googleSignIn =>
+      _googleSignInOverride ?? (_googleSignInLazy ??= GoogleSignIn());
+  GoogleSignIn? _googleSignInLazy;
 
   // ---------------------------------------------------------------------------
   // 4.2 — Email/password sign-up

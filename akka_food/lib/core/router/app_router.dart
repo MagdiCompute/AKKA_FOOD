@@ -14,6 +14,8 @@ import '../../features/admin_dashboard/presentation/screens/admin_user_detail_sc
 import '../../features/admin_dashboard/presentation/screens/admin_user_list_screen.dart';
 import '../../features/delivery_system/presentation/screens/order_tracking_screen.dart';
 import '../../features/leaderboard/presentation/screens/leaderboard_screen.dart';
+import '../../features/meal_catalog/presentation/screens/catalog_screen.dart';
+import '../../features/meal_catalog/presentation/screens/meal_detail_screen.dart';
 import '../../features/auth/domain/entities/app_user.dart';
 import '../../features/auth/presentation/notifiers/auth_notifier.dart';
 import '../../features/auth/presentation/notifiers/auth_state.dart';
@@ -65,6 +67,10 @@ abstract final class AppRoutes {
 
   // Order Tracking
   static const orderTracking = '/orders/:orderId/tracking';
+
+  // Catalog
+  static const catalog = '/catalog';
+  static const mealDetail = '/meals/:mealId';
 
   // Leaderboard
   static const leaderboard = '/leaderboard';
@@ -254,7 +260,7 @@ class HomeScreen extends ConsumerWidget {
             icon: Icons.restaurant_menu,
             title: 'Browse Meals',
             subtitle: 'Explore our meal catalog',
-            onTap: () => context.push('/leaderboard'), // TODO: add catalog route
+            onTap: () => context.push(AppRoutes.catalog),
           ),
           _HomeNavCard(
             icon: Icons.leaderboard,
@@ -389,6 +395,20 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.leaderboard,
         builder: (context, state) => const LeaderboardScreen(),
+      ),
+
+      // ── Catalog ────────────────────────────────────────────────────────
+      GoRoute(
+        path: AppRoutes.catalog,
+        builder: (context, state) => const CatalogScreen(),
+      ),
+
+      // ── Meal Detail ────────────────────────────────────────────────────
+      GoRoute(
+        path: AppRoutes.mealDetail,
+        builder: (context, state) => MealDetailScreen(
+          mealId: state.pathParameters['mealId']!,
+        ),
       ),
 
       // ── Payment ────────────────────────────────────────────────────────

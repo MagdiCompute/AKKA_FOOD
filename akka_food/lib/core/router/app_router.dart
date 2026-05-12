@@ -240,7 +240,42 @@ class HomeScreen extends ConsumerWidget {
     ];
 
     return Scaffold(
-      body: const Center(child: Text('Home')),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          const SizedBox(height: 16),
+          Text(
+            'Welcome to AKKA Food',
+            style: Theme.of(context).textTheme.headlineSmall,
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 24),
+          _HomeNavCard(
+            icon: Icons.restaurant_menu,
+            title: 'Browse Meals',
+            subtitle: 'Explore our meal catalog',
+            onTap: () => context.push('/leaderboard'), // placeholder — catalog route
+          ),
+          _HomeNavCard(
+            icon: Icons.leaderboard,
+            title: 'Leaderboard',
+            subtitle: 'See top users',
+            onTap: () => context.push('/leaderboard'),
+          ),
+          _HomeNavCard(
+            icon: Icons.shopping_cart,
+            title: 'My Cart',
+            subtitle: 'View your cart',
+            onTap: () => context.go(AppRoutes.cart),
+          ),
+          _HomeNavCard(
+            icon: Icons.person,
+            title: 'Profile',
+            subtitle: 'View and edit your profile',
+            onTap: () => context.go(AppRoutes.profile),
+          ),
+        ],
+      ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: 0,
         destinations: destinations,
@@ -256,6 +291,38 @@ class HomeScreen extends ConsumerWidget {
               if (isAdmin) context.go(AppRoutes.adminPrefix);
           }
         },
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// _HomeNavCard — navigation card for the home screen
+// ---------------------------------------------------------------------------
+
+class _HomeNavCard extends StatelessWidget {
+  const _HomeNavCard({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 12),
+      child: ListTile(
+        leading: Icon(icon, size: 32, color: Theme.of(context).colorScheme.primary),
+        title: Text(title),
+        subtitle: Text(subtitle),
+        trailing: const Icon(Icons.chevron_right),
+        onTap: onTap,
       ),
     );
   }

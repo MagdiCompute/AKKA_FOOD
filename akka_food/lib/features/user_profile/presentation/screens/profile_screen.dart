@@ -558,14 +558,14 @@ class _CoinBadge extends StatelessWidget {
 // _ErrorView
 // ---------------------------------------------------------------------------
 
-class _ErrorView extends StatelessWidget {
+class _ErrorView extends ConsumerWidget {
   const _ErrorView({required this.message, required this.onRetry});
 
   final String message;
   final VoidCallback onRetry;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24),
@@ -595,6 +595,15 @@ class _ErrorView extends StatelessWidget {
               onPressed: onRetry,
               icon: const Icon(Icons.refresh),
               label: const Text('Retry'),
+            ),
+            const SizedBox(height: 16),
+            OutlinedButton.icon(
+              onPressed: () async {
+                await ref.read(authNotifierProvider.notifier).signOut();
+                if (context.mounted) context.go(AppRoutes.login);
+              },
+              icon: const Icon(Icons.logout),
+              label: const Text('Sign Out'),
             ),
           ],
         ),

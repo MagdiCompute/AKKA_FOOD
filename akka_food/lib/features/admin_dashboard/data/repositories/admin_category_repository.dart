@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 import '../../domain/entities/category.dart';
 import '../../domain/repositories/i_admin_category_repository.dart';
 import '../datasources/cloud_function_admin_data_source.dart';
@@ -6,8 +8,7 @@ import '../datasources/firestore_admin_category_data_source.dart';
 /// Concrete implementation of [IAdminCategoryRepository].
 ///
 /// Delegates read operations to [FirestoreAdminCategoryDataSource].
-/// Writes go through [CloudFunctionAdminDataSource] via the
-/// `adminManageCategory` Cloud Function.
+/// Writes go directly to Firestore (Cloud Functions not yet deployed).
 class AdminCategoryRepository implements IAdminCategoryRepository {
   const AdminCategoryRepository(
     this._firestoreDataSource,
@@ -16,6 +17,8 @@ class AdminCategoryRepository implements IAdminCategoryRepository {
 
   final FirestoreAdminCategoryDataSource _firestoreDataSource;
   final CloudFunctionAdminDataSource _cloudFunctionDataSource;
+
+  FirebaseFirestore get _firestore => FirebaseFirestore.instance;
 
   @override
   Stream<List<Category>> watchAllCategories() =>
@@ -27,11 +30,13 @@ class AdminCategoryRepository implements IAdminCategoryRepository {
 
   @override
   Future<String> createCategory(Map<String, dynamic> data) async {
-    final result = await _cloudFunctionDataSource.manageCategory({
-      'action': 'create',
-      ...data,
+    final docRef = await _firestore.collection('categories').add({
+      'name': data['name'],
+      'imageUrl': data['imageUrl'],
+      'isActive': true,
+      'createdAt': FieldValue.serverTimestamp(),
     });
-    return result['categoryId'] as String;
+    return docRef.id;
   }
 
   @override
@@ -39,26 +44,20 @@ class AdminCategoryRepository implements IAdminCategoryRepository {
     String categoryId,
     Map<String, dynamic> data,
   ) async {
-    await _cloudFunctionDataSource.manageCategory({
-      'action': 'update',
-      'categoryId': categoryId,
-      ...data,
-    });
+    await _firestore.collection('categories').doc(categoryId).update(data);
   }
 
   @override
   Future<void> deactivateCategory(String categoryId) async {
-    await _cloudFunctionDataSource.manageCategory({
-      'action': 'deactivate',
-      'categoryId': categoryId,
+    await _firestore.collection('categories').doc(categoryId).update({
+      'isActive': false,
     });
   }
 
   @override
   Future<void> activateCategory(String categoryId) async {
-    await _cloudFunctionDataSource.manageCategory({
-      'action': 'activate',
-      'categoryId': categoryId,
+    await _firestore.collection('categories').doc(categoryId).update({
+      'isActive': true,
     });
   }
 }

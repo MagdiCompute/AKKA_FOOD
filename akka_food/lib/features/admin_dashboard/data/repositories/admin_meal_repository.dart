@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 import '../../domain/entities/meal.dart';
 import '../../domain/repositories/i_admin_meal_repository.dart';
 import '../datasources/cloud_function_admin_data_source.dart';
@@ -5,8 +7,8 @@ import '../datasources/firestore_admin_meal_data_source.dart';
 
 /// Concrete implementation of [IAdminMealRepository].
 ///
-/// Delegates read operations to [FirestoreAdminMealDataSource] and
-/// write operations (via Cloud Functions) to [CloudFunctionAdminDataSource].
+/// Delegates read operations to [FirestoreAdminMealDataSource].
+/// Write operations go directly to Firestore (Cloud Functions not yet deployed).
 class AdminMealRepository implements IAdminMealRepository {
   const AdminMealRepository(
     this._firestoreDataSource,
@@ -15,6 +17,8 @@ class AdminMealRepository implements IAdminMealRepository {
 
   final FirestoreAdminMealDataSource _firestoreDataSource;
   final CloudFunctionAdminDataSource _cloudFunctionDataSource;
+
+  static FirebaseFirestore get _firestore => FirebaseFirestore.instance;
 
   @override
   Stream<List<Meal>> watchAllMeals() => _firestoreDataSource.watchAllMeals();
@@ -30,14 +34,21 @@ class AdminMealRepository implements IAdminMealRepository {
       _firestoreDataSource.toggleAvailability(mealId, isAvailable: isAvailable);
 
   @override
-  Future<String> createMeal(Map<String, dynamic> data) =>
-      _cloudFunctionDataSource.createMeal(data);
+  Future<String> createMeal(Map<String, dynamic> data) async {
+    final docRef = await _firestore.collection('meals').add({
+      ...data,
+      'createdAt': FieldValue.serverTimestamp(),
+    });
+    return docRef.id;
+  }
 
   @override
-  Future<void> updateMeal(String mealId, Map<String, dynamic> data) =>
-      _cloudFunctionDataSource.updateMeal(mealId, data);
+  Future<void> updateMeal(String mealId, Map<String, dynamic> data) async {
+    await _firestore.collection('meals').doc(mealId).update(data);
+  }
 
   @override
-  Future<void> deleteMeal(String mealId) =>
-      _cloudFunctionDataSource.deleteMeal(mealId);
+  Future<void> deleteMeal(String mealId) async {
+    await _firestore.collection('meals').doc(mealId).delete();
+  }
 }

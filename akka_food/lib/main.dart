@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -15,12 +16,15 @@ import 'features/delivery_system/data/datasources/fcm_service.dart';
 import 'features/delivery_system/data/datasources/notification_handler.dart'
     show rootScaffoldMessengerKey, notificationHandlerProvider;
 import 'features/user_profile/data/datasources/hive_profile_cache.dart';
+import 'firebase_options.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize Firebase (uses platform-native config: google-services.json / GoogleService-Info.plist).
-  await Firebase.initializeApp();
+  // Initialize Firebase with platform-specific options.
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
   // Initialise Hive and open all user-profile cache boxes.
   await Hive.initFlutter();
@@ -38,20 +42,23 @@ Future<void> main() async {
   await remoteConfigService.initialize();
   await remoteConfigService.fetchAndActivate();
 
-  // Initialize Flutter Local Notifications plugin for Android channel setup.
-  final localNotifications = FlutterLocalNotificationsPlugin();
-  const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
-  const initSettings = InitializationSettings(android: androidSettings);
-  await localNotifications.initialize(initSettings);
+  // Platform-specific initialization (not available on web).
+  if (!kIsWeb) {
+    // Initialize Flutter Local Notifications plugin for Android channel setup.
+    final localNotifications = FlutterLocalNotificationsPlugin();
+    const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+    const initSettings = InitializationSettings(android: androidSettings);
+    await localNotifications.initialize(initSettings);
 
-  // Initialize Firebase Cloud Messaging for push notifications.
-  final fcmService = FCMService(
-    messaging: FirebaseMessaging.instance,
-    firestore: FirebaseFirestore.instance,
-    auth: FirebaseAuth.instance,
-    localNotifications: localNotifications,
-  );
-  await fcmService.initialize();
+    // Initialize Firebase Cloud Messaging for push notifications.
+    final fcmService = FCMService(
+      messaging: FirebaseMessaging.instance,
+      firestore: FirebaseFirestore.instance,
+      auth: FirebaseAuth.instance,
+      localNotifications: localNotifications,
+    );
+    await fcmService.initialize();
+  }
 
   runApp(
     // ProviderScope is required for Riverpod to work.
@@ -82,6 +89,7 @@ class _AkkaFoodAppState extends ConsumerState<AkkaFoodApp> {
 
   Future<void> _initNotificationHandler() async {
     if (_notificationHandlerInitialized) return;
+    if (kIsWeb) return; // Push notifications not supported on web.
     _notificationHandlerInitialized = true;
 
     final handler = ref.read(notificationHandlerProvider);

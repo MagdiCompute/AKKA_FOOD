@@ -289,6 +289,21 @@ class _AdminCategoryFormScreenState
                             ? () => _removeImage(formState.imageUrl!)
                             : null),
                   ),
+                  const SizedBox(height: 8),
+                  // Alternative: paste an image URL directly
+                  TextFormField(
+                    initialValue: formState.imageUrl ?? '',
+                    decoration: const InputDecoration(
+                      labelText: 'Or paste image URL',
+                      border: OutlineInputBorder(),
+                      hintText: 'https://...',
+                    ),
+                    onChanged: (url) {
+                      if (url.trim().isNotEmpty) {
+                        notifier.setImageUrl(url.trim());
+                      }
+                    },
+                  ),
                   const SizedBox(height: 24),
 
                   // ── Active toggle (edit mode only) ────────────────────────

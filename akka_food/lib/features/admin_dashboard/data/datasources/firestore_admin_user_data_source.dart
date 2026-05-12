@@ -36,14 +36,22 @@ class FirestoreAdminUserDataSource {
 
   /// Fetches the 20 most recent orders for the user identified by [uid].
   Future<List<AdminOrderView>> getOrdersByUserId(String uid) async {
-    final snapshot = await _ordersCollection
-        .where('uid', isEqualTo: uid)
-        .orderBy('createdAt', descending: true)
-        .limit(20)
-        .get();
-    return snapshot.docs
-        .map((doc) => AdminOrderView.fromMap(doc.id, doc.data()))
-        .toList();
+    try {
+      final snapshot = await _ordersCollection
+          .where('uid', isEqualTo: uid)
+          .orderBy('createdAt', descending: true)
+          .limit(20)
+          .get();
+      return snapshot.docs
+          .map((doc) => AdminOrderView.fromMap(doc.id, doc.data()))
+          .toList();
+    } on FirebaseException catch (e) {
+      // Composite index not yet created — return empty list.
+      if (e.code == 'failed-precondition' || e.message?.contains('index') == true) {
+        return [];
+      }
+      rethrow;
+    }
   }
 
   // ---------------------------------------------------------------------------

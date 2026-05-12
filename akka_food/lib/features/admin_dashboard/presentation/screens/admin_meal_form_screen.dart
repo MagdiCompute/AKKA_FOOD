@@ -1,10 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../notifiers/admin_meal_form_notifier.dart';
-import '../notifiers/admin_meal_notifier.dart';
 import '../widgets/meal_image_upload_widget.dart';
 
 // ---------------------------------------------------------------------------
@@ -18,6 +18,20 @@ const _kDietaryTags = [
   'Spicy',
   'Halal',
 ];
+
+// ---------------------------------------------------------------------------
+// Categories provider — reads directly from Firestore
+// ---------------------------------------------------------------------------
+
+/// Fetches active categories from Firestore for the category dropdown.
+final _firestoreCategoriesProvider =
+    FutureProvider<List<Map<String, dynamic>>>((ref) async {
+  final snapshot = await FirebaseFirestore.instance
+      .collection('categories')
+      .where('isActive', isEqualTo: true)
+      .get();
+  return snapshot.docs.map((doc) => {'id': doc.id, 'name': doc.data()['name'] ?? doc.id}).toList();
+});
 
 // ---------------------------------------------------------------------------
 // Screen
@@ -409,7 +423,7 @@ class _AdminMealFormScreenState extends ConsumerState<AdminMealFormScreen> {
 // Category dropdown
 // ---------------------------------------------------------------------------
 
-/// Dropdown that loads categories from [adminMealNotifierProvider].
+/// Dropdown that loads categories from Firestore directly.
 class _CategoryDropdown extends ConsumerWidget {
   const _CategoryDropdown({
     required this.selectedCategory,
@@ -421,30 +435,35 @@ class _CategoryDropdown extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final mealState = ref.watch(adminMealNotifierProvider);
+    final categoriesAsync = ref.watch(_firestoreCategoriesProvider);
 
-    final categories = mealState.valueOrNull?.categories ?? [];
-
-    return DropdownButtonFormField<String>(
-      initialValue: (selectedCategory != null && categories.contains(selectedCategory))
-          ? selectedCategory
-          : null,
-      decoration: const InputDecoration(
-        labelText: 'Category *',
-        border: OutlineInputBorder(),
-      ),
-      hint: const Text('Select a category'),
-      items: categories
-          .map(
-            (cat) => DropdownMenuItem<String>(
-              value: cat,
-              child: Text(cat),
-            ),
-          )
-          .toList(),
-      onChanged: onChanged,
-      validator: (v) =>
-          (v == null || v.trim().isEmpty) ? 'Category is required' : null,
+    return categoriesAsync.when(
+      loading: () => const LinearProgressIndicator(),
+      error: (e, _) => Text('Failed to load categories: $e'),
+      data: (categories) {
+        return DropdownButtonFormField<String>(
+          value: (selectedCategory != null &&
+                  categories.any((c) => c['id'] == selectedCategory))
+              ? selectedCategory
+              : null,
+          decoration: const InputDecoration(
+            labelText: 'Category *',
+            border: OutlineInputBorder(),
+          ),
+          hint: const Text('Select a category'),
+          items: categories
+              .map(
+                (cat) => DropdownMenuItem<String>(
+                  value: cat['id'] as String,
+                  child: Text(cat['name'] as String),
+                ),
+              )
+              .toList(),
+          onChanged: onChanged,
+          validator: (v) =>
+              (v == null || v.trim().isEmpty) ? 'Category is required' : null,
+        );
+      },
     );
   }
 }

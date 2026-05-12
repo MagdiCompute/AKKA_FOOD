@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -67,13 +68,34 @@ class _AdminCategoryFormScreenState
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (widget.categoryId != null) {
-        ref
-            .read(adminCategoryFormNotifierProvider.notifier)
-            .loadCategory(widget.categoryId!);
+        _loadCategoryDirectly(widget.categoryId!);
       } else {
         ref.read(adminCategoryFormNotifierProvider.notifier).initCreate();
       }
     });
+  }
+
+  /// Loads category data directly from Firestore and populates controllers.
+  Future<void> _loadCategoryDirectly(String categoryId) async {
+    final notifier = ref.read(adminCategoryFormNotifierProvider.notifier);
+    notifier.loadCategory(categoryId);
+
+    // Also fetch directly from Firestore to populate controllers immediately
+    try {
+      final doc = await FirebaseFirestore.instance
+          .collection('categories')
+          .doc(categoryId)
+          .get();
+      if (doc.exists && doc.data() != null && mounted) {
+        final data = doc.data()!;
+        _nameController.text = data['name'] as String? ?? '';
+        _imageUrlController.text = data['imageUrl'] as String? ?? '';
+        _controllersInitialised = true;
+        setState(() {});
+      }
+    } catch (_) {
+      // Fallback to notifier-based loading
+    }
   }
 
   @override
@@ -170,7 +192,12 @@ class _AdminCategoryFormScreenState
   Future<void> _onSave() async {
     if (!(_formKey.currentState?.validate() ?? false)) return;
 
+    // Sync controller values to notifier state before saving
     final notifier = ref.read(adminCategoryFormNotifierProvider.notifier);
+    notifier.setName(_nameController.text);
+    final imageUrl = _imageUrlController.text.trim();
+    notifier.setImageUrl(imageUrl.isEmpty ? null : imageUrl);
+
     final success = await notifier.save();
 
     if (!mounted) return;

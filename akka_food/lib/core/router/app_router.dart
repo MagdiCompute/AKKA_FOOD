@@ -283,30 +283,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         return const ProfileScreen();
       case 4:
         if (isAdmin) {
-          return const _AdminPlaceholder();
+          return const AdminHomeScreen();
         }
         return const CatalogScreen();
       default:
         return const CatalogScreen();
     }
-  }
-}
-
-/// Simple admin entry point from the home shell.
-class _AdminPlaceholder extends StatelessWidget {
-  const _AdminPlaceholder();
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Admin')),
-      body: Center(
-        child: FilledButton(
-          onPressed: () => context.push(AppRoutes.adminPrefix),
-          child: const Text('Open Admin Dashboard'),
-        ),
-      ),
-    );
   }
 }
 

@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -85,7 +86,8 @@ class AuthNotifier extends _$AuthNotifier {
     try {
       final user = await _repository.getCurrentUser();
       if (user != null) {
-        state = AuthState.authenticated(user);
+        final enriched = await _enrichWithFirestoreRole(user);
+        state = AuthState.authenticated(enriched);
       } else {
         state = const AuthState.unauthenticated();
       }
@@ -108,7 +110,8 @@ class AuthNotifier extends _$AuthNotifier {
         email: email,
         password: password,
       );
-      state = AuthState.authenticated(result.user);
+      final enriched = await _enrichWithFirestoreRole(result.user);
+      state = AuthState.authenticated(enriched);
     } catch (e) {
       state = AuthState.error(mapAuthError(e));
     }
@@ -133,7 +136,8 @@ class AuthNotifier extends _$AuthNotifier {
         password: password,
         displayName: displayName,
       );
-      state = AuthState.authenticated(result.user);
+      final enriched = await _enrichWithFirestoreRole(result.user);
+      state = AuthState.authenticated(enriched);
     } catch (e) {
       state = AuthState.error(mapAuthError(e));
     }
@@ -247,6 +251,31 @@ class AuthNotifier extends _$AuthNotifier {
     } catch (e) {
       state = AuthState.error(mapAuthError(e));
     }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Firestore role enrichment
+  // ---------------------------------------------------------------------------
+
+  /// Reads the user's `role` field from Firestore `/users/{uid}` and returns
+  /// an [AppUser] with the role applied.
+  ///
+  /// Falls back to the original user (role='user') if the document doesn't
+  /// exist or the read fails.
+  Future<AppUser> _enrichWithFirestoreRole(AppUser user) async {
+    try {
+      final doc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get();
+      if (doc.exists && doc.data() != null) {
+        final role = doc.data()!['role'] as String? ?? 'user';
+        return user.copyWith(role: role);
+      }
+    } catch (_) {
+      // Firestore read failed — use default role.
+    }
+    return user;
   }
 
   // ---------------------------------------------------------------------------

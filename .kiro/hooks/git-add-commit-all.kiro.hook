@@ -8,6 +8,6 @@
   },
   "then": {
     "type": "runCommand",
-    "command": "cd \"c:\\Users\\LENOVO THINKPAD X1\\AKKA-FOOD\" && git add . && git commit -m \"chore: auto-commit agent changes\""
+    "command": "cd \"c:\\Users\\LENOVO THINKPAD X1\\AKKA-FOOD\" && git add . && (git diff --cached --quiet && echo Nothing to commit || git commit -m \"chore: auto-commit agent changes\")"
   }
 }

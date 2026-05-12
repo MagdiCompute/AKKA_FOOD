@@ -3,9 +3,29 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:akka_food/core/router/app_router.dart';
+import 'package:akka_food/features/admin_dashboard/domain/entities/admin_order_view.dart';
+import 'package:akka_food/features/admin_dashboard/domain/entities/admin_user_view.dart';
+import 'package:akka_food/features/admin_dashboard/domain/entities/category.dart'
+    as admin_cat;
+import 'package:akka_food/features/admin_dashboard/domain/entities/meal.dart'
+    as admin_meal;
+import 'package:akka_food/features/admin_dashboard/domain/repositories/i_admin_analytics_repository.dart';
+import 'package:akka_food/features/admin_dashboard/domain/repositories/i_admin_category_repository.dart';
+import 'package:akka_food/features/admin_dashboard/domain/repositories/i_admin_meal_repository.dart';
+import 'package:akka_food/features/admin_dashboard/domain/repositories/i_admin_order_repository.dart';
+import 'package:akka_food/features/admin_dashboard/domain/repositories/i_admin_user_repository.dart';
+import 'package:akka_food/features/admin_dashboard/presentation/notifiers/admin_analytics_notifier.dart';
+import 'package:akka_food/features/admin_dashboard/presentation/notifiers/admin_category_notifier.dart';
+import 'package:akka_food/features/admin_dashboard/presentation/notifiers/admin_meal_notifier.dart';
+import 'package:akka_food/features/admin_dashboard/presentation/notifiers/admin_order_notifier.dart';
+import 'package:akka_food/features/admin_dashboard/presentation/notifiers/admin_user_notifier.dart';
 import 'package:akka_food/features/auth/domain/entities/app_user.dart';
 import 'package:akka_food/features/auth/presentation/notifiers/auth_notifier.dart';
 import 'package:akka_food/features/auth/presentation/notifiers/auth_state.dart';
+import 'package:akka_food/features/cart/domain/entities/cart.dart';
+import 'package:akka_food/features/cart/domain/entities/delivery_option.dart'
+    as cart_do;
+import 'package:akka_food/features/cart/presentation/notifiers/cart_notifier.dart';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -22,6 +42,105 @@ AppUser _makeUser({String role = 'user'}) => AppUser(
       linkedProviders: const ['password'],
       role: role,
     );
+
+/// Override for [cartNotifierProvider] that avoids Hive initialization.
+final _cartOverride = cartNotifierProvider.overrideWith(() => _FakeCartNotifier());
+
+class _FakeCartNotifier extends CartNotifier {
+  @override
+  Cart build() => Cart(items: const [], deliveryOption: cart_do.DeliveryOption.delivery);
+}
+
+/// Fake [IAdminUserRepository] that avoids Firebase dependency.
+class _FakeAdminUserRepository implements IAdminUserRepository {
+  @override
+  Stream<List<AdminUserView>> watchAllUsers() => Stream.value([]);
+
+  @override
+  Future<AdminUserView?> getUserById(String uid) async => null;
+
+  @override
+  Future<List<AdminOrderView>> getUserOrders(String uid) async => [];
+
+  @override
+  Future<void> deactivateUser(String uid) async {}
+
+  @override
+  Future<void> reactivateUser(String uid) async {}
+}
+
+class _FakeAdminOrderRepository implements IAdminOrderRepository {
+  @override
+  Stream<List<AdminOrderView>> watchActiveOrders() => Stream.value([]);
+
+  @override
+  Future<AdminOrderView?> getOrderById(String orderId) async => null;
+
+  @override
+  Future<void> updateOrderStatus(String orderId, DeliveryStatus status,
+      {int? etaMinutes}) async {}
+}
+
+class _FakeAdminMealRepository implements IAdminMealRepository {
+  @override
+  Stream<List<admin_meal.Meal>> watchAllMeals() => Stream.value([]);
+
+  @override
+  Future<List<admin_meal.Meal>> getAllMeals() async => [];
+
+  @override
+  Future<void> toggleAvailability(String mealId,
+      {required bool isAvailable}) async {}
+
+  @override
+  Future<String> createMeal(Map<String, dynamic> data) async => 'fake-id';
+
+  @override
+  Future<void> updateMeal(String mealId, Map<String, dynamic> data) async {}
+
+  @override
+  Future<void> deleteMeal(String mealId) async {}
+}
+
+class _FakeAdminAnalyticsRepository implements IAdminAnalyticsRepository {
+  @override
+  Stream<Map<String, dynamic>> watchSummary() => Stream.value({});
+}
+
+class _FakeAdminCategoryRepository implements IAdminCategoryRepository {
+  @override
+  Stream<List<admin_cat.Category>> watchAllCategories() => Stream.value([]);
+
+  @override
+  Future<List<admin_cat.Category>> getAllCategories() async => [];
+
+  @override
+  Future<String> createCategory(Map<String, dynamic> data) async => 'fake-id';
+
+  @override
+  Future<void> updateCategory(
+      String categoryId, Map<String, dynamic> data) async {}
+
+  @override
+  Future<void> deactivateCategory(String categoryId) async {}
+
+  @override
+  Future<void> activateCategory(String categoryId) async {}
+}
+
+/// All admin repository overrides needed for widget tests.
+final _adminOverrides = <Override>[
+  adminUserRepositoryProvider
+      .overrideWith((ref) => _FakeAdminUserRepository()),
+  adminOrderRepositoryProvider
+      .overrideWith((ref) => _FakeAdminOrderRepository()),
+  adminMealRepositoryProvider
+      .overrideWith((ref) => _FakeAdminMealRepository()),
+  adminAnalyticsRepositoryProvider
+      .overrideWith((ref) => _FakeAdminAnalyticsRepository()),
+  adminCategoryRepositoryProvider
+      .overrideWith((ref) => _FakeAdminCategoryRepository()),
+];
 
 // ---------------------------------------------------------------------------
 // Unit tests — pure redirect logic (no widget tree required)
@@ -389,6 +508,7 @@ void main() {
       final container = ProviderContainer(
         overrides: [
           currentUserProvider.overrideWith((ref) => _makeUser(role: 'user')),
+          _cartOverride,
         ],
       );
       addTearDown(container.dispose);
@@ -405,7 +525,7 @@ void main() {
       router.go('/admin');
       await tester.pumpAndSettle();
 
-      expect(find.text('Home'), findsOneWidget);
+      expect(find.text('Home'), findsWidgets);
       // AdminHomeScreen tab icons should not be visible.
       expect(find.byIcon(Icons.receipt_long), findsNothing);
     });
@@ -416,6 +536,7 @@ void main() {
       final container = ProviderContainer(
         overrides: [
           currentUserProvider.overrideWith((ref) => null),
+          _cartOverride,
         ],
       );
       addTearDown(container.dispose);
@@ -432,7 +553,7 @@ void main() {
       router.go('/admin');
       await tester.pumpAndSettle();
 
-      expect(find.text('Home'), findsOneWidget);
+      expect(find.text('Home'), findsWidgets);
       // AdminHomeScreen tab icons should not be visible.
       expect(find.byIcon(Icons.receipt_long), findsNothing);
     });
@@ -442,6 +563,8 @@ void main() {
       final container = ProviderContainer(
         overrides: [
           currentUserProvider.overrideWith((ref) => _makeUser(role: 'admin')),
+          _cartOverride,
+          ..._adminOverrides,
         ],
       );
       addTearDown(container.dispose);
@@ -472,6 +595,8 @@ void main() {
       final container = ProviderContainer(
         overrides: [
           currentUserProvider.overrideWith((ref) => _makeUser(role: 'user')),
+          _cartOverride,
+          ..._adminOverrides,
         ],
       );
       addTearDown(container.dispose);
@@ -488,7 +613,7 @@ void main() {
       // Regular user is redirected away from /admin.
       router.go('/admin');
       await tester.pumpAndSettle();
-      expect(find.text('Home'), findsOneWidget);
+      expect(find.text('Home'), findsWidgets);
 
       // Promote to admin.
       container.read(currentUserProvider.notifier).state =

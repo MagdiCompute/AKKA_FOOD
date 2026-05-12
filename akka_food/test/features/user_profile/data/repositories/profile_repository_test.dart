@@ -2,8 +2,10 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hive/hive.dart';
 
 import 'package:akka_food/features/user_profile/data/datasources/firestore_profile_data_source.dart';
+import 'package:akka_food/features/user_profile/data/datasources/hive_profile_cache.dart';
 import 'package:akka_food/features/user_profile/data/datasources/image_compression_service.dart';
 import 'package:akka_food/features/user_profile/data/repositories/profile_repository.dart';
 import 'package:akka_food/features/user_profile/domain/entities/notification_preference.dart';
@@ -94,6 +96,7 @@ void main() {
   late _FakeStorageClient fakeStorage;
   late _FakeCompressionService fakeCompression;
   late ProfileRepository repository;
+  late HiveProfileCache fakeCache;
 
   setUp(() async {
     fakeFirestore = FakeFirebaseFirestore();
@@ -103,11 +106,21 @@ void main() {
     fakeCompression = _FakeCompressionService();
     await fakeCompression.init();
 
+    // Initialize Hive with a temp directory for the cache.
+    final tempDir = await Directory.systemTemp.createTemp('hive_test_');
+    Hive.init(tempDir.path);
+    fakeCache = await HiveProfileCache.open();
+
     repository = ProfileRepository(
       firestoreDataSource: firestoreDataSource,
       storageClient: fakeStorage,
       compressionService: fakeCompression,
+      cache: fakeCache,
     );
+  });
+
+  tearDown(() async {
+    await Hive.deleteFromDisk();
   });
 
   // -------------------------------------------------------------------------

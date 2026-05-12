@@ -39,7 +39,8 @@ class FirestoreOrderDataSource {
   /// of the current page to fetch the next page. This cursor-based approach
   /// avoids re-reading already-seen documents and scales to large histories.
   ///
-  /// Returns an empty list when there are no more results.
+  /// Returns an empty list when there are no more results or if the required
+  /// composite index is not yet created.
   Future<List<OrderSummary>> getOrders(
     String uid, {
     int pageSize = 20,
@@ -56,15 +57,24 @@ class FirestoreOrderDataSource {
       query = query.startAfterDocument(lastDocument);
     }
 
-    final snapshot = await query.get();
+    try {
+      final snapshot = await query.get();
 
-    return snapshot.docs.map((doc) {
-      final data = <String, dynamic>{
-        'orderId': doc.id,
-        ...doc.data(),
-      };
-      return OrderSummary.fromMap(data);
-    }).toList();
+      return snapshot.docs.map((doc) {
+        final data = <String, dynamic>{
+          'orderId': doc.id,
+          ...doc.data(),
+        };
+        return OrderSummary.fromMap(data);
+      }).toList();
+    } on FirebaseException catch (e) {
+      // Firestore throws FAILED_PRECONDITION when a composite index is missing.
+      // Return empty list instead of crashing — the user has no orders yet anyway.
+      if (e.code == 'failed-precondition' || e.message?.contains('index') == true) {
+        return [];
+      }
+      rethrow;
+    }
   }
 
   // ---------------------------------------------------------------------------

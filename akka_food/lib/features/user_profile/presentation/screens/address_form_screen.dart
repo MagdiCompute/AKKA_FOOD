@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../auth/presentation/notifiers/auth_notifier.dart';
 import '../../domain/entities/delivery_address.dart';
 import '../notifiers/address_notifier.dart';
 
@@ -156,9 +157,15 @@ class _AddressFormScreenState extends ConsumerState<AddressFormScreen> {
     } else {
       // Add mode — create a new address with a temporary id; the repository
       // will assign the real Firestore document id.
+      final currentUser = ref.read(currentUserProvider);
+      if (currentUser == null) {
+        _showErrorSnackBar('Not signed in. Please sign in first.');
+        return;
+      }
+
       final newAddress = DeliveryAddress(
         id: '',
-        uid: '',
+        uid: currentUser.uid,
         label: label,
         streetAddress: street,
         city: city,

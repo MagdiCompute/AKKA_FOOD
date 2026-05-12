@@ -80,15 +80,24 @@ class CartNotifier extends _$CartNotifier {
   /// Schedules an async restore from Hive via [Future.microtask] so that the
   /// previously saved cart is loaded after the initial synchronous build
   /// completes (Req 9.2).
+  /// Whether the cart has been restored from Hive. Used to prevent the
+  /// auto-save listener from overwriting the saved cart with an empty one
+  /// before the restore completes.
+  bool _restored = false;
+
   @override
   Cart build() {
     // Watch the current user — when auth state changes (e.g. after page
     // refresh and session restore), the notifier rebuilds and restores the
     // cart from Hive.
     final currentUser = ref.watch(currentUserProvider);
+    _restored = false;
 
     // Auto-save listener: persist cart to Hive on every state change (Req 9.1).
+    // Only saves after the initial restore is complete to avoid overwriting
+    // the saved cart with an empty one.
     listenSelf((_, cart) async {
+      if (!_restored) return; // Don't save until restore is done.
       final repository = await ref.read(cartRepositoryProvider.future);
       if (repository == null) return; // No authenticated user — skip saving.
       try {
@@ -127,15 +136,20 @@ class CartNotifier extends _$CartNotifier {
   Future<void> _restoreCart() async {
     try {
       final repository = await ref.read(cartRepositoryProvider.future);
-      if (repository == null) return; // No authenticated user — skip restore.
+      if (repository == null) {
+        _restored = true;
+        return;
+      }
 
       final savedCart = await repository.load();
       if (savedCart != null) {
         state = savedCart;
       }
+      _restored = true;
     } catch (e) {
       // Log silently — cart still works in-memory.
       debugPrint('CartNotifier: failed to restore cart from Hive: $e');
+      _restored = true;
     }
   }
 

@@ -182,13 +182,44 @@ class _AddressFormScreenState extends ConsumerState<AddressFormScreen> {
   }
 
   // ---------------------------------------------------------------------------
-  // Map picker placeholder
+  // Map picker — simple location selection dialog
   // ---------------------------------------------------------------------------
 
   void _onPickOnMap() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Map picker coming soon')),
-    );
+    showDialog<Map<String, double>>(
+      context: context,
+      builder: (ctx) => SimpleDialog(
+        title: const Text('Pick a Location'),
+        children: [
+          _LocationOption(
+            label: 'Ouagadougou Centre',
+            lat: 12.3714,
+            lng: -1.5197,
+          ),
+          _LocationOption(
+            label: 'Ouaga 2000',
+            lat: 12.3400,
+            lng: -1.4900,
+          ),
+          _LocationOption(
+            label: 'Koudougou',
+            lat: 12.2533,
+            lng: -2.3625,
+          ),
+          _LocationOption(
+            label: 'Bobo-Dioulasso',
+            lat: 11.1771,
+            lng: -4.2979,
+          ),
+        ],
+      ),
+    ).then((coords) {
+      if (coords != null) {
+        _latController.text = coords['lat']!.toString();
+        _lngController.text = coords['lng']!.toString();
+        setState(() {});
+      }
+    });
   }
 
   // ---------------------------------------------------------------------------
@@ -377,6 +408,53 @@ class _AddressFormScreenState extends ConsumerState<AddressFormScreen> {
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+
+// ---------------------------------------------------------------------------
+// _LocationOption — preset location for the simple picker dialog
+// ---------------------------------------------------------------------------
+
+class _LocationOption extends StatelessWidget {
+  const _LocationOption({
+    required this.label,
+    required this.lat,
+    required this.lng,
+  });
+
+  final String label;
+  final double lat;
+  final double lng;
+
+  @override
+  Widget build(BuildContext context) {
+    return SimpleDialogOption(
+      onPressed: () => Navigator.of(context).pop({'lat': lat, 'lng': lng}),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        child: Row(
+          children: [
+            const Icon(Icons.location_on, size: 20),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(label, style: Theme.of(context).textTheme.bodyMedium),
+                  Text(
+                    '${lat.toStringAsFixed(4)}, ${lng.toStringAsFixed(4)}',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Theme.of(context).colorScheme.outline,
+                        ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );

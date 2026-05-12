@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:akka_food/features/cart/presentation/notifiers/cart_notifier.dart';
 import 'package:akka_food/features/meal_catalog/domain/entities/meal.dart';
 import 'package:akka_food/features/meal_catalog/domain/entities/nutritional_info.dart';
 import 'package:akka_food/features/meal_catalog/presentation/notifiers/catalog_notifier.dart';
@@ -475,19 +476,20 @@ class _NutrientCard extends StatelessWidget {
 // Add to Cart bottom bar.
 // ---------------------------------------------------------------------------
 
-class _AddToCartBar extends StatelessWidget {
+class _AddToCartBar extends ConsumerWidget {
   const _AddToCartBar({required this.meal});
 
   final Meal meal;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
         child: FilledButton.icon(
           onPressed: meal.isAvailable
               ? () {
+                  ref.read(cartNotifierProvider.notifier).addItem(meal);
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content: Text('Added to cart'),

@@ -159,6 +159,34 @@
         }
         log(`   ✅ ${leaderboardUsers.length} leaderboard users created`, 'success');
 
+        // Create the leaderboard document at /leaderboard/all_time
+        log('📊 Creating leaderboard document...', 'info');
+        const allEntries = [
+          { uid: 'user-1', displayName: 'Alice', avatarUrl: null, score: 12500 },
+          { uid: 'user-2', displayName: 'Bob', avatarUrl: null, score: 9800 },
+          { uid: 'user-3', displayName: 'Charlie', avatarUrl: null, score: 7200 },
+          { uid: 'user-4', displayName: 'Diana', avatarUrl: null, score: 5500 },
+          { uid: testUid, displayName: 'Test User', avatarUrl: null, score: 5000 },
+          { uid: 'user-5', displayName: 'Eve', avatarUrl: null, score: 3000 },
+        ];
+        // Also add the current user if different from testUid
+        const leaderboardEntries = [...allEntries];
+        if (currentUser && currentUser.uid !== testUid) {
+          leaderboardEntries.push({
+            uid: currentUser.uid,
+            displayName: currentUser.displayName || currentUser.email || 'You',
+            avatarUrl: currentUser.photoURL || null,
+            score: 5000,
+          });
+          // Re-sort by score descending
+          leaderboardEntries.sort((a, b) => b.score - a.score);
+        }
+        await setDoc(doc(db, 'leaderboard', 'all_time'), {
+          entries: leaderboardEntries,
+          updatedAt: serverTimestamp(),
+        });
+        log(`   ✅ Leaderboard document created with ${leaderboardEntries.length} entries`, 'success');
+
         log('\n✅ Seeding complete! Refresh your Flutter app to see the data.', 'success');
         log('\n📋 Your user has admin role — you can access the Admin panel.', 'info');
       } catch (e) {

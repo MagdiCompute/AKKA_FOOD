@@ -82,6 +82,11 @@ class CartNotifier extends _$CartNotifier {
   /// completes (Req 9.2).
   @override
   Cart build() {
+    // Watch the current user — when auth state changes (e.g. after page
+    // refresh and session restore), the notifier rebuilds and restores the
+    // cart from Hive.
+    final currentUser = ref.watch(currentUserProvider);
+
     // Auto-save listener: persist cart to Hive on every state change (Req 9.1).
     listenSelf((_, cart) async {
       final repository = await ref.read(cartRepositoryProvider.future);
@@ -94,17 +99,10 @@ class CartNotifier extends _$CartNotifier {
       }
     });
 
-    // Listen for auth state changes — when a user signs in (e.g. after page
-    // refresh and session restore), re-attempt cart restore from Hive.
-    ref.listen(currentUserProvider, (previous, next) {
-      if (previous == null && next != null) {
-        // User just became available — restore cart from Hive.
-        Future.microtask(_restoreCart);
-      }
-    });
-
     // Restore cart from Hive asynchronously after the initial build (Req 9.2).
-    Future.microtask(_restoreCart);
+    if (currentUser != null) {
+      Future.microtask(_restoreCart);
+    }
 
     return Cart.empty();
   }

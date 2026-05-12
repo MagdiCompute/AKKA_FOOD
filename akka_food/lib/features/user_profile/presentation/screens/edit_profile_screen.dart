@@ -112,29 +112,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     final newEmail = _emailController.text.trim();
     final newPhone = _phoneController.text.trim();
 
-    final currentProfile = ref.read(profileNotifierProvider).valueOrNull;
-    final originalEmail = currentProfile?.email ?? '';
-    final originalPhone = currentProfile?.phoneNumber ?? '';
-
-    final emailChanged =
-        newEmail.isNotEmpty && newEmail != originalEmail;
-    final phoneChanged =
-        newPhone.isNotEmpty && newPhone != originalPhone;
-
-    if (emailChanged || phoneChanged) {
-      // Requirements 2.3 / 2.4 — OTP re-verification required before
-      // persisting the new email or phone.
-      //
-      // Pass the changed value as `extra` so the OTP screen knows what to
-      // verify. Email takes priority when both change simultaneously.
-      final contactToVerify = emailChanged ? newEmail : newPhone;
-      if (context.mounted) {
-        context.push(AppRoutes.otp, extra: contactToVerify);
-      }
-      return;
-    }
-
-    // No contact change — persist directly.
+    // Persist directly — OTP re-verification is skipped for now since
+    // phone/SMS verification requires a deployed backend.
     await ref.read(profileNotifierProvider.notifier).updateProfile(
           displayName,
           email: newEmail.isEmpty ? null : newEmail,

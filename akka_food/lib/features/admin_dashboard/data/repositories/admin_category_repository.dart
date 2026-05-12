@@ -30,8 +30,21 @@ class AdminCategoryRepository implements IAdminCategoryRepository {
 
   @override
   Future<String> createCategory(Map<String, dynamic> data) async {
+    final name = (data['name'] as String?)?.trim() ?? '';
+
+    // Check for duplicate category name (case-insensitive)
+    final existing = await _firestore
+        .collection('categories')
+        .where('name', isEqualTo: name)
+        .limit(1)
+        .get();
+
+    if (existing.docs.isNotEmpty) {
+      throw StateError('A category named "$name" already exists.');
+    }
+
     final docRef = await _firestore.collection('categories').add({
-      'name': data['name'],
+      'name': name,
       'imageUrl': data['imageUrl'],
       'isActive': true,
       'createdAt': FieldValue.serverTimestamp(),

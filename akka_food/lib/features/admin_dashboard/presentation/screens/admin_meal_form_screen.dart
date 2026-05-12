@@ -92,9 +92,7 @@ class _AdminMealFormScreenState extends ConsumerState<AdminMealFormScreen> {
     // Initialise the notifier after the first frame so the provider is ready.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (widget.mealId != null) {
-        ref
-            .read(adminMealFormNotifierProvider.notifier)
-            .loadMeal(widget.mealId!);
+        _loadMealDirectly(widget.mealId!);
       } else {
         ref.read(adminMealFormNotifierProvider.notifier).initCreate();
       }
@@ -112,6 +110,38 @@ class _AdminMealFormScreenState extends ConsumerState<AdminMealFormScreen> {
     _fatController.dispose();
     _featuredOrderController.dispose();
     super.dispose();
+  }
+
+  /// Loads meal data directly from Firestore and populates controllers.
+  Future<void> _loadMealDirectly(String mealId) async {
+    final notifier = ref.read(adminMealFormNotifierProvider.notifier);
+    notifier.loadMeal(mealId);
+
+    try {
+      final doc = await FirebaseFirestore.instance
+          .collection('meals')
+          .doc(mealId)
+          .get();
+      if (doc.exists && doc.data() != null && mounted) {
+        final data = doc.data()!;
+        _nameController.text = data['name'] as String? ?? '';
+        _descriptionController.text = data['description'] as String? ?? '';
+        final price = data['price'];
+        _priceController.text = price != null ? price.toString() : '';
+        final nutritional = data['nutritionalInfo'] as Map<String, dynamic>?;
+        if (nutritional != null) {
+          _caloriesController.text = nutritional['calories']?.toString() ?? '';
+          _proteinController.text = nutritional['protein']?.toString() ?? '';
+          _carbsController.text = nutritional['carbs']?.toString() ?? '';
+          _fatController.text = nutritional['fat']?.toString() ?? '';
+        }
+        _featuredOrderController.text = (data['featuredOrder'] ?? '').toString();
+        _controllersInitialised = true;
+        setState(() {});
+      }
+    } catch (_) {
+      // Fallback to notifier-based loading
+    }
   }
 
   // ── Sync controllers from notifier state (edit mode load) ─────────────────
@@ -138,7 +168,17 @@ class _AdminMealFormScreenState extends ConsumerState<AdminMealFormScreen> {
     // Trigger Flutter form validation (required fields, etc.).
     if (!(_formKey.currentState?.validate() ?? false)) return;
 
+    // Sync controller values to notifier state before saving
     final notifier = ref.read(adminMealFormNotifierProvider.notifier);
+    notifier.setName(_nameController.text);
+    notifier.setDescription(_descriptionController.text);
+    notifier.setPrice(_priceController.text);
+    notifier.setCalories(_caloriesController.text);
+    notifier.setProtein(_proteinController.text);
+    notifier.setCarbs(_carbsController.text);
+    notifier.setFat(_fatController.text);
+    notifier.setFeaturedOrder(_featuredOrderController.text);
+
     final success = await notifier.save();
 
     if (!mounted) return;

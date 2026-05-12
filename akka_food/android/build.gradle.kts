@@ -5,15 +5,12 @@ allprojects {
     }
 }
 
-val newBuildDir: Directory =
-    rootProject.layout.buildDirectory
-        .dir("../../build")
-        .get()
-rootProject.layout.buildDirectory.value(newBuildDir)
+// Keep build output inside the android directory to avoid path-with-spaces
+// issues in the Flutter Gradle plugin on Windows.
+rootProject.layout.buildDirectory.value(rootProject.layout.projectDirectory.dir("build"))
 
 subprojects {
-    val newSubprojectBuildDir: Directory = newBuildDir.dir(project.name)
-    project.layout.buildDirectory.value(newSubprojectBuildDir)
+    project.layout.buildDirectory.value(rootProject.layout.buildDirectory.get().dir(project.name))
 }
 subprojects {
     project.evaluationDependsOn(":app")

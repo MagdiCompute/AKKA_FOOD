@@ -187,6 +187,17 @@
         });
         log(`   ✅ Leaderboard document created with ${leaderboardEntries.length} entries`, 'success');
 
+        // Create coin transactions for the test user so coin balance shows correctly
+        log('💰 Creating coin transactions...', 'info');
+        const coinUid = currentUser ? currentUser.uid : testUid;
+        await setDoc(doc(db, 'users', coinUid, 'coinTransactions', 'initial-credit'), {
+          amount: 5000,
+          type: 'credit',
+          reason: 'Welcome bonus',
+          timestamp: serverTimestamp(),
+        });
+        log(`   ✅ Coin transaction created (5000 coins for ${coinUid})`, 'success');
+
         log('\n✅ Seeding complete! Refresh your Flutter app to see the data.', 'success');
         log('\n📋 Your user has admin role — you can access the Admin panel.', 'info');
       } catch (e) {

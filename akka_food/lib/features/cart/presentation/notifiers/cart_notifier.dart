@@ -94,6 +94,15 @@ class CartNotifier extends _$CartNotifier {
       }
     });
 
+    // Listen for auth state changes — when a user signs in (e.g. after page
+    // refresh and session restore), re-attempt cart restore from Hive.
+    ref.listen(currentUserProvider, (previous, next) {
+      if (previous == null && next != null) {
+        // User just became available — restore cart from Hive.
+        Future.microtask(_restoreCart);
+      }
+    });
+
     // Restore cart from Hive asynchronously after the initial build (Req 9.2).
     Future.microtask(_restoreCart);
 

@@ -197,16 +197,25 @@ class RouterNotifier extends ChangeNotifier {
 /// Home screen shell.
 ///
 /// Displays a Material 3 [NavigationBar] with:
-/// - Home tab (index 0) → [AppRoutes.home]
-/// - Cart tab (index 1) → [AppRoutes.cart] with a badge showing the item
-///   count (Requirement 2.4)
-/// - Profile tab (index 2) → [AppRoutes.profile]
-/// - Admin tab (index 3, admin users only) → [AppRoutes.adminPrefix]
-class HomeScreen extends ConsumerWidget {
+/// - Home tab (index 0) → Browse Meals (Catalog)
+/// - Cart tab (index 1) → Cart with badge showing item count
+/// - Profile tab (index 2) → Profile
+/// - Admin tab (index 3, admin users only) → Admin Dashboard
+///
+/// Each tab shows its respective screen inline, providing persistent
+/// bottom navigation across the app's main sections.
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends ConsumerState<HomeScreen> {
+  int _selectedIndex = 0;
+
+  @override
+  Widget build(BuildContext context) {
     final currentUser = ref.watch(currentUserProvider);
     final isAdmin = currentUser?.isAdmin ?? false;
     final cart = ref.watch(cartNotifierProvider);
@@ -215,9 +224,9 @@ class HomeScreen extends ConsumerWidget {
     // Build navigation destinations dynamically based on user role.
     final destinations = <NavigationDestination>[
       const NavigationDestination(
-        icon: Icon(Icons.home_outlined),
-        selectedIcon: Icon(Icons.home),
-        label: 'Home',
+        icon: Icon(Icons.restaurant_menu_outlined),
+        selectedIcon: Icon(Icons.restaurant_menu),
+        label: 'Menu',
       ),
       NavigationDestination(
         icon: Badge(
@@ -233,6 +242,11 @@ class HomeScreen extends ConsumerWidget {
         label: 'Cart',
       ),
       const NavigationDestination(
+        icon: Icon(Icons.leaderboard_outlined),
+        selectedIcon: Icon(Icons.leaderboard),
+        label: 'Ranks',
+      ),
+      const NavigationDestination(
         icon: Icon(Icons.person_outline),
         selectedIcon: Icon(Icons.person),
         label: 'Profile',
@@ -246,89 +260,51 @@ class HomeScreen extends ConsumerWidget {
     ];
 
     return Scaffold(
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          const SizedBox(height: 16),
-          Text(
-            'Welcome to AKKA Food',
-            style: Theme.of(context).textTheme.headlineSmall,
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 24),
-          _HomeNavCard(
-            icon: Icons.restaurant_menu,
-            title: 'Browse Meals',
-            subtitle: 'Explore our meal catalog',
-            onTap: () => context.push(AppRoutes.catalog),
-          ),
-          _HomeNavCard(
-            icon: Icons.leaderboard,
-            title: 'Leaderboard',
-            subtitle: 'See top users',
-            onTap: () => context.push('/leaderboard'),
-          ),
-          _HomeNavCard(
-            icon: Icons.shopping_cart,
-            title: 'My Cart',
-            subtitle: 'View your cart',
-            onTap: () => context.go(AppRoutes.cart),
-          ),
-          _HomeNavCard(
-            icon: Icons.person,
-            title: 'Profile',
-            subtitle: 'View and edit your profile',
-            onTap: () => context.go(AppRoutes.profile),
-          ),
-        ],
-      ),
+      body: _buildBody(context, isAdmin),
       bottomNavigationBar: NavigationBar(
-        selectedIndex: 0,
+        selectedIndex: _selectedIndex,
         destinations: destinations,
         onDestinationSelected: (index) {
-          switch (index) {
-            case 0:
-              context.go(AppRoutes.home);
-            case 1:
-              context.go(AppRoutes.cart);
-            case 2:
-              context.go(AppRoutes.profile);
-            case 3:
-              if (isAdmin) context.go(AppRoutes.adminPrefix);
-          }
+          setState(() => _selectedIndex = index);
         },
       ),
     );
   }
+
+  Widget _buildBody(BuildContext context, bool isAdmin) {
+    switch (_selectedIndex) {
+      case 0:
+        return const CatalogScreen();
+      case 1:
+        return const CartScreen();
+      case 2:
+        return const LeaderboardScreen();
+      case 3:
+        return const ProfileScreen();
+      case 4:
+        if (isAdmin) {
+          return const _AdminPlaceholder();
+        }
+        return const CatalogScreen();
+      default:
+        return const CatalogScreen();
+    }
+  }
 }
 
-// ---------------------------------------------------------------------------
-// _HomeNavCard — navigation card for the home screen
-// ---------------------------------------------------------------------------
-
-class _HomeNavCard extends StatelessWidget {
-  const _HomeNavCard({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-    required this.onTap,
-  });
-
-  final IconData icon;
-  final String title;
-  final String subtitle;
-  final VoidCallback onTap;
+/// Simple admin entry point from the home shell.
+class _AdminPlaceholder extends StatelessWidget {
+  const _AdminPlaceholder();
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      child: ListTile(
-        leading: Icon(icon, size: 32, color: Theme.of(context).colorScheme.primary),
-        title: Text(title),
-        subtitle: Text(subtitle),
-        trailing: const Icon(Icons.chevron_right),
-        onTap: onTap,
+    return Scaffold(
+      appBar: AppBar(title: const Text('Admin')),
+      body: Center(
+        child: FilledButton(
+          onPressed: () => context.push(AppRoutes.adminPrefix),
+          child: const Text('Open Admin Dashboard'),
+        ),
       ),
     );
   }

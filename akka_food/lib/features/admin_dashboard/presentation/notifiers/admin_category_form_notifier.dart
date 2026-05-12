@@ -149,8 +149,13 @@ class AdminCategoryFormNotifier extends _$AdminCategoryFormNotifier {
 
   void setName(String value) => state = state.copyWith(name: value);
 
-  void setImageUrl(String? value) =>
-      state = state.copyWith(imageUrl: value ?? _sentinel);
+  void setImageUrl(String? value) {
+    if (value == null) {
+      state = state.copyWith(imageUrl: null);
+    } else {
+      state = state.copyWith(imageUrl: value);
+    }
+  }
 
   void setIsActive(bool value) => state = state.copyWith(isActive: value);
 

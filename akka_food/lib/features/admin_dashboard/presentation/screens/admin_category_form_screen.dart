@@ -278,32 +278,62 @@ class _AdminCategoryFormScreenState
                   // ── Image ─────────────────────────────────────────────────
                   _SectionHeader(label: 'Image'),
                   const SizedBox(height: 8),
-                  _CategoryImageUpload(
-                    imageUrl: formState.imageUrl,
-                    isUploading: _isUploading,
-                    uploadProgress: _uploadProgress,
-                    onPickImage: isBusy ? null : _pickAndUpload,
-                    onRemoveImage: isBusy
-                        ? null
-                        : (formState.imageUrl != null
-                            ? () => _removeImage(formState.imageUrl!)
-                            : null),
-                  ),
-                  const SizedBox(height: 8),
-                  // Alternative: paste an image URL directly
+                  // Image URL text field with live preview
                   TextFormField(
                     initialValue: formState.imageUrl ?? '',
-                    decoration: const InputDecoration(
-                      labelText: 'Or paste image URL',
-                      border: OutlineInputBorder(),
-                      hintText: 'https://...',
+                    decoration: InputDecoration(
+                      labelText: 'Image URL',
+                      border: const OutlineInputBorder(),
+                      hintText: 'https://images.unsplash.com/...',
+                      suffixIcon: formState.imageUrl != null && formState.imageUrl!.isNotEmpty
+                          ? IconButton(
+                              icon: const Icon(Icons.clear),
+                              onPressed: () {
+                                notifier.setImageUrl(null);
+                              },
+                            )
+                          : null,
                     ),
                     onChanged: (url) {
-                      if (url.trim().isNotEmpty) {
-                        notifier.setImageUrl(url.trim());
-                      }
+                      final trimmed = url.trim();
+                      notifier.setImageUrl(trimmed.isEmpty ? null : trimmed);
                     },
                   ),
+                  const SizedBox(height: 12),
+                  // Live image preview
+                  if (formState.imageUrl != null && formState.imageUrl!.isNotEmpty)
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Image.network(
+                        formState.imageUrl!,
+                        height: 120,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => Container(
+                          height: 120,
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.errorContainer,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Center(
+                            child: Text('Failed to load image. Check the URL.'),
+                          ),
+                        ),
+                      ),
+                    )
+                  else
+                    Container(
+                      height: 80,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Center(
+                        child: Text('No image — paste a URL above'),
+                      ),
+                    ),
                   const SizedBox(height: 24),
 
                   // ── Active toggle (edit mode only) ────────────────────────

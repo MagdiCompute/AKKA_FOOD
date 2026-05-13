@@ -1,10 +1,14 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:akka_food/core/theme/app_theme.dart';
 import 'package:akka_food/features/cart/domain/entities/cart.dart';
 import 'package:akka_food/features/cart/domain/entities/cart_summary.dart';
+import 'package:akka_food/features/cart/presentation/notifiers/cart_notifier.dart';
 import 'package:akka_food/features/payment_processing/domain/entities/payment_request.dart';
 import 'package:akka_food/features/payment_processing/presentation/notifiers/payment_notifier.dart';
 
@@ -139,9 +143,9 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
 
     if (cart == null || cart.items.isEmpty) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Checkout')),
+        appBar: AppBar(title: const Text('Paiement')),
         body: const Center(
-          child: Text('No items to checkout. Please add items to your cart.'),
+          child: Text('Aucun article à commander. Ajoutez des plats au panier.'),
         ),
       );
     }
@@ -166,7 +170,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Checkout'),
+        title: const Text('Paiement'),
       ),
       body: SafeArea(
         child: Column(
@@ -208,11 +212,10 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Order Summary',
+          'Résumé de la commande',
           style: theme.textTheme.titleLarge?.copyWith(
             fontWeight: FontWeight.bold,
           ),
-          semanticsLabel: 'Order Summary',
         ),
         const SizedBox(height: 12),
 
@@ -258,7 +261,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                 // Subtotal
                 _buildSummaryRow(
                   context,
-                  label: 'Subtotal',
+                  label: 'Sous-total',
                   value: _formatXOF(cart.subtotal),
                 ),
 
@@ -266,7 +269,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                 if (cart.deliveryFee > 0)
                   _buildSummaryRow(
                     context,
-                    label: 'Delivery fee',
+                    label: 'Frais de livraison',
                     value: _formatXOF(cart.deliveryFee),
                   ),
 
@@ -274,7 +277,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                 if (cart.discount > 0)
                   _buildSummaryRow(
                     context,
-                    label: 'Coin discount',
+                    label: 'Réduction coins',
                     value: '-${_formatXOF(cart.discount)}',
                     isDiscount: true,
                   ),
@@ -382,37 +385,155 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
   Widget _buildPayButton(BuildContext context, Cart cart, bool isInitiating) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-      child: SizedBox(
-        width: double.infinity,
-        height: 52,
-        child: FilledButton(
-          onPressed: isInitiating ? null : () => _onPayTapped(cart),
-          style: FilledButton.styleFrom(
-            backgroundColor: Colors.orange,
-            foregroundColor: Colors.white,
-          ),
-          child: isInitiating
-              ? const SizedBox(
-                  width: 24,
-                  height: 24,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2.5,
-                    color: Colors.white,
-                  ),
-                )
-              : Semantics(
-                  button: true,
-                  label: 'Pay ${_formatXOF(cart.total)} with Orange Money',
-                  child: Text(
-                    'Pay ${_formatXOF(cart.total)} with Orange Money',
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+      child: Column(
+        children: [
+          // ── Test Mode Button (bypasses payment) ─────────────────────
+          SizedBox(
+            width: double.infinity,
+            height: 48,
+            child: FilledButton.icon(
+              onPressed: isInitiating ? null : () => _createTestOrder(cart),
+              icon: const Icon(Icons.flash_on, size: 20),
+              label: const Text(
+                'Commander (Mode Test)',
+                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+              ),
+              style: FilledButton.styleFrom(
+                backgroundColor: AppColors.primaryBlue,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
                 ),
-        ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 10),
+
+          // ── Real Payment Button ─────────────────────────────────────
+          SizedBox(
+            width: double.infinity,
+            height: 48,
+            child: OutlinedButton(
+              onPressed: isInitiating ? null : () => _onPayTapped(cart),
+              style: OutlinedButton.styleFrom(
+                side: const BorderSide(color: Colors.orange),
+                foregroundColor: Colors.orange,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              child: isInitiating
+                  ? const SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(strokeWidth: 2.5),
+                    )
+                  : Text(
+                      'Payer ${_formatXOF(cart.total)} (Orange Money)',
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+            ),
+          ),
+        ],
       ),
     );
+  }
+
+  // ---------------------------------------------------------------------------
+  // Test Mode — Create order directly in Firestore
+  // ---------------------------------------------------------------------------
+
+  Future<void> _createTestOrder(Cart cart) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Veuillez vous connecter')),
+      );
+      return;
+    }
+
+    // Show loading
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const Center(child: CircularProgressIndicator()),
+    );
+
+    try {
+      final firestore = FirebaseFirestore.instance;
+
+      // Create order document
+      final orderData = <String, dynamic>{
+        'uid': user.uid,
+        'status': 'confirmed',
+        'items': cart.items.map((item) => {
+          'mealId': item.mealId,
+          'mealName': item.mealName,
+          'mealImageUrl': item.mealImageUrl,
+          'unitPrice': item.unitPrice,
+          'quantity': item.quantity,
+          'lineTotal': item.lineTotal,
+        }).toList(),
+        'subtotal': cart.subtotal,
+        'deliveryFee': cart.deliveryFee,
+        'discount': cart.discount,
+        'total': cart.total,
+        'redeemedCoins': cart.redeemedCoins,
+        'deliveryOption': cart.deliveryOption.name,
+        'deliveryAddress': cart.selectedAddress != null
+            ? {
+                'label': cart.selectedAddress!.label,
+                'streetAddress': cart.selectedAddress!.streetAddress,
+                'city': cart.selectedAddress!.city,
+              }
+            : null,
+        'paymentMethod': 'test_mode',
+        'createdAt': FieldValue.serverTimestamp(),
+        'updatedAt': FieldValue.serverTimestamp(),
+      };
+
+      final orderRef = await firestore.collection('orders').add(orderData);
+
+      // Credit 5% coins (loyalty)
+      final coinsEarned = (cart.total * 0.05).round();
+      if (coinsEarned > 0) {
+        await firestore
+            .collection('users')
+            .doc(user.uid)
+            .collection('coinTransactions')
+            .add({
+          'amount': coinsEarned,
+          'type': 'credit',
+          'reason': 'Commande #${orderRef.id.substring(0, 8)}',
+          'orderId': orderRef.id,
+          'timestamp': FieldValue.serverTimestamp(),
+        });
+
+        // Update user's coinBalance field
+        await firestore.collection('users').doc(user.uid).update({
+          'coinBalance': FieldValue.increment(coinsEarned),
+        });
+      }
+
+      // Clear the cart
+      ref.read(cartNotifierProvider.notifier).clearCart();
+
+      if (!mounted) return;
+      Navigator.of(context, rootNavigator: true).pop(); // dismiss loading
+
+      // Navigate to order tracking
+      context.go('/orders/${orderRef.id}/tracking');
+    } catch (e) {
+      if (!mounted) return;
+      Navigator.of(context, rootNavigator: true).pop(); // dismiss loading
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Erreur: $e'),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        ),
+      );
+    }
   }
 }

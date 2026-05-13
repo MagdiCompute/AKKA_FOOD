@@ -12,7 +12,20 @@
           "package_name": "com.akkafood.akka_food"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "497736524789-u3d7rj83sio6ao5rni6lrsjv05e97c3g.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.akkafood.akka_food",
+            "certificate_hash": "0b7f7a40b8d95928696f2bcd6edd9d7287457e12"
+          }
+        },
+        {
+          "client_id": "497736524789-86qu34ht2ipl4v8f6f57rdo2a2cs954o.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDM3j3MDD6Gjsgd9ZAs8t3B2v9-d7po3mg"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "497736524789-86qu34ht2ipl4v8f6f57rdo2a2cs954o.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

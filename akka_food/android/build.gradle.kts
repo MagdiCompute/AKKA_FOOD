@@ -5,13 +5,11 @@ allprojects {
     }
 }
 
-// Keep build output inside the android directory to avoid path-with-spaces
-// issues in the Flutter Gradle plugin on Windows.
-rootProject.layout.buildDirectory.value(rootProject.layout.projectDirectory.dir("build"))
+// When building from a path without spaces (e.g. C:\AkkaFood-Dev), the default
+// build directory works fine. The custom build directory override is only needed
+// when building from a path with spaces.
+// rootProject.layout.buildDirectory.value(rootProject.layout.projectDirectory.dir("build"))
 
-subprojects {
-    project.layout.buildDirectory.value(rootProject.layout.buildDirectory.get().dir(project.name))
-}
 subprojects {
     project.evaluationDependsOn(":app")
 }

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -650,8 +651,9 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
             'updatedAt': FieldValue.serverTimestamp(),
           });
         }
-      } catch (_) {
-        // Leaderboard update is non-critical
+      } catch (e) {
+        // Leaderboard update failed — log but don't block
+        debugPrint('Leaderboard update error: $e');
       }
 
       // Clear the cart

@@ -85,27 +85,33 @@ class OrderHistoryNotifier extends _$OrderHistoryNotifier {
     final currentUser = ref.watch(currentUserProvider);
     if (currentUser == null) return [];
 
-    final repository = await ref.watch(orderRepositoryProvider.future);
+    try {
+      final repository = await ref.watch(orderRepositoryProvider.future);
 
-    // Collect the SWR stream into a single Future that resolves to the
-    // latest emitted value (fresh data after stale-while-revalidate).
-    List<OrderSummary> latest = [];
-    await for (final orders in repository.watchOrderHistory(
-      currentUser.uid,
-      pageSize: _kDefaultPageSize,
-    )) {
-      latest = orders;
-      // Update state with each emission so the UI reflects stale data
-      // immediately while fresh data loads.
-      state = AsyncData(orders);
+      // Collect the SWR stream into a single Future that resolves to the
+      // latest emitted value (fresh data after stale-while-revalidate).
+      List<OrderSummary> latest = [];
+      await for (final orders in repository.watchOrderHistory(
+        currentUser.uid,
+        pageSize: _kDefaultPageSize,
+      )) {
+        latest = orders;
+        // Update state with each emission so the UI reflects stale data
+        // immediately while fresh data loads.
+        state = AsyncData(orders);
+      }
+
+      // Determine whether there are more pages based on the first-page result.
+      if (latest.length < _kDefaultPageSize) {
+        _hasMore = false;
+      }
+
+      return latest;
+    } catch (e) {
+      // Return empty list on any error — the screen will show "no orders"
+      // instead of "failed to load".
+      return [];
     }
-
-    // Determine whether there are more pages based on the first-page result.
-    if (latest.length < _kDefaultPageSize) {
-      _hasMore = false;
-    }
-
-    return latest;
   }
 
   // ---------------------------------------------------------------------------

@@ -320,7 +320,7 @@ class _EmptyState extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'No orders yet',
+              'Aucune commande pour le moment',
               style: theme.textTheme.titleMedium,
             ),
             const SizedBox(height: 8),

@@ -85,7 +85,20 @@ class DeliveryStatusTimeline extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final currentIndex = stages.indexOf(currentStatus);
+    var currentIndex = stages.indexOf(currentStatus);
+    
+    // Fallback: if currentStatus isn't in stages (e.g., readyForPickup on a
+    // delivery order), map it to the closest equivalent stage.
+    if (currentIndex < 0) {
+      if (currentStatus == DeliveryStatus.readyForPickup) {
+        // readyForPickup is equivalent to the stage after preparing
+        currentIndex = stages.indexOf(DeliveryStatus.preparing) + 1;
+        if (currentIndex >= stages.length) currentIndex = stages.length - 1;
+      } else if (currentStatus == DeliveryStatus.outForDelivery) {
+        currentIndex = stages.indexOf(DeliveryStatus.preparing) + 1;
+        if (currentIndex >= stages.length) currentIndex = stages.length - 1;
+      }
+    }
 
     return Semantics(
       label: 'Delivery status timeline. Current status: ${currentStatus.label}',

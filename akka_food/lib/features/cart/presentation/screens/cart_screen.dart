@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import 'package:akka_food/core/router/app_router.dart';
 import 'package:akka_food/core/widgets/animated_list_item.dart';
+import 'package:akka_food/core/widgets/profile_avatar_button.dart';
 import 'package:akka_food/features/cart/domain/entities/cart.dart';
 import 'package:akka_food/features/cart/domain/entities/delivery_option.dart';
 import 'package:akka_food/features/cart/domain/entities/cart_validation_result.dart';
@@ -156,6 +157,9 @@ class _CartScreenState extends ConsumerState<CartScreen> {
 
   PreferredSizeWidget _buildAppBar(BuildContext context, Cart cart) {
     return AppBar(
+      leading: ProfileAvatarButton(
+        onTap: () => context.push(AppRoutes.profile),
+      ),
       title: const Text('Mon Panier'),
       actions: [
         if (cart.items.isNotEmpty)

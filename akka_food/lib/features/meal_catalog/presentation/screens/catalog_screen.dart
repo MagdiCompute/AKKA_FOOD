@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import 'package:akka_food/core/router/app_router.dart';
 import 'package:akka_food/core/widgets/animated_list_item.dart';
+import 'package:akka_food/core/widgets/profile_avatar_button.dart';
 import 'package:akka_food/core/widgets/shimmer_loading.dart';
 import 'package:akka_food/features/auth/presentation/notifiers/auth_notifier.dart';
 import 'package:akka_food/features/cart/presentation/notifiers/cart_notifier.dart';
@@ -282,6 +283,9 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
     final activeFilterCount = catalogAsync.valueOrNull?.activeFilterCount ?? 0;
 
     return AppBar(
+      leading: ProfileAvatarButton(
+        onTap: () => context.push(AppRoutes.profile),
+      ),
       title: const Text('Menu'),
       actions: [
         // Cart icon with item count badge

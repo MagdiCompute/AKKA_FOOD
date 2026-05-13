@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../../core/router/app_router.dart';
 import '../../../../core/widgets/animated_list_item.dart';
+import '../../../../core/widgets/profile_avatar_button.dart';
 import '../../domain/entities/leaderboard_entry.dart';
 import '../../domain/entities/leaderboard_period.dart';
 import '../notifiers/leaderboard_notifier.dart';
@@ -82,6 +85,9 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
 
   PreferredSizeWidget _buildAppBar(BuildContext context) {
     return AppBar(
+      leading: ProfileAvatarButton(
+        onTap: () => context.push(AppRoutes.profile),
+      ),
       title: const Text('Classement'),
       bottom: TabBar(
         controller: _tabController,

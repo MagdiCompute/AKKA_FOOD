@@ -464,14 +464,29 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     try {
       final firestore = FirebaseFirestore.instance;
 
+      // Get user's display name from Firestore profile (more up-to-date than Auth)
+      String customerName = user.displayName ?? user.email ?? 'Client';
+      try {
+        final userDoc = await firestore.collection('users').doc(user.uid).get();
+        if (userDoc.exists && userDoc.data() != null) {
+          final firestoreName = userDoc.data()!['displayName'] as String?;
+          if (firestoreName != null && firestoreName.isNotEmpty) {
+            customerName = firestoreName;
+          }
+        }
+      } catch (_) {
+        // Use Auth name as fallback
+      }
+
       // Create order document
       final orderData = <String, dynamic>{
         'uid': user.uid,
-        'userDisplayName': user.displayName ?? user.email ?? 'Client',
+        'userDisplayName': customerName,
         'userPhone': user.phoneNumber,
         'status': 'confirmed',
         'items': cart.items.map((item) => {
           'mealId': item.mealId,
+          'name': item.mealName,
           'mealName': item.mealName,
           'mealImageUrl': item.mealImageUrl,
           'unitPrice': item.unitPrice,
@@ -482,6 +497,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
         'deliveryFee': cart.deliveryFee,
         'discount': cart.discount,
         'total': cart.total,
+        'totalAmount': cart.total,
         'redeemedCoins': cart.redeemedCoins,
         'deliveryOption': cart.deliveryOption.name,
         'deliveryAddress': cart.selectedAddress != null

@@ -37,14 +37,17 @@ class FirestoreAdminUserDataSource {
   /// Fetches the 20 most recent orders for the user identified by [uid].
   Future<List<AdminOrderView>> getOrdersByUserId(String uid) async {
     try {
+      // Query without orderBy to avoid composite index requirement.
       final snapshot = await _ordersCollection
           .where('uid', isEqualTo: uid)
-          .orderBy('createdAt', descending: true)
           .limit(20)
           .get();
-      return snapshot.docs
+      final orders = snapshot.docs
           .map((doc) => AdminOrderView.fromMap(doc.id, doc.data()))
           .toList();
+      // Sort client-side by createdAt descending
+      orders.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      return orders;
     } on FirebaseException catch (e) {
       // Composite index not yet created — return empty list.
       if (e.code == 'failed-precondition' || e.message?.contains('index') == true) {

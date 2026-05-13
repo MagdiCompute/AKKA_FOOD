@@ -48,25 +48,30 @@ class FirestoreOrderDataSource {
   }) async {
     assert(pageSize >= 1, 'pageSize must be >= 1');
 
-    Query<Map<String, dynamic>> query = _ordersCollection
-        .where('uid', isEqualTo: uid)
-        .orderBy('createdAt', descending: true)
-        .limit(pageSize);
-
-    if (lastDocument != null) {
-      query = query.startAfterDocument(lastDocument);
-    }
-
     try {
+      // Query without orderBy to avoid composite index requirement.
+      // Sort client-side instead.
+      Query<Map<String, dynamic>> query = _ordersCollection
+          .where('uid', isEqualTo: uid)
+          .limit(pageSize);
+
+      if (lastDocument != null) {
+        query = query.startAfterDocument(lastDocument);
+      }
+
       final snapshot = await query.get();
 
-      return snapshot.docs.map((doc) {
+      final orders = snapshot.docs.map((doc) {
         final data = <String, dynamic>{
           'orderId': doc.id,
           ...doc.data(),
         };
         return OrderSummary.fromMap(data);
       }).toList();
+
+      // Sort by orderDate descending (client-side)
+      orders.sort((a, b) => b.orderDate.compareTo(a.orderDate));
+      return orders;
     } on FirebaseException catch (e) {
       // Firestore throws FAILED_PRECONDITION when a composite index is missing.
       // Return empty list instead of crashing — the user has no orders yet anyway.

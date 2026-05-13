@@ -68,7 +68,7 @@ class _CoinHistoryScreenState extends ConsumerState<CoinHistoryScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Coin Balance'),
+        title: const Text('Solde Coins'),
         centerTitle: true,
       ),
       body: Column(
@@ -157,7 +157,7 @@ class _BalanceCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Current Balance',
+                          'Solde actuel',
                           style: theme.textTheme.labelMedium?.copyWith(
                             color: theme.colorScheme.onSurfaceVariant,
                           ),
@@ -204,8 +204,8 @@ class _BalanceCard extends StatelessWidget {
                 // ── Redemption label ───────────────────────────────────────
                 Text(
                   readyToRedeem
-                      ? '🎉 Ready to redeem! (${balance ~/ threshold} × 1,000 XOF available)'
-                      : '$coinsUntilNext coins until next redemption',
+                      ? '🎉 Prêt à utiliser ! (${balance ~/ threshold} × 1 000 XOF disponibles)'
+                      : '$coinsUntilNext coins avant la prochaine utilisation',
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: readyToRedeem
                         ? Colors.green.shade700
@@ -336,7 +336,7 @@ class _TransactionTile extends StatelessWidget {
           children: [
             if (transaction.orderId != null)
               Text(
-                'Order: ${transaction.orderId}',
+                'Commande : ${transaction.orderId}',
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
@@ -373,7 +373,7 @@ class _ConnectivityBanner extends StatelessWidget {
           const SizedBox(width: 8),
           Expanded(
             child: Text(
-              "You're offline. Showing cached coin history.",
+              "Vous êtes hors ligne. Historique des coins en cache affiché.",
               style: TextStyle(
                 color: Colors.orange.shade900,
                 fontSize: 13,
@@ -409,12 +409,12 @@ class _EmptyState extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'No coin transactions yet',
+              'Aucune transaction de coins',
               style: theme.textTheme.titleMedium,
             ),
             const SizedBox(height: 8),
             Text(
-              'Earn coins by placing orders. 5% of each order value is credited as coins.',
+              'Gagnez des coins en passant des commandes. 5% de chaque commande est crédité en coins.',
               textAlign: TextAlign.center,
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
@@ -452,7 +452,7 @@ class _ErrorView extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'Failed to load coin history',
+              'Échec du chargement de l\'historique des coins',
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 8),
@@ -467,7 +467,7 @@ class _ErrorView extends StatelessWidget {
             FilledButton.icon(
               onPressed: onRetry,
               icon: const Icon(Icons.refresh),
-              label: const Text('Retry'),
+              label: const Text('Réessayer'),
             ),
           ],
         ),

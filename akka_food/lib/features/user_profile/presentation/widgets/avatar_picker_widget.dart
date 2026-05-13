@@ -90,7 +90,7 @@ class AvatarPickerWidget extends ConsumerWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Text(
-                'Profile Photo',
+                'Photo de profil',
                 style: Theme.of(ctx).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w600,
                     ),
@@ -99,7 +99,7 @@ class AvatarPickerWidget extends ConsumerWidget {
             const Divider(height: 1),
             ListTile(
               leading: const Icon(Icons.camera_alt_outlined),
-              title: const Text('Take Photo'),
+              title: const Text('Prendre une photo'),
               onTap: () {
                 Navigator.of(ctx).pop();
                 _pickImage(context, ref, ImageSource.camera);
@@ -107,7 +107,7 @@ class AvatarPickerWidget extends ConsumerWidget {
             ),
             ListTile(
               leading: const Icon(Icons.photo_library_outlined),
-              title: const Text('Choose from Gallery'),
+              title: const Text('Choisir depuis la galerie'),
               onTap: () {
                 Navigator.of(ctx).pop();
                 _pickImage(context, ref, ImageSource.gallery);
@@ -120,7 +120,7 @@ class AvatarPickerWidget extends ConsumerWidget {
                   color: Theme.of(ctx).colorScheme.error,
                 ),
                 title: Text(
-                  'Remove Photo',
+                  'Supprimer la photo',
                   style: TextStyle(
                     color: Theme.of(ctx).colorScheme.error,
                   ),
@@ -161,7 +161,7 @@ class AvatarPickerWidget extends ConsumerWidget {
       if (context.mounted) {
         _showErrorSnackbar(
           context,
-          'Avatar upload is not supported on web. Please use the mobile app.',
+          'L\'envoi de photo n\'est pas disponible sur le web. Utilisez l\'application mobile.',
         );
       }
       return;
@@ -177,7 +177,7 @@ class AvatarPickerWidget extends ConsumerWidget {
       // Error is already reflected in profileNotifierProvider state.
       // Show a snackbar if the context is still mounted.
       if (context.mounted) {
-        _showErrorSnackbar(context, 'Failed to upload avatar. Please try again.');
+        _showErrorSnackbar(context, 'Échec de l\'envoi. Veuillez réessayer.');
       }
     }
   }
@@ -191,7 +191,7 @@ class AvatarPickerWidget extends ConsumerWidget {
       await ref.read(profileNotifierProvider.notifier).removeAvatar();
     } catch (_) {
       if (context.mounted) {
-        _showErrorSnackbar(context, 'Failed to remove avatar. Please try again.');
+        _showErrorSnackbar(context, 'Échec de la suppression. Veuillez réessayer.');
       }
     }
   }

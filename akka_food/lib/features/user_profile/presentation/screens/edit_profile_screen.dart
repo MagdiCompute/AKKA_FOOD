@@ -70,10 +70,10 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   String? _validateDisplayName(String? value) {
     final trimmed = value?.trim() ?? '';
     if (trimmed.length < 2) {
-      return 'Display name must be at least 2 characters.';
+      return 'Le nom doit contenir au moins 2 caractères.';
     }
     if (trimmed.length > 50) {
-      return 'Display name must be at most 50 characters.';
+      return 'Le nom doit contenir au maximum 50 caractères.';
     }
     return null;
   }
@@ -84,7 +84,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     if (trimmed.isEmpty) return null; // optional
     final emailRegex = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
     if (!emailRegex.hasMatch(trimmed)) {
-      return 'Enter a valid email address.';
+      return 'Entrez une adresse e-mail valide.';
     }
     return null;
   }
@@ -96,7 +96,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     // E.164: starts with +, followed by digits only, 7–15 digits total.
     final e164Regex = RegExp(r'^\+\d{7,15}$');
     if (!e164Regex.hasMatch(trimmed)) {
-      return 'Phone must be in E.164 format (e.g. +22670000000).';
+      return 'Le téléphone doit être au format E.164 (ex. +22670000000).';
     }
     return null;
   }
@@ -135,7 +135,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     final wasLoading = previous?.isLoading ?? false;
     if (wasLoading && next.hasValue && !next.hasError) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Profile updated successfully.')),
+        const SnackBar(content: Text('Profil mis à jour avec succès.')),
       );
       context.pop();
       return;
@@ -143,7 +143,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
     // Show error snackbar on failure.
     if (next.hasError) {
-      final message = next.error?.toString() ?? 'Failed to update profile.';
+      final message = next.error?.toString() ?? 'Échec de la mise à jour du profil.';
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(message),
@@ -170,7 +170,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Edit Profile'),
+        title: const Text('Modifier le profil'),
         centerTitle: true,
       ),
       body: profileAsync.when(
@@ -201,8 +201,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                 textCapitalization: TextCapitalization.words,
                 validator: _validateDisplayName,
                 decoration: const InputDecoration(
-                  labelText: 'Display Name',
-                  hintText: 'Your name (2–50 characters)',
+                  labelText: 'Nom complet',
+                  hintText: 'Votre nom (2–50 caractères)',
                   prefixIcon: Icon(Icons.person_outline),
                 ),
               ),
@@ -216,11 +216,11 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                 autocorrect: false,
                 validator: _validateEmail,
                 decoration: const InputDecoration(
-                  labelText: 'Email',
-                  hintText: 'your@email.com (optional)',
+                  labelText: 'Adresse e-mail',
+                  hintText: 'votre@email.com (optionnel)',
                   prefixIcon: Icon(Icons.email_outlined),
                   helperText:
-                      'Changing your email requires OTP verification.',
+                      'La modification de votre e-mail nécessite une vérification OTP.',
                 ),
               ),
               const SizedBox(height: 20),
@@ -233,11 +233,11 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                 validator: _validatePhone,
                 onFieldSubmitted: (_) => isLoading ? null : _save(),
                 decoration: const InputDecoration(
-                  labelText: 'Phone Number',
-                  hintText: '+22670000000 (E.164 format)',
+                  labelText: 'Numéro de téléphone',
+                  hintText: '+22670000000 (format E.164)',
                   prefixIcon: Icon(Icons.phone_outlined),
                   helperText:
-                      'Changing your phone requires OTP verification.',
+                      'La modification de votre téléphone nécessite une vérification OTP.',
                 ),
               ),
               const SizedBox(height: 32),
@@ -246,13 +246,13 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
               if (isLoading)
                 const Center(
                   child: CircularProgressIndicator(
-                    semanticsLabel: 'Saving profile',
+                    semanticsLabel: 'Enregistrement',
                   ),
                 )
               else
                 FilledButton(
                   onPressed: _save,
-                  child: const Text('Save Changes'),
+                  child: const Text('Enregistrer'),
                 ),
             ],
           ),
@@ -287,7 +287,7 @@ class _ErrorView extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'Failed to load profile',
+              'Échec du chargement du profil',
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 8),
@@ -302,7 +302,7 @@ class _ErrorView extends StatelessWidget {
             FilledButton.icon(
               onPressed: onRetry,
               icon: const Icon(Icons.refresh),
-              label: const Text('Retry'),
+              label: const Text('Réessayer'),
             ),
           ],
         ),

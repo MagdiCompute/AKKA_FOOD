@@ -34,7 +34,7 @@ class NotificationPrefsScreen extends ConsumerWidget {
         if (next is AsyncError && next.hasValue) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: const Text('Failed to save preference. Please try again.'),
+              content: const Text('Échec de l\'enregistrement. Veuillez réessayer.'),
               backgroundColor: Theme.of(context).colorScheme.error,
             ),
           );
@@ -61,7 +61,7 @@ class NotificationPrefsScreen extends ConsumerWidget {
         data: (prefs) {
           // prefs can be null when no user is signed in; guard defensively.
           if (prefs == null) {
-            return const Center(child: Text('No user signed in.'));
+            return const Center(child: Text('Aucun utilisateur connecté.'));
           }
 
           // The notifier is "saving" when it is in a loading state but still
@@ -72,8 +72,8 @@ class NotificationPrefsScreen extends ConsumerWidget {
             children: [
               // ── Order Updates ──────────────────────────────────────────
               SwitchListTile(
-                title: const Text('Order Updates'),
-                subtitle: const Text('Get notified about your order status'),
+                title: const Text('Mises à jour des commandes'),
+                subtitle: const Text('Recevez des notifications sur le statut de vos commandes'),
                 value: prefs.orderUpdates,
                 onChanged: isSaving
                     ? null
@@ -87,7 +87,7 @@ class NotificationPrefsScreen extends ConsumerWidget {
               // ── Promotions ─────────────────────────────────────────────
               SwitchListTile(
                 title: const Text('Promotions'),
-                subtitle: const Text('Receive special offers and discounts'),
+                subtitle: const Text('Recevez des offres spéciales et réductions'),
                 value: prefs.promotions,
                 onChanged: isSaving
                     ? null
@@ -100,9 +100,9 @@ class NotificationPrefsScreen extends ConsumerWidget {
 
               // ── Coin Rewards ───────────────────────────────────────────
               SwitchListTile(
-                title: const Text('Coin Rewards'),
+                title: const Text('Récompenses Coins'),
                 subtitle: const Text(
-                    'Get notified when you earn or can redeem coins'),
+                    'Recevez des notifications quand vous gagnez ou pouvez utiliser des coins'),
                 value: prefs.coinEvents,
                 onChanged: isSaving
                     ? null
@@ -112,7 +112,7 @@ class NotificationPrefsScreen extends ConsumerWidget {
               ),
 
               // ── Privacy section ────────────────────────────────────────
-              const _SectionHeader(title: 'Privacy'),
+              const _SectionHeader(title: 'Confidentialité'),
 
               // ── Leaderboard Visibility ─────────────────────────────────
               _LeaderboardVisibilityTile(isSaving: isSaving),
@@ -156,7 +156,7 @@ class _ErrorView extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'Failed to load notification preferences',
+              'Échec du chargement des préférences de notification',
               style: Theme.of(context).textTheme.titleMedium,
               textAlign: TextAlign.center,
             ),
@@ -172,7 +172,7 @@ class _ErrorView extends StatelessWidget {
             FilledButton.icon(
               onPressed: onRetry,
               icon: const Icon(Icons.refresh),
-              label: const Text('Retry'),
+              label: const Text('Réessayer'),
             ),
           ],
         ),
@@ -236,7 +236,7 @@ class _LeaderboardVisibilityTile extends ConsumerWidget {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: const Text(
-                  'Failed to update leaderboard visibility. Please try again.'),
+                  'Échec de la mise à jour de la visibilité. Veuillez réessayer.'),
               backgroundColor: Theme.of(context).colorScheme.error,
             ),
           );
@@ -248,8 +248,8 @@ class _LeaderboardVisibilityTile extends ConsumerWidget {
     final value = visibilityAsync.valueOrNull ?? true;
 
     return SwitchListTile(
-      title: const Text('Leaderboard Visibility'),
-      subtitle: const Text('Show your profile on the leaderboard'),
+      title: const Text('Visibilité classement'),
+      subtitle: const Text('Afficher votre profil dans le classement'),
       value: value,
       onChanged: (isSaving || isToggleSaving)
           ? null

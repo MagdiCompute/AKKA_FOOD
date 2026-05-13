@@ -203,7 +203,7 @@ class _ProfileBody extends ConsumerWidget {
                   obscureText: obscure,
                   autofocus: true,
                   decoration: InputDecoration(
-                    labelText: 'Current password',
+                    labelText: 'Mot de passe actuel',
                     border: const OutlineInputBorder(),
                     suffixIcon: IconButton(
                       icon: Icon(
@@ -214,7 +214,7 @@ class _ProfileBody extends ConsumerWidget {
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter your password';
+                      return 'Veuillez entrer votre mot de passe';
                     }
                     return null;
                   },
@@ -225,7 +225,7 @@ class _ProfileBody extends ConsumerWidget {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(ctx).pop(null),
-              child: const Text('Cancel'),
+              child: const Text('Annuler'),
             ),
             TextButton(
               onPressed: () {
@@ -254,12 +254,12 @@ class _ProfileBody extends ConsumerWidget {
   ) async {
     final password = await _showPasswordDialog(
       context,
-      title: 'Deactivate Account',
+      title: 'Désactiver le compte',
       subtitle:
-          'Your account will be temporarily deactivated. You can reactivate it '
-          'at any time by signing in again.\n\nEnter your current password to confirm.',
+          'Votre compte sera temporairement désactivé. Vous pouvez le réactiver '
+          'à tout moment en vous reconnectant.\n\nEntrez votre mot de passe actuel pour confirmer.',
       confirmColor: Colors.orange,
-      confirmLabel: 'Deactivate',
+      confirmLabel: 'Désactiver',
     );
 
     if (password == null || !context.mounted) return;
@@ -286,7 +286,7 @@ class _ProfileBody extends ConsumerWidget {
         Navigator.of(context, rootNavigator: true).pop(); // dismiss loader
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(e.message ?? 'Deactivation failed. Please try again.'),
+            content: Text(e.message ?? 'Échec de la désactivation. Veuillez réessayer.'),
             backgroundColor: Colors.red,
           ),
         );
@@ -296,7 +296,7 @@ class _ProfileBody extends ConsumerWidget {
         Navigator.of(context, rootNavigator: true).pop(); // dismiss loader
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Deactivation failed: ${e.toString()}'),
+            content: Text('Échec de la désactivation : ${e.toString()}'),
             backgroundColor: Colors.red,
           ),
         );
@@ -320,23 +320,23 @@ class _ProfileBody extends ConsumerWidget {
     final irreversibleConfirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Delete Account'),
+        title: const Text('Supprimer le compte'),
         content: const Text(
-          'This action is permanent and cannot be undone.\n\n'
-          'All your personal data, delivery addresses, coin balance, and '
-          'transaction history will be permanently deleted. '
-          'Your order records will be anonymised for legal compliance.\n\n'
-          'Are you absolutely sure you want to delete your account?',
+          'Cette action est permanente et irréversible.\n\n'
+          'Toutes vos données personnelles, adresses de livraison, solde de coins et '
+          'historique de transactions seront définitivement supprimés. '
+          'Vos commandes seront anonymisées pour conformité légale.\n\n'
+          'Êtes-vous absolument sûr de vouloir supprimer votre compte ?',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Cancel'),
+            child: const Text('Annuler'),
           ),
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(true),
             style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Yes, delete my account'),
+            child: const Text('Oui, supprimer mon compte'),
           ),
         ],
       ),
@@ -347,10 +347,10 @@ class _ProfileBody extends ConsumerWidget {
     // Step 2 — Password confirmation dialog.
     final password = await _showPasswordDialog(
       context,
-      title: 'Confirm Deletion',
-      subtitle: 'Enter your current password to permanently delete your account.',
+      title: 'Confirmer la suppression',
+      subtitle: 'Entrez votre mot de passe actuel pour supprimer définitivement votre compte.',
       confirmColor: Colors.red,
-      confirmLabel: 'Delete',
+      confirmLabel: 'Supprimer',
     );
 
     if (password == null || !context.mounted) return;
@@ -384,7 +384,7 @@ class _ProfileBody extends ConsumerWidget {
         Navigator.of(context, rootNavigator: true).pop(); // dismiss loader
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(e.message ?? 'Account deletion failed. Please try again.'),
+            content: Text(e.message ?? 'Échec de la suppression. Veuillez réessayer.'),
             backgroundColor: Colors.red,
           ),
         );
@@ -394,7 +394,7 @@ class _ProfileBody extends ConsumerWidget {
         Navigator.of(context, rootNavigator: true).pop(); // dismiss loader
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Account deletion failed: ${e.toString()}'),
+            content: Text('Échec de la suppression : ${e.toString()}'),
             backgroundColor: Colors.red,
           ),
         );

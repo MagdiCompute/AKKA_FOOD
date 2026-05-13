@@ -61,7 +61,7 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Order #${_truncateId(widget.orderId)}',
+          'Commande #${_truncateId(widget.orderId)}',
         ),
         centerTitle: true,
       ),
@@ -108,7 +108,7 @@ class _OrderDetailBody extends StatelessWidget {
         _SectionCard(
           children: [
             _DetailRow(
-              label: 'Order ID',
+              label: 'N° de commande',
               value: order.orderId.length > 8
                   ? '${order.orderId.substring(0, 8).toUpperCase()}…'
                   : order.orderId.toUpperCase(),
@@ -120,7 +120,7 @@ class _OrderDetailBody extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Status',
+                  'Statut',
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
@@ -139,13 +139,13 @@ class _OrderDetailBody extends StatelessWidget {
             if (order.deliveryAddress != null &&
                 order.deliveryAddress!.isNotEmpty) ...[
               _DetailRow(
-                label: 'Delivery Address',
+                label: 'Adresse de livraison',
                 value: order.deliveryAddress!,
               ),
               const SizedBox(height: 8),
             ],
             _DetailRow(
-              label: 'Payment Method',
+              label: 'Mode de paiement',
               value: order.paymentMethod,
             ),
           ],
@@ -155,7 +155,7 @@ class _OrderDetailBody extends StatelessWidget {
 
         // ── Items ──────────────────────────────────────────────────────
         Text(
-          'Items',
+          'Articles',
           style: theme.textTheme.titleSmall?.copyWith(
             fontWeight: FontWeight.w600,
           ),
@@ -259,7 +259,7 @@ class _OrderItemRow extends StatelessWidget {
               ),
               const SizedBox(height: 2),
               Text(
-                '$unitPriceStr XOF / unit',
+                '$unitPriceStr XOF / unité',
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
@@ -313,10 +313,10 @@ class _StatusBadge extends StatelessWidget {
 
   static (String, Color) _statusStyle(String status) {
     return switch (status.toLowerCase()) {
-      'pending' => ('Pending', Colors.orange),
-      'preparing' => ('Preparing', Colors.blue),
-      'delivered' => ('Delivered', Colors.green),
-      'cancelled' => ('Cancelled', Colors.red),
+      'pending' => ('En attente', Colors.orange),
+      'preparing' => ('En préparation', Colors.blue),
+      'delivered' => ('Livré', Colors.green),
+      'cancelled' => ('Annulé', Colors.red),
       _ => (status, Colors.grey),
     };
   }
@@ -411,7 +411,7 @@ class _ErrorView extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'Failed to load order details',
+              'Échec du chargement des détails de la commande',
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 8),
@@ -426,7 +426,7 @@ class _ErrorView extends StatelessWidget {
             FilledButton.icon(
               onPressed: onRetry,
               icon: const Icon(Icons.refresh),
-              label: const Text('Retry'),
+              label: const Text('Réessayer'),
             ),
           ],
         ),

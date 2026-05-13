@@ -66,7 +66,7 @@ class _OrderHistoryScreenState extends ConsumerState<OrderHistoryScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Order History'),
+        title: const Text('Historique des commandes'),
         centerTitle: true,
       ),
       body: ordersAsync.when(
@@ -206,7 +206,7 @@ class _OrderTile extends StatelessWidget {
             ),
             const SizedBox(width: 12),
             Text(
-              '$itemCount ${itemCount == 1 ? 'item' : 'items'}',
+              '$itemCount ${itemCount == 1 ? 'article' : 'articles'}',
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
@@ -256,10 +256,10 @@ class _StatusBadge extends StatelessWidget {
 
   static (String, Color) _statusStyle(String status) {
     return switch (status.toLowerCase()) {
-      'pending' => ('Pending', Colors.orange),
-      'preparing' => ('Preparing', Colors.blue),
-      'delivered' => ('Delivered', Colors.green),
-      'cancelled' => ('Cancelled', Colors.red),
+      'pending' => ('En attente', Colors.orange),
+      'preparing' => ('En préparation', Colors.blue),
+      'delivered' => ('Livré', Colors.green),
+      'cancelled' => ('Annulé', Colors.red),
       _ => (status, Colors.grey),
     };
   }
@@ -284,7 +284,7 @@ class _ConnectivityBanner extends StatelessWidget {
           const SizedBox(width: 8),
           Expanded(
             child: Text(
-              "You're offline. Showing cached order history.",
+              "Vous êtes hors ligne. Historique des commandes en cache affiché.",
               style: TextStyle(
                 color: Colors.orange.shade900,
                 fontSize: 13,
@@ -325,7 +325,7 @@ class _EmptyState extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              'Your order history will appear here once you place an order.',
+              'Votre historique de commandes apparaîtra ici une fois votre première commande passée.',
               textAlign: TextAlign.center,
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
@@ -363,7 +363,7 @@ class _ErrorView extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'Failed to load order history',
+              'Échec du chargement de l\'historique des commandes',
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 8),
@@ -378,7 +378,7 @@ class _ErrorView extends StatelessWidget {
             FilledButton.icon(
               onPressed: onRetry,
               icon: const Icon(Icons.refresh),
-              label: const Text('Retry'),
+              label: const Text('Réessayer'),
             ),
           ],
         ),

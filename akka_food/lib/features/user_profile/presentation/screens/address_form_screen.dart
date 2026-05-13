@@ -99,7 +99,7 @@ class _AddressFormScreenState extends ConsumerState<AddressFormScreen> {
   /// Requirement 4.2 — label is required.
   String? _validateRequired(String? value, String fieldName) {
     if (value == null || value.trim().isEmpty) {
-      return '$fieldName is required.';
+      return '$fieldName est requis.';
     }
     return null;
   }
@@ -109,7 +109,7 @@ class _AddressFormScreenState extends ConsumerState<AddressFormScreen> {
     if (value == null || value.trim().isEmpty) return null; // optional
     final parsed = double.tryParse(value.trim());
     if (parsed == null) {
-      return '$fieldName must be a valid number.';
+      return '$fieldName doit être un nombre valide.';
     }
     return null;
   }
@@ -139,7 +139,7 @@ class _AddressFormScreenState extends ConsumerState<AddressFormScreen> {
           addresses.where((a) => a.id == widget.addressId).firstOrNull;
 
       if (existing == null) {
-        _showErrorSnackBar('Address not found. It may have been deleted.');
+        _showErrorSnackBar('Adresse introuvable. Elle a peut-être été supprimée.');
         return;
       }
 
@@ -159,7 +159,7 @@ class _AddressFormScreenState extends ConsumerState<AddressFormScreen> {
       // will assign the real Firestore document id.
       final currentUser = ref.read(currentUserProvider);
       if (currentUser == null) {
-        _showErrorSnackBar('Not signed in. Please sign in first.');
+        _showErrorSnackBar('Non connecté. Veuillez vous connecter.');
         return;
       }
 
@@ -189,7 +189,7 @@ class _AddressFormScreenState extends ConsumerState<AddressFormScreen> {
     showDialog<Map<String, double>>(
       context: context,
       builder: (ctx) => SimpleDialog(
-        title: const Text('Pick a Location'),
+        title: const Text('Choisir un emplacement'),
         children: [
           _LocationOption(
             label: 'Ouagadougou Centre',
@@ -242,7 +242,7 @@ class _AddressFormScreenState extends ConsumerState<AddressFormScreen> {
     // Show error snackbar on failure.
     if (next.hasError && (previous?.isLoading ?? false)) {
       final message = next.error?.toString() ??
-          (_isEditing ? 'Failed to update address.' : 'Failed to add address.');
+          (_isEditing ? 'Échec de la mise à jour de l\'adresse.' : 'Échec de l\'ajout de l\'adresse.');
       _showErrorSnackBar(message);
     }
   }
@@ -273,7 +273,7 @@ class _AddressFormScreenState extends ConsumerState<AddressFormScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(_isEditing ? 'Edit Address' : 'Add Address'),
+        title: Text(_isEditing ? 'Modifier l\'adresse' : 'Ajouter une adresse'),
         centerTitle: true,
       ),
       body: SafeArea(
@@ -290,10 +290,10 @@ class _AddressFormScreenState extends ConsumerState<AddressFormScreen> {
                   textInputAction: TextInputAction.next,
                   keyboardType: TextInputType.text,
                   textCapitalization: TextCapitalization.words,
-                  validator: (v) => _validateRequired(v, 'Label'),
+                  validator: (v) => _validateRequired(v, 'Libellé'),
                   decoration: const InputDecoration(
-                    labelText: 'Label',
-                    hintText: 'e.g. Home, Office, Other',
+                    labelText: 'Libellé',
+                    hintText: 'ex. Maison, Bureau, Autre',
                     prefixIcon: Icon(Icons.label_outline),
                   ),
                 ),
@@ -305,10 +305,10 @@ class _AddressFormScreenState extends ConsumerState<AddressFormScreen> {
                   textInputAction: TextInputAction.next,
                   keyboardType: TextInputType.streetAddress,
                   textCapitalization: TextCapitalization.sentences,
-                  validator: (v) => _validateRequired(v, 'Street address'),
+                  validator: (v) => _validateRequired(v, 'Adresse'),
                   decoration: const InputDecoration(
-                    labelText: 'Street Address',
-                    hintText: 'e.g. 12 Rue de la Paix',
+                    labelText: 'Adresse',
+                    hintText: 'ex. 12 Rue de la Paix',
                     prefixIcon: Icon(Icons.home_outlined),
                   ),
                 ),
@@ -320,10 +320,10 @@ class _AddressFormScreenState extends ConsumerState<AddressFormScreen> {
                   textInputAction: TextInputAction.next,
                   keyboardType: TextInputType.text,
                   textCapitalization: TextCapitalization.words,
-                  validator: (v) => _validateRequired(v, 'City'),
+                  validator: (v) => _validateRequired(v, 'Ville'),
                   decoration: const InputDecoration(
-                    labelText: 'City',
-                    hintText: 'e.g. Ouagadougou',
+                    labelText: 'Ville',
+                    hintText: 'ex. Ouagadougou',
                     prefixIcon: Icon(Icons.location_city_outlined),
                   ),
                 ),
@@ -331,7 +331,7 @@ class _AddressFormScreenState extends ConsumerState<AddressFormScreen> {
 
                 // ── Coordinates section header ─────────────────────────
                 Text(
-                  'Coordinates (optional)',
+                  'Coordonnées (optionnel)',
                   style: Theme.of(context).textTheme.labelLarge?.copyWith(
                         color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
@@ -354,7 +354,7 @@ class _AddressFormScreenState extends ConsumerState<AddressFormScreen> {
                   validator: (v) => _validateCoordinate(v, 'Latitude'),
                   decoration: const InputDecoration(
                     labelText: 'Latitude',
-                    hintText: 'e.g. 12.3647',
+                    hintText: 'ex. 12.3647',
                     prefixIcon: Icon(Icons.explore_outlined),
                   ),
                 ),
@@ -377,7 +377,7 @@ class _AddressFormScreenState extends ConsumerState<AddressFormScreen> {
                   onFieldSubmitted: (_) => isLoading ? null : _save(),
                   decoration: const InputDecoration(
                     labelText: 'Longitude',
-                    hintText: 'e.g. -1.5332',
+                    hintText: 'ex. -1.5332',
                     prefixIcon: Icon(Icons.explore_outlined),
                   ),
                 ),
@@ -387,7 +387,7 @@ class _AddressFormScreenState extends ConsumerState<AddressFormScreen> {
                 OutlinedButton.icon(
                   onPressed: isLoading ? null : _onPickOnMap,
                   icon: const Icon(Icons.map_outlined),
-                  label: const Text('Pick on Map'),
+                  label: const Text('Choisir sur la carte'),
                 ),
                 const SizedBox(height: 32),
 
@@ -395,14 +395,14 @@ class _AddressFormScreenState extends ConsumerState<AddressFormScreen> {
                 if (isLoading)
                   const Center(
                     child: CircularProgressIndicator(
-                      semanticsLabel: 'Saving address',
+                      semanticsLabel: 'Enregistrement',
                     ),
                   )
                 else
                   FilledButton(
                     onPressed: _save,
                     child: Text(
-                      _isEditing ? 'Save Changes' : 'Add Address',
+                      _isEditing ? 'Enregistrer' : 'Ajouter une adresse',
                     ),
                   ),
               ],

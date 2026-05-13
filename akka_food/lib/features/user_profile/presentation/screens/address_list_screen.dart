@@ -30,12 +30,12 @@ class AddressListScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My Addresses'),
+        title: const Text('Mes adresses'),
         centerTitle: true,
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _onAddAddress(context, addressAsync),
-        tooltip: 'Add address',
+        tooltip: 'Ajouter une adresse',
         child: const Icon(Icons.add),
       ),
       body: addressAsync.when(
@@ -72,7 +72,7 @@ class AddressListScreen extends ConsumerWidget {
     if (current.length >= 10) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Maximum 10 addresses reached. Delete one to add more.'),
+          content: Text('Maximum 10 adresses atteint. Supprimez-en une pour en ajouter.'),
         ),
       );
       return;
@@ -150,19 +150,19 @@ class _AddressList extends ConsumerWidget {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Delete Address'),
-        content: const Text('Are you sure you want to delete this address?'),
+        title: const Text('Supprimer l\'adresse'),
+        content: const Text('Êtes-vous sûr de vouloir supprimer cette adresse ?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Cancel'),
+            child: const Text('Annuler'),
           ),
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(true),
             style: TextButton.styleFrom(
               foregroundColor: Theme.of(ctx).colorScheme.error,
             ),
-            child: const Text('Delete'),
+            child: const Text('Supprimer'),
           ),
         ],
       ),
@@ -186,22 +186,22 @@ class _AddressList extends ConsumerWidget {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Delete Default Address'),
+        title: const Text('Supprimer l\'adresse par défaut'),
         content: const Text(
-          'This is your default address. Deleting it will clear your default '
-          'selection. You will be prompted to choose a new default.',
+          'Ceci est votre adresse par défaut. La supprimer effacera votre sélection '
+          'par défaut. Vous serez invité à en choisir une nouvelle.',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Cancel'),
+            child: const Text('Annuler'),
           ),
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(true),
             style: TextButton.styleFrom(
               foregroundColor: Theme.of(ctx).colorScheme.error,
             ),
-            child: const Text('Delete'),
+            child: const Text('Supprimer'),
           ),
         ],
       ),
@@ -309,11 +309,11 @@ class _AddressTile extends StatelessWidget {
             if (!address.isDefault)
               TextButton(
                 onPressed: onSetDefault,
-                child: const Text('Set as Default'),
+                child: const Text('Définir par défaut'),
               ),
             IconButton(
               icon: const Icon(Icons.edit_outlined),
-              tooltip: 'Edit address',
+              tooltip: 'Modifier',
               onPressed: onEdit,
             ),
           ],
@@ -358,7 +358,7 @@ class _DefaultBadge extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
       ),
       child: Text(
-        'Default',
+        'Par défaut',
         style: theme.textTheme.labelSmall?.copyWith(
           color: theme.colorScheme.onPrimaryContainer,
           fontWeight: FontWeight.w600,
@@ -386,7 +386,7 @@ class _SelectNewDefaultDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Select New Default'),
+      title: const Text('Choisir une nouvelle adresse par défaut'),
       content: SizedBox(
         width: double.maxFinite,
         child: ListView.builder(
@@ -405,7 +405,7 @@ class _SelectNewDefaultDialog extends StatelessWidget {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Skip'),
+          child: const Text('Ignorer'),
         ),
       ],
     );
@@ -437,12 +437,12 @@ class _EmptyState extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'No addresses yet',
+              'Aucune adresse enregistrée',
               style: theme.textTheme.titleMedium,
             ),
             const SizedBox(height: 8),
             Text(
-              'Add a delivery address to get started.',
+              'Ajoutez une adresse de livraison pour commencer.',
               textAlign: TextAlign.center,
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
@@ -452,7 +452,7 @@ class _EmptyState extends StatelessWidget {
             FilledButton.icon(
               onPressed: onAdd,
               icon: const Icon(Icons.add),
-              label: const Text('Add Address'),
+              label: const Text('Ajouter une adresse'),
             ),
           ],
         ),
@@ -486,7 +486,7 @@ class _ErrorView extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'Failed to load addresses',
+              'Échec du chargement des adresses',
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 8),
@@ -501,7 +501,7 @@ class _ErrorView extends StatelessWidget {
             FilledButton.icon(
               onPressed: onRetry,
               icon: const Icon(Icons.refresh),
-              label: const Text('Retry'),
+              label: const Text('Réessayer'),
             ),
           ],
         ),

@@ -1,11 +1,12 @@
 /// Represents the current status of an order in the delivery pipeline.
 ///
 /// Pure Dart — no Flutter or Firebase imports.
-/// Statuses per design: pending → confirmed → preparing → outForDelivery → delivered | failed
+/// Statuses per design: pending → confirmed → preparing → readyForPickup → outForDelivery → delivered | failed
 enum DeliveryStatus {
   pending,
   confirmed,
   preparing,
+  readyForPickup,
   outForDelivery,
   delivered,
   failed;
@@ -17,6 +18,8 @@ enum DeliveryStatus {
         return DeliveryStatus.confirmed;
       case 'preparing':
         return DeliveryStatus.preparing;
+      case 'ready_for_pickup':
+        return DeliveryStatus.readyForPickup;
       case 'out_for_delivery':
         return DeliveryStatus.outForDelivery;
       case 'delivered':
@@ -38,6 +41,8 @@ enum DeliveryStatus {
         return 'confirmed';
       case DeliveryStatus.preparing:
         return 'preparing';
+      case DeliveryStatus.readyForPickup:
+        return 'ready_for_pickup';
       case DeliveryStatus.outForDelivery:
         return 'out_for_delivery';
       case DeliveryStatus.delivered:
@@ -51,17 +56,19 @@ enum DeliveryStatus {
   String get label {
     switch (this) {
       case DeliveryStatus.pending:
-        return 'Pending';
+        return 'En attente';
       case DeliveryStatus.confirmed:
-        return 'Confirmed';
+        return 'Confirmée';
       case DeliveryStatus.preparing:
-        return 'Preparing';
+        return 'En préparation';
+      case DeliveryStatus.readyForPickup:
+        return 'Prêt à récupérer';
       case DeliveryStatus.outForDelivery:
-        return 'Out for Delivery';
+        return 'En livraison';
       case DeliveryStatus.delivered:
-        return 'Delivered';
+        return 'Livrée';
       case DeliveryStatus.failed:
-        return 'Failed';
+        return 'Échouée';
     }
   }
 

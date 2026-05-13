@@ -27,6 +27,7 @@ class DeliveryStatusTimeline extends StatelessWidget {
     DeliveryStatus.pending,
     DeliveryStatus.confirmed,
     DeliveryStatus.preparing,
+    DeliveryStatus.readyForPickup,
     DeliveryStatus.outForDelivery,
     DeliveryStatus.delivered,
   ];
@@ -40,6 +41,8 @@ class DeliveryStatusTimeline extends StatelessWidget {
         return Icons.check_circle;
       case DeliveryStatus.preparing:
         return Icons.restaurant;
+      case DeliveryStatus.readyForPickup:
+        return Icons.inventory_2;
       case DeliveryStatus.outForDelivery:
         return Icons.delivery_dining;
       case DeliveryStatus.delivered:
@@ -74,7 +77,7 @@ class DeliveryStatusTimeline extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Delivery Status',
+                'Suivi de la commande',
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),

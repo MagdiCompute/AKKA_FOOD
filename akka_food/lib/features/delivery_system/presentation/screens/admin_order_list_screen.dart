@@ -332,6 +332,8 @@ class _StatusBadge extends StatelessWidget {
         return (Colors.blue.shade100, Colors.blue.shade900);
       case DeliveryStatus.preparing:
         return (Colors.purple.shade100, Colors.purple.shade900);
+      case DeliveryStatus.readyForPickup:
+        return (Colors.indigo.shade100, Colors.indigo.shade900);
       case DeliveryStatus.outForDelivery:
         return (Colors.teal.shade100, Colors.teal.shade900);
       case DeliveryStatus.delivered:

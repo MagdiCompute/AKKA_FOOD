@@ -883,6 +883,8 @@ class _StatusTransitionButton extends StatelessWidget {
         return (null, Icons.restaurant_outlined);
       case DeliveryStatus.outForDelivery:
         return (null, Icons.delivery_dining_outlined);
+      case DeliveryStatus.readyForPickup:
+        return (null, Icons.inventory_2_outlined);
       case DeliveryStatus.pending:
         return (null, Icons.receipt_long_outlined);
     }

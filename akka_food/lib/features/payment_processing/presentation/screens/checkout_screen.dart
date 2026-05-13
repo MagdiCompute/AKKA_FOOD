@@ -45,6 +45,41 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
   bool _hasNavigatedToProcessing = false;
 
   @override
+  void initState() {
+    super.initState();
+    // Pre-populate phone number from user profile after first frame
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _prepopulatePhone();
+    });
+  }
+
+  /// Reads the user's phone number from Firestore profile and pre-fills the field.
+  Future<void> _prepopulatePhone() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    // Try Firebase Auth phone first
+    if (user.phoneNumber != null && user.phoneNumber!.isNotEmpty) {
+      _phoneController.text = user.phoneNumber!.replaceFirst('+223', '');
+      return;
+    }
+
+    // Try Firestore profile
+    try {
+      final doc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get();
+      if (doc.exists && doc.data() != null) {
+        final phone = doc.data()!['phoneNumber'] as String?;
+        if (phone != null && phone.isNotEmpty && mounted) {
+          _phoneController.text = phone.replaceFirst('+223', '');
+        }
+      }
+    } catch (_) {}
+  }
+
+  @override
   void dispose() {
     _phoneController.dispose();
     super.dispose();
@@ -62,7 +97,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
   /// - 223 followed by 8 digits (e.g. "22376123456")
   String? _validatePhoneNumber(String? value) {
     if (value == null || value.trim().isEmpty) {
-      return 'Please enter your phone number';
+      return 'Veuillez entrer votre numéro de téléphone';
     }
 
     final cleaned = value.trim().replaceAll(RegExp(r'[\s\-]'), '');
@@ -70,7 +105,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     // Match: optional +223 or 223 prefix, then exactly 8 digits
     final regex = RegExp(r'^(\+?223)?[0-9]{8}$');
     if (!regex.hasMatch(cleaned)) {
-      return 'Enter a valid Mali phone number (8 digits)';
+      return 'Entrez un numéro malien valide (8 chiffres)';
     }
 
     return null;
@@ -342,14 +377,14 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Orange Money Phone Number',
+            'Numéro Orange Money',
             style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.bold,
             ),
           ),
           const SizedBox(height: 8),
           Text(
-            'Enter the phone number linked to your Orange Money account.',
+            'Entrez le numéro lié à votre compte Orange Money.',
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.outline,
             ),
@@ -365,9 +400,9 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
             decoration: const InputDecoration(
               prefixText: '+223 ',
               hintText: '76 XX XX XX',
-              labelText: 'Phone number',
+              labelText: 'Numéro de téléphone',
               border: OutlineInputBorder(),
-              helperText: '8-digit Mali phone number',
+              helperText: 'Numéro malien à 8 chiffres',
             ),
             validator: _validatePhoneNumber,
             textInputAction: TextInputAction.done,
@@ -513,6 +548,27 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
       };
 
       final orderRef = await firestore.collection('orders').add(orderData);
+
+      // Deduct redeemed coins first
+      final redeemedCoins = cart.redeemedCoins;
+      if (redeemedCoins > 0) {
+        await firestore
+            .collection('users')
+            .doc(user.uid)
+            .collection('coinTransactions')
+            .add({
+          'amount': -redeemedCoins,
+          'type': 'debit',
+          'reason': 'Utilisés pour commande #${orderRef.id.substring(0, 8)}',
+          'orderId': orderRef.id,
+          'timestamp': FieldValue.serverTimestamp(),
+        });
+
+        // Deduct from coinBalance
+        await firestore.collection('users').doc(user.uid).update({
+          'coinBalance': FieldValue.increment(-redeemedCoins),
+        });
+      }
 
       // Credit 5% coins (loyalty)
       final coinsEarned = (cart.total * 0.05).round();

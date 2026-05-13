@@ -95,7 +95,15 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.restaurant, size: 20, color: AppColors.primaryBlue),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(4),
+              child: Image.asset(
+                'assets/images/logo.png',
+                width: 24,
+                height: 24,
+                errorBuilder: (_, __, ___) => Icon(Icons.restaurant, size: 20, color: AppColors.primaryBlue),
+              ),
+            ),
             const SizedBox(width: 6),
             Text(
               'AKKA Food',

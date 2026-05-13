@@ -87,10 +87,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   FadeInWidget(
                     child: Row(
                       children: [
-                        Icon(
-                          Icons.restaurant,
-                          size: 24,
-                          color: AppColors.primaryBlue,
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(6),
+                          child: Image.asset(
+                            'assets/images/logo.png',
+                            width: 32,
+                            height: 32,
+                            errorBuilder: (_, __, ___) => Icon(
+                              Icons.restaurant,
+                              size: 24,
+                              color: AppColors.primaryBlue,
+                            ),
+                          ),
                         ),
                         const SizedBox(width: 8),
                         Text(

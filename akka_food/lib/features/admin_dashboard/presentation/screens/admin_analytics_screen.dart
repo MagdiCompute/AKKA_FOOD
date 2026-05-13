@@ -27,7 +27,7 @@ class AdminAnalyticsScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Analytics'),
+        title: const Text('Statistiques'),
         centerTitle: false,
       ),
       body: asyncState.when(
@@ -63,13 +63,13 @@ class _AnalyticsBody extends ConsumerWidget {
 
         // Daily orders line chart (task 6.3)
         _ChartCard(
-          title: 'Daily Orders (Last 30 Days)',
+          title: 'Commandes quotidiennes (30 derniers jours)',
           child: DailyOrdersLineChart(dailyOrders: state.summary.dailyOrders),
         ),
         const SizedBox(height: 16),
         // Top 5 meals bar chart (task 6.4)
         _ChartCard(
-          title: 'Top 5 Best-Selling Meals',
+          title: 'Top 5 des plats les plus vendus',
           child: TopMealsBarChart(topMeals: state.summary.topMeals),
         ),
       ],
@@ -95,17 +95,17 @@ class _PeriodSelector extends ConsumerWidget {
       segments: const [
         ButtonSegment(
           value: AnalyticsPeriod.today,
-          label: Text('Today'),
+          label: Text('Aujourd\'hui'),
           icon: Icon(Icons.today),
         ),
         ButtonSegment(
           value: AnalyticsPeriod.week,
-          label: Text('Week'),
+          label: Text('Semaine'),
           icon: Icon(Icons.date_range),
         ),
         ButtonSegment(
           value: AnalyticsPeriod.month,
-          label: Text('Month'),
+          label: Text('Mois'),
           icon: Icon(Icons.calendar_month),
         ),
       ],
@@ -142,7 +142,7 @@ class _SummaryCardsRow extends StatelessWidget {
       children: [
         Expanded(
           child: _SummaryCard(
-            label: 'Total Orders',
+            label: 'Total commandes',
             value: summary.totalOrders.toString(),
             icon: Icons.receipt_long,
             color: Colors.blue,
@@ -151,7 +151,7 @@ class _SummaryCardsRow extends StatelessWidget {
         const SizedBox(width: 12),
         Expanded(
           child: _SummaryCard(
-            label: 'Revenue (XOF)',
+            label: 'Revenus (XOF)',
             value: _formatRevenue(summary.totalRevenue),
             icon: Icons.payments,
             color: Colors.green,
@@ -160,7 +160,7 @@ class _SummaryCardsRow extends StatelessWidget {
         const SizedBox(width: 12),
         Expanded(
           child: _SummaryCard(
-            label: 'Active Users',
+            label: 'Utilisateurs actifs',
             value: summary.activeUsers.toString(),
             icon: Icons.people,
             color: Colors.orange,
@@ -304,7 +304,7 @@ class _ErrorView extends StatelessWidget {
             const Icon(Icons.error_outline, size: 48, color: Colors.red),
             const SizedBox(height: 16),
             Text(
-              'Failed to load analytics',
+              'Échec du chargement des statistiques',
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 8),

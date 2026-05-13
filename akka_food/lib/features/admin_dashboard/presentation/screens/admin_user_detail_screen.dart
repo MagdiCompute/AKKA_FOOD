@@ -23,12 +23,12 @@ class AdminUserDetailScreen extends ConsumerWidget {
         title: detailAsync.whenOrNull(
               data: (s) => Text(s.user.displayName),
             ) ??
-            const Text('User Detail'),
+            const Text('Détail utilisateur'),
         actions: [
           // Refresh button
           IconButton(
             icon: const Icon(Icons.refresh),
-            tooltip: 'Refresh',
+            tooltip: 'Actualiser',
             onPressed: () => ref.invalidate(adminUserDetailProvider(userId)),
           ),
         ],
@@ -39,7 +39,7 @@ class AdminUserDetailScreen extends ConsumerWidget {
           child: Padding(
             padding: const EdgeInsets.all(24),
             child: Text(
-              'Failed to load user.\n$error',
+              'Échec du chargement de l\'utilisateur.\n$error',
               textAlign: TextAlign.center,
               style: TextStyle(color: Theme.of(context).colorScheme.error),
             ),
@@ -102,13 +102,13 @@ class _UserDetailBody extends ConsumerWidget {
           // ── Order history ───────────────────────────────────────────────
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-            child: Text('Order History', style: textTheme.titleMedium),
+            child: Text('Historique des commandes', style: textTheme.titleMedium),
           ),
           if (orders.isEmpty)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               child: Text(
-                'No orders yet.',
+                'Aucune commande.',
                 style: TextStyle(color: colorScheme.onSurfaceVariant),
               ),
             )
@@ -209,7 +209,7 @@ class _ProfileHeader extends StatelessWidget {
                   ),
                 const SizedBox(height: 4),
                 Text(
-                  'Joined ${_formatDate(user.createdAt)}',
+                  'Inscrit le ${_formatDate(user.createdAt)}',
                   style: textTheme.bodySmall?.copyWith(
                     color: colorScheme.onSurfaceVariant,
                   ),
@@ -226,7 +226,7 @@ class _ProfileHeader extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
-                    user.isDeactivated ? 'Deactivated' : 'Active',
+                    user.isDeactivated ? 'Désactivé' : 'Actif',
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
@@ -274,7 +274,7 @@ class _StatsRow extends StatelessWidget {
           Expanded(
             child: _StatItem(
               icon: Icons.monetization_on_outlined,
-              label: 'Coin Balance',
+              label: 'Solde coins',
               value: '${user.coinBalance} coins',
               colorScheme: colorScheme,
               textTheme: textTheme,
@@ -284,7 +284,7 @@ class _StatsRow extends StatelessWidget {
           Expanded(
             child: _StatItem(
               icon: Icons.receipt_long_outlined,
-              label: 'Total Orders',
+              label: 'Total commandes',
               value: '${user.orderCount}',
               colorScheme: colorScheme,
               textTheme: textTheme,
@@ -344,21 +344,21 @@ class _ManageUserButton extends ConsumerWidget {
 
   Future<void> _confirm(BuildContext context, WidgetRef ref) async {
     final isDeactivating = !user.isDeactivated;
-    final action = isDeactivating ? 'Deactivate' : 'Reactivate';
+    final action = isDeactivating ? 'Désactiver' : 'Réactiver';
     final message = isDeactivating
-        ? 'Deactivating this account will prevent the user from signing in. '
-            'You can reactivate it at any time.'
-        : 'Reactivating this account will allow the user to sign in again.';
+        ? 'La désactivation de ce compte empêchera l\'utilisateur de se connecter. '
+            'Vous pouvez le réactiver à tout moment.'
+        : 'La réactivation de ce compte permettra à l\'utilisateur de se connecter à nouveau.';
 
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text('$action Account'),
+        title: Text('$action le compte'),
         content: Text(message),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Cancel'),
+            child: const Text('Annuler'),
           ),
           FilledButton(
             style: isDeactivating
@@ -389,7 +389,7 @@ class _ManageUserButton extends ConsumerWidget {
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Failed to $action user: $e'),
+          content: Text('Échec de l\'opération $action : $e'),
           backgroundColor: Theme.of(context).colorScheme.error,
         ),
       );
@@ -407,7 +407,7 @@ class _ManageUserButton extends ConsumerWidget {
               : Icons.person_off_outlined,
         ),
         label: Text(
-            user.isDeactivated ? 'Reactivate Account' : 'Deactivate Account'),
+            user.isDeactivated ? 'Réactiver le compte' : 'Désactiver le compte'),
         style: OutlinedButton.styleFrom(
           foregroundColor: user.isDeactivated
               ? Theme.of(context).colorScheme.primary

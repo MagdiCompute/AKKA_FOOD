@@ -34,11 +34,11 @@ class _AdminMealListScreenState extends ConsumerState<AdminMealListScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Meals'),
+        title: const Text('Plats'),
         actions: [
           IconButton(
             icon: const Icon(Icons.category_outlined),
-            tooltip: 'Manage Categories',
+            tooltip: 'Gérer les catégories',
             onPressed: () => context.push(AppRoutes.adminCategories),
           ),
         ],
@@ -50,7 +50,7 @@ class _AdminMealListScreenState extends ConsumerState<AdminMealListScreen> {
             padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
             child: SearchBar(
               controller: _searchController,
-              hintText: 'Search meals…',
+              hintText: 'Rechercher des plats…',
               leading: const Icon(Icons.search),
               trailing: [
                 if (_searchController.text.isNotEmpty)
@@ -104,8 +104,8 @@ class _AdminMealListScreenState extends ConsumerState<AdminMealListScreen> {
                         const SizedBox(height: 16),
                         Text(
                           state.allMeals.isEmpty
-                              ? 'No meals yet.\nTap + to add the first meal.'
-                              : 'No meals match your search.',
+                              ? 'Aucun plat.\nAppuyez sur + pour ajouter le premier.'
+                              : 'Aucun plat ne correspond à votre recherche.',
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             color: colorScheme.onSurfaceVariant,
@@ -148,7 +148,7 @@ class _AdminMealListScreenState extends ConsumerState<AdminMealListScreen> {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                   content: Text(
-                                    'Failed to update availability. Please try again.',
+                                    'Échec de la mise à jour. Veuillez réessayer.',
                                   ),
                                 ),
                               );
@@ -174,7 +174,7 @@ class _AdminMealListScreenState extends ConsumerState<AdminMealListScreen> {
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        'Failed to load meals.\n$error',
+                        'Échec du chargement des plats.\n$error',
                         textAlign: TextAlign.center,
                         style: TextStyle(color: colorScheme.error),
                       ),
@@ -191,7 +191,7 @@ class _AdminMealListScreenState extends ConsumerState<AdminMealListScreen> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => context.push(AppRoutes.adminMealNew),
         icon: const Icon(Icons.add),
-        label: const Text('Add Meal'),
+        label: const Text('Ajouter un plat'),
       ),
     );
   }
@@ -227,7 +227,7 @@ class _CategoryFilterBar extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(right: 8),
             child: FilterChip(
-              label: const Text('All'),
+              label: const Text('Tous'),
               selected: selectedCategory == null,
               onSelected: (_) => onSelected(null),
             ),

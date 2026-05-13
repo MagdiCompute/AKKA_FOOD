@@ -48,7 +48,7 @@ class AdminOrderDetailScreen extends ConsumerWidget {
               content: Text(next.errorMessage!),
               backgroundColor: Theme.of(context).colorScheme.error,
               action: SnackBarAction(
-                label: 'Dismiss',
+                label: 'Fermer',
                 textColor: Theme.of(context).colorScheme.onError,
                 onPressed: () => ref
                     .read(adminOrderDetailNotifierProvider(orderId).notifier)
@@ -64,7 +64,7 @@ class AdminOrderDetailScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Order #$shortId'),
+        title: Text('Commande #$shortId'),
       ),
       body: _buildBody(context, detailState),
     );
@@ -109,7 +109,7 @@ class AdminOrderDetailScreen extends ConsumerWidget {
         children: [
           // ── Order items ─────────────────────────────────────────────────
           _SectionCard(
-            title: 'Items',
+            title: 'Articles',
             child: Column(
               children: [
                 ...order.items.map((item) => _OrderItemRow(item: item)),
@@ -120,35 +120,35 @@ class AdminOrderDetailScreen extends ConsumerWidget {
 
           // ── Order summary ───────────────────────────────────────────────
           _SectionCard(
-            title: 'Summary',
+            title: 'Résumé',
             child: _OrderSummary(order: order),
           ),
           const SizedBox(height: 12),
 
           // ── Customer info ───────────────────────────────────────────────
           _SectionCard(
-            title: 'Customer',
+            title: 'Client',
             child: _CustomerInfo(order: order),
           ),
           const SizedBox(height: 12),
 
           // ── Delivery info ───────────────────────────────────────────────
           _SectionCard(
-            title: 'Delivery',
+            title: 'Livraison',
             child: _DeliveryInfo(order: order),
           ),
           const SizedBox(height: 12),
 
           // ── Current status ──────────────────────────────────────────────
           _SectionCard(
-            title: 'Status',
+            title: 'Statut',
             child: _StatusBadge(status: order.status),
           ),
           const SizedBox(height: 12),
 
           // ── Status update controls ──────────────────────────────────────
           _SectionCard(
-            title: 'Update Status',
+            title: 'Mettre à jour le statut',
             child: _StatusUpdateControls(
               orderId: orderId,
               order: order,
@@ -282,7 +282,7 @@ class _OrderSummary extends StatelessWidget {
     return Column(
       children: [
         _SummaryRow(
-          label: 'Subtotal',
+          label: 'Sous-total',
           value: '${_formatXof(subtotal)} XOF',
         ),
         const Divider(height: 16),
@@ -342,14 +342,14 @@ class _CustomerInfo extends StatelessWidget {
       children: [
         _InfoRow(
           icon: Icons.person_outline,
-          label: 'Name',
+          label: 'Nom',
           value: order.userDisplayName,
         ),
         if (order.userPhone != null) ...[
           const SizedBox(height: 6),
           _InfoRow(
             icon: Icons.phone_outlined,
-            label: 'Phone',
+            label: 'Téléphone',
             value: order.userPhone!,
           ),
         ],
@@ -384,7 +384,7 @@ class _DeliveryInfo extends StatelessWidget {
           const SizedBox(height: 6),
           _InfoRow(
             icon: Icons.location_on_outlined,
-            label: 'Address',
+            label: 'Adresse',
             value: _formatAddress(order.deliveryAddress!),
           ),
         ],
@@ -392,7 +392,7 @@ class _DeliveryInfo extends StatelessWidget {
           const SizedBox(height: 6),
           _InfoRow(
             icon: Icons.timer_outlined,
-            label: 'ETA',
+            label: 'Temps estimé',
             value: '${order.etaMinutes} min',
           ),
         ],
@@ -623,7 +623,7 @@ class _StatusUpdateControlsState
     if (newState.errorMessage == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Status updated to ${_selectedStatus!.label}'),
+          content: Text('Statut mis à jour : ${_selectedStatus!.label}'),
         ),
       );
     }
@@ -641,7 +641,7 @@ class _StatusUpdateControlsState
       return const Padding(
         padding: EdgeInsets.symmetric(vertical: 8),
         child: Text(
-          'No further status updates available.',
+          'Aucune mise à jour de statut disponible.',
           style: TextStyle(fontStyle: FontStyle.italic),
         ),
       );
@@ -684,18 +684,18 @@ class _StatusUpdateControlsState
               keyboardType: TextInputType.number,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
               decoration: const InputDecoration(
-                labelText: 'ETA (minutes)',
-                hintText: 'e.g. 30',
+                labelText: 'Temps estimé (minutes)',
+                hintText: 'ex. 30',
                 border: OutlineInputBorder(),
                 suffixText: 'min',
               ),
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
-                  return 'ETA is required for out-for-delivery status';
+                  return 'Le temps estimé est requis pour le statut en livraison';
                 }
                 final parsed = int.tryParse(value.trim());
                 if (parsed == null || parsed <= 0) {
-                  return 'ETA must be a positive number';
+                  return 'Le temps estimé doit être un nombre positif';
                 }
                 return null;
               },
@@ -731,7 +731,7 @@ class _StatusUpdateControlsState
                       width: 20,
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
-                  : const Text('Update Status'),
+                  : const Text('Mettre à jour le statut'),
             ),
           ),
         ],

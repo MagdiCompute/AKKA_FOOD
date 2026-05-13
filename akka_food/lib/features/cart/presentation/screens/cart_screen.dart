@@ -80,16 +80,16 @@ class _CartScreenState extends ConsumerState<CartScreen> {
     String message;
 
     if (result.emptyCart) {
-      message = 'Your cart is empty. Add some meals first.';
+      message = 'Votre panier est vide. Ajoutez des plats d\'abord.';
     } else if (result.missingDeliveryAddress) {
-      message = 'Please select a delivery address before checking out.';
+      message = 'Veuillez sélectionner une adresse de livraison avant de commander.';
     } else if (result.unavailableMealIds.isNotEmpty) {
       final count = result.unavailableMealIds.length;
       message = count == 1
-          ? 'One item in your cart is no longer available. Please remove it.'
-          : '$count items in your cart are no longer available. Please remove them.';
+          ? 'Un article de votre panier n\'est plus disponible. Veuillez le retirer.'
+          : '$count articles de votre panier ne sont plus disponibles. Veuillez les retirer.';
     } else {
-      message = 'Unable to proceed to checkout. Please review your cart.';
+      message = 'Impossible de procéder à la commande. Veuillez vérifier votre panier.';
     }
 
     ScaffoldMessenger.of(context).showSnackBar(
@@ -273,7 +273,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          'Please select a delivery address',
+                          'Veuillez sélectionner une adresse de livraison',
                           style:
                               Theme.of(context).textTheme.bodySmall?.copyWith(
                                     color:

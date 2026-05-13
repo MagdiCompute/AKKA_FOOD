@@ -54,7 +54,7 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
       _confirmPasswordController.clear();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Password changed successfully.'),
+          content: Text('Mot de passe changé avec succès.'),
         ),
       );
       return;
@@ -95,7 +95,7 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Change Password'),
+        title: const Text('Changer le mot de passe'),
       ),
       body: SafeArea(
         child: Center(
@@ -113,12 +113,12 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                     textInputAction: TextInputAction.next,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Current password is required.';
+                        return 'Le mot de passe actuel est requis.';
                       }
                       return null;
                     },
                     decoration: InputDecoration(
-                      labelText: 'Current Password',
+                      labelText: 'Mot de passe actuel',
                       prefixIcon: const Icon(Icons.lock_outlined),
                       suffixIcon: IconButton(
                         icon: Icon(
@@ -127,8 +127,8 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                               : Icons.visibility_off_outlined,
                         ),
                         tooltip: _obscureCurrent
-                            ? 'Show password'
-                            : 'Hide password',
+                            ? 'Afficher le mot de passe'
+                            : 'Masquer le mot de passe',
                         onPressed: () {
                           setState(() => _obscureCurrent = !_obscureCurrent);
                         },
@@ -144,7 +144,7 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                     textInputAction: TextInputAction.next,
                     validator: validatePassword,
                     decoration: InputDecoration(
-                      labelText: 'New Password',
+                      labelText: 'Nouveau mot de passe',
                       prefixIcon: const Icon(Icons.lock_outlined),
                       suffixIcon: IconButton(
                         icon: Icon(
@@ -153,7 +153,7 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                               : Icons.visibility_off_outlined,
                         ),
                         tooltip:
-                            _obscureNew ? 'Show password' : 'Hide password',
+                            _obscureNew ? 'Afficher le mot de passe' : 'Masquer le mot de passe',
                         onPressed: () {
                           setState(() => _obscureNew = !_obscureNew);
                         },
@@ -173,7 +173,7 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                       _newPasswordController.text,
                     ),
                     decoration: InputDecoration(
-                      labelText: 'Confirm New Password',
+                      labelText: 'Confirmer le nouveau mot de passe',
                       prefixIcon: const Icon(Icons.lock_outlined),
                       suffixIcon: IconButton(
                         icon: Icon(
@@ -182,8 +182,8 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                               : Icons.visibility_off_outlined,
                         ),
                         tooltip: _obscureConfirm
-                            ? 'Show password'
-                            : 'Hide password',
+                            ? 'Afficher le mot de passe'
+                            : 'Masquer le mot de passe',
                         onPressed: () {
                           setState(() => _obscureConfirm = !_obscureConfirm);
                         },
@@ -201,7 +201,7 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                         )
                       : ElevatedButton(
                           onPressed: _changePassword,
-                          child: const Text('Change Password'),
+                          child: const Text('Changer le mot de passe'),
                         ),
                 ],
               ),

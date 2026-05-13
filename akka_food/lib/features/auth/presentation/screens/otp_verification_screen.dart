@@ -135,11 +135,11 @@ class _OtpVerificationScreenState
 
   String? _validateOtp(String? value) {
     if (value == null || value.trim().isEmpty) {
-      return 'Please enter the 6-digit code.';
+      return 'Veuillez entrer le code à 6 chiffres.';
     }
     if (value.trim().length != 6 ||
         !RegExp(r'^\d{6}$').hasMatch(value.trim())) {
-      return 'Code must be exactly 6 digits.';
+      return 'Le code doit contenir exactement 6 chiffres.';
     }
     return null;
   }
@@ -157,7 +157,7 @@ class _OtpVerificationScreenState
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Verify Your Account'),
+        title: const Text('Vérifiez votre compte'),
         leading: BackButton(
           onPressed: () => context.canPop() ? context.pop() : null,
         ),
@@ -173,7 +173,7 @@ class _OtpVerificationScreenState
                 children: [
                   // ── Instruction text ───────────────────────────────────
                   Text(
-                    'Enter the 6-digit code sent to ${widget.phoneNumber}.',
+                    'Entrez le code à 6 chiffres envoyé à ${widget.phoneNumber}.',
                     style: Theme.of(context).textTheme.bodyLarge,
                     textAlign: TextAlign.center,
                   ),
@@ -190,7 +190,7 @@ class _OtpVerificationScreenState
                     validator: _validateOtp,
                     style: Theme.of(context).textTheme.headlineSmall,
                     decoration: const InputDecoration(
-                      labelText: 'Verification Code',
+                      labelText: 'Code de vérification',
                       hintText: '000000',
                       counterText: '',
                     ),
@@ -206,7 +206,7 @@ class _OtpVerificationScreenState
                         )
                       : ElevatedButton(
                           onPressed: _verify,
-                          child: const Text('Verify'),
+                          child: const Text('Vérifier'),
                         ),
                   const SizedBox(height: 16),
 
@@ -215,10 +215,10 @@ class _OtpVerificationScreenState
                     child: _canResend
                         ? TextButton(
                             onPressed: isLoading ? null : _resend,
-                            child: const Text('Resend code'),
+                            child: const Text('Renvoyer le code'),
                           )
                         : Text(
-                            'Resend in ${_secondsRemaining}s',
+                            'Renvoyer dans ${_secondsRemaining}s',
                             style: Theme.of(context).textTheme.bodyMedium,
                           ),
                   ),

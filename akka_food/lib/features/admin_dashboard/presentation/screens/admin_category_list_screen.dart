@@ -35,7 +35,7 @@ class _AdminCategoryListScreenState
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Categories'),
+        title: const Text('Catégories'),
       ),
       body: Column(
         children: [
@@ -44,7 +44,7 @@ class _AdminCategoryListScreenState
             padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
             child: SearchBar(
               controller: _searchController,
-              hintText: 'Search categories…',
+              hintText: 'Rechercher des catégories…',
               leading: const Icon(Icons.search),
               trailing: [
                 if (_searchController.text.isNotEmpty)
@@ -85,8 +85,8 @@ class _AdminCategoryListScreenState
                         const SizedBox(height: 16),
                         Text(
                           state.allCategories.isEmpty
-                              ? 'No categories yet.\nTap + to add the first category.'
-                              : 'No categories match your search.',
+                              ? 'Aucune catégorie.\nAppuyez sur + pour ajouter la première.'
+                              : 'Aucune catégorie ne correspond à votre recherche.',
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             color: colorScheme.onSurfaceVariant,
@@ -134,7 +134,7 @@ class _AdminCategoryListScreenState
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        'Failed to load categories.\n$error',
+                        'Échec du chargement des catégories.\n$error',
                         textAlign: TextAlign.center,
                         style: TextStyle(color: colorScheme.error),
                       ),
@@ -151,7 +151,7 @@ class _AdminCategoryListScreenState
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => context.push(AppRoutes.adminCategoryNew),
         icon: const Icon(Icons.add),
-        label: const Text('Add Category'),
+        label: const Text('Ajouter une catégorie'),
       ),
     );
   }

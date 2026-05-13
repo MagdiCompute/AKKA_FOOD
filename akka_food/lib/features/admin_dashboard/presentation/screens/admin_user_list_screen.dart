@@ -51,7 +51,7 @@ class _AdminUserListScreenState extends ConsumerState<AdminUserListScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Users'),
+        title: const Text('Utilisateurs'),
       ),
       body: Column(
         children: [
@@ -61,7 +61,7 @@ class _AdminUserListScreenState extends ConsumerState<AdminUserListScreen> {
             child: TextField(
               controller: _searchController,
               decoration: InputDecoration(
-                hintText: 'Search by name or email…',
+                hintText: 'Rechercher par nom ou e-mail…',
                 prefixIcon: const Icon(Icons.search_outlined),
                 suffixIcon: userState.whenOrNull(
                   data: (state) => state.searchQuery.isNotEmpty
@@ -98,7 +98,7 @@ class _AdminUserListScreenState extends ConsumerState<AdminUserListScreen> {
                       padding: const EdgeInsets.all(24),
                       child: Center(
                         child: Text(
-                          'Failed to load users.\n$error',
+                          'Échec du chargement des utilisateurs.\n$error',
                           textAlign: TextAlign.center,
                           style: TextStyle(color: colorScheme.error),
                         ),
@@ -119,8 +119,8 @@ class _AdminUserListScreenState extends ConsumerState<AdminUserListScreen> {
                           child: Center(
                             child: Text(
                               state.allUsers.isEmpty
-                                  ? 'No users registered yet.'
-                                  : 'No users match your search.',
+                                  ? 'Aucun utilisateur inscrit.'
+                                  : 'Aucun utilisateur ne correspond à votre recherche.',
                               style: TextStyle(
                                   color: colorScheme.onSurfaceVariant),
                             ),
@@ -175,8 +175,7 @@ class _AdminUserListScreenState extends ConsumerState<AdminUserListScreen> {
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: Text(
-                                  'Deactivated',
-                                  style: TextStyle(
+                                  'Désactivé',                                  style: TextStyle(
                                     fontSize: 10,
                                     color: colorScheme.onErrorContainer,
                                     fontWeight: FontWeight.w600,
@@ -186,9 +185,9 @@ class _AdminUserListScreenState extends ConsumerState<AdminUserListScreen> {
                           ],
                         ),
                         subtitle: Text(
-                          '${user.email ?? 'No email'} · '
-                          '${user.orderCount} orders · '
-                          'Joined ${_formatDate(user.createdAt)}',
+                          '${user.email ?? 'Pas d\'e-mail'} · '
+                          '${user.orderCount} commandes · '
+                          'Inscrit le ${_formatDate(user.createdAt)}',
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(

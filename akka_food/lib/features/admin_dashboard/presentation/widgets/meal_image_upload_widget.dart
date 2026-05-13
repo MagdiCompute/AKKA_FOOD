@@ -91,7 +91,7 @@ class _MealImageUploadWidgetState extends ConsumerState<MealImageUploadWidget> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Upload failed: $e'),
+          content: Text('Échec de l\'envoi : $e'),
           backgroundColor: Theme.of(context).colorScheme.error,
         ),
       );
@@ -178,7 +178,7 @@ class _MealImageUploadWidgetState extends ConsumerState<MealImageUploadWidget> {
           LinearProgressIndicator(value: _uploadProgress),
           const SizedBox(height: 4),
           Text(
-            'Uploading… ${(_uploadProgress * 100).toStringAsFixed(0)}%',
+            'Envoi… ${(_uploadProgress * 100).toStringAsFixed(0)}%',
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: colorScheme.onSurfaceVariant,
                 ),
@@ -283,7 +283,7 @@ class _AddImageButton extends StatelessWidget {
             ),
             const SizedBox(height: 4),
             Text(
-              'Add',
+              'Ajouter',
               style: TextStyle(
                 color: colorScheme.primary,
                 fontSize: 11,

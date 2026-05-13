@@ -48,7 +48,7 @@ class AdminOrderListScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Active Orders'),
+        title: const Text('Commandes actives'),
       ),
       body: ordersAsync.when(
         loading: () => _buildLoading(context),
@@ -100,7 +100,7 @@ class AdminOrderListScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'Unable to load orders',
+              'Impossible de charger les commandes',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -108,7 +108,7 @@ class AdminOrderListScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              'Please check your connection and try again.',
+              'Veuillez vérifier votre connexion et réessayer.',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: colorScheme.outline,
                   ),
@@ -138,7 +138,7 @@ class AdminOrderListScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            'No active orders',
+            'Aucune commande active',
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   color: colorScheme.onSurfaceVariant,
                 ),
@@ -146,7 +146,7 @@ class AdminOrderListScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            'Active orders will appear here in real time.',
+            'Les commandes actives apparaîtront ici en temps réel.',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: colorScheme.outline,
                 ),
@@ -233,7 +233,7 @@ class _ActiveOrderTile extends StatelessWidget {
                     children: [
                       // Order ID
                       Text(
-                        'Order #${_truncateId(order.id)}',
+                        'Commande #${_truncateId(order.id)}',
                         style: theme.textTheme.titleSmall?.copyWith(
                           fontWeight: FontWeight.w600,
                         ),

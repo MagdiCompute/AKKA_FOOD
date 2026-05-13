@@ -121,7 +121,7 @@ class _NoAddressContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Text(
-      'Select delivery address',
+      'Sélectionner l\'adresse de livraison',
       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
             color: Theme.of(context).colorScheme.outline,
           ),
@@ -149,7 +149,7 @@ class _AddressPickerScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Select Address'),
+        title: const Text('Sélectionner une adresse'),
         centerTitle: true,
       ),
       body: addressAsync.when(
@@ -254,7 +254,7 @@ class _DefaultBadge extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
       ),
       child: Text(
-        'Default',
+        'Par défaut',
         style: theme.textTheme.labelSmall?.copyWith(
           color: theme.colorScheme.onPrimaryContainer,
           fontWeight: FontWeight.w600,
@@ -287,12 +287,12 @@ class _PickerEmptyState extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'No addresses saved',
+              'Aucune adresse enregistrée',
               style: theme.textTheme.titleMedium,
             ),
             const SizedBox(height: 8),
             Text(
-              'Go to your profile to add a delivery address.',
+              'Allez dans votre profil pour ajouter une adresse de livraison.',
               textAlign: TextAlign.center,
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
@@ -330,7 +330,7 @@ class _PickerErrorView extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'Failed to load addresses',
+              'Échec du chargement des adresses',
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 8),
@@ -345,7 +345,7 @@ class _PickerErrorView extends StatelessWidget {
             FilledButton.icon(
               onPressed: onRetry,
               icon: const Icon(Icons.refresh),
-              label: const Text('Retry'),
+              label: const Text('Réessayer'),
             ),
           ],
         ),

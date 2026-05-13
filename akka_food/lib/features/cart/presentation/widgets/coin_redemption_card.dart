@@ -86,14 +86,14 @@ class CoinRedemptionCard extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Redeem Coins',
+                      'Utiliser les coins',
                       style: Theme.of(context).textTheme.titleSmall?.copyWith(
                             fontWeight: FontWeight.bold,
                           ),
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      'You have $coinBalance coins',
+                      'Vous avez $coinBalance coins',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                             color: Theme.of(context).colorScheme.outline,
                           ),
@@ -101,7 +101,7 @@ class CoinRedemptionCard extends ConsumerWidget {
                     if (redeemableAmount > 0) ...[
                       const SizedBox(height: 2),
                       Text(
-                        'Save $redeemableAmount XOF',
+                        'Économisez $redeemableAmount XOF',
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                               color: Colors.amber.shade700,
                               fontWeight: FontWeight.w600,

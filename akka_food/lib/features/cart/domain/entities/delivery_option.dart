@@ -35,9 +35,9 @@ enum DeliveryOption {
   String get label {
     switch (this) {
       case DeliveryOption.delivery:
-        return 'Delivery';
+        return 'Livraison';
       case DeliveryOption.pickup:
-        return 'Pickup';
+        return 'À emporter';
     }
   }
 }

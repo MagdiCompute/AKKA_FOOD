@@ -37,12 +37,12 @@ class DeliveryOptionToggle extends StatelessWidget {
           segments: const [
             ButtonSegment<DeliveryOption>(
               value: DeliveryOption.delivery,
-              label: Text('Delivery'),
+              label: Text('Livraison'),
               icon: Icon(Icons.local_shipping_outlined),
             ),
             ButtonSegment<DeliveryOption>(
               value: DeliveryOption.pickup,
-              label: Text('Pickup'),
+              label: Text('À emporter'),
               icon: Icon(Icons.storefront_outlined),
             ),
           ],

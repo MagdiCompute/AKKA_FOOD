@@ -102,7 +102,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Forgot Password'),
+        title: const Text('Mot de passe oublié'),
         leading: BackButton(
           onPressed: () => context.go(AppRoutes.login),
         ),
@@ -118,15 +118,15 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                 children: [
                   // ── Title ──────────────────────────────────────────────
                   Text(
-                    'Reset your password',
+                    'Réinitialisez votre mot de passe',
                     style: Theme.of(context).textTheme.headlineSmall,
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 8),
                   Text(
                     _usePhone
-                        ? 'Enter your phone number to receive a verification code.'
-                        : 'Enter your email address to receive a reset link.',
+                        ? 'Entrez votre numéro de téléphone pour recevoir un code de vérification.'
+                        : 'Entrez votre adresse e-mail pour recevoir un lien de réinitialisation.',
                     style: Theme.of(context).textTheme.bodyMedium,
                     textAlign: TextAlign.center,
                   ),
@@ -137,7 +137,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       ChoiceChip(
-                        label: const Text('Email'),
+                        label: const Text('E-mail'),
                         selected: !_usePhone,
                         onSelected: (_) {
                           setState(() {
@@ -149,7 +149,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                       ),
                       const SizedBox(width: 12),
                       ChoiceChip(
-                        label: const Text('Phone'),
+                        label: const Text('Téléphone'),
                         selected: _usePhone,
                         onSelected: (_) {
                           setState(() {
@@ -179,7 +179,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                           const SizedBox(width: 12),
                           Expanded(
                             child: Text(
-                              'Reset link sent! Check your email inbox.',
+                              'Lien de réinitialisation envoyé ! Vérifiez votre boîte e-mail.',
                               style: TextStyle(color: Colors.green.shade800),
                             ),
                           ),
@@ -199,8 +199,8 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                       onFieldSubmitted: (_) => _sendResetCode(),
                       validator: validateEmail,
                       decoration: const InputDecoration(
-                        labelText: 'Email',
-                        hintText: 'you@example.com',
+                        labelText: 'E-mail',
+                        hintText: 'vous@exemple.com',
                         prefixIcon: Icon(Icons.email_outlined),
                       ),
                     )
@@ -212,7 +212,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                       onFieldSubmitted: (_) => _sendResetCode(),
                       validator: validatePhoneNumber,
                       decoration: const InputDecoration(
-                        labelText: 'Phone Number',
+                        labelText: 'Numéro de téléphone',
                         hintText: '+22670000000',
                         prefixIcon: Icon(Icons.phone_outlined),
                       ),
@@ -229,7 +229,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                       : ElevatedButton(
                           onPressed: _emailSent ? null : _sendResetCode,
                           child: Text(
-                            _usePhone ? 'Send Code' : 'Send Reset Link',
+                            _usePhone ? 'Envoyer le code' : 'Envoyer le lien',
                           ),
                         ),
                   const SizedBox(height: 16),
@@ -238,7 +238,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                   Center(
                     child: TextButton(
                       onPressed: () => context.go(AppRoutes.login),
-                      child: const Text('Back to Sign In'),
+                      child: const Text('Retour à la connexion'),
                     ),
                   ),
                 ],

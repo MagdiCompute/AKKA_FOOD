@@ -31,7 +31,7 @@ class CartSummaryCard extends StatelessWidget {
             children: [
               // Title
               Text(
-                'Order Summary',
+                'Résumé de la commande',
                 style: textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
@@ -42,24 +42,24 @@ class CartSummaryCard extends StatelessWidget {
 
               // Subtotal row
               _SummaryRow(
-                label: 'Subtotal',
+                label: 'Sous-total',
                 value: '${cart.subtotal.toStringAsFixed(0)} XOF',
               ),
               const SizedBox(height: 6),
 
               // Delivery fee row
               _SummaryRow(
-                label: 'Delivery fee',
+                label: 'Frais de livraison',
                 value: cart.deliveryFee > 0
                     ? '${cart.deliveryFee.toStringAsFixed(0)} XOF'
-                    : 'Free',
+                    : 'Gratuit',
               ),
 
               // Coin discount row — only shown when a discount is applied
               if (cart.discount > 0) ...[
                 const SizedBox(height: 6),
                 _SummaryRow(
-                  label: 'Coin discount',
+                  label: 'Réduction coins',
                   value: '−${cart.discount.toStringAsFixed(0)} XOF',
                   valueColor: colorScheme.primary,
                 ),

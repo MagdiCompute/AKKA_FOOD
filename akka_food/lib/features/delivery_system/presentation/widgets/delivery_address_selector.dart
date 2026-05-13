@@ -48,7 +48,7 @@ class DeliveryAddressSelector extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(top: 8, left: 4),
                 child: Text(
-                  'Delivery address is required',
+                  'L\'adresse de livraison est requise',
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: colorScheme.error,
                   ),
@@ -78,7 +78,7 @@ class DeliveryAddressSelector extends StatelessWidget {
           color: colorScheme.primary,
         ),
         title: Text(
-          address!.label ?? 'Delivery Address',
+          address!.label ?? 'Adresse de livraison',
           style: theme.textTheme.titleSmall,
         ),
         subtitle: Text(
@@ -87,7 +87,7 @@ class DeliveryAddressSelector extends StatelessWidget {
         ),
         trailing: IconButton(
           icon: const Icon(Icons.edit_outlined),
-          tooltip: 'Change address',
+          tooltip: 'Changer l\'adresse',
           onPressed: onAddressChanged,
         ),
       ),
@@ -103,7 +103,7 @@ class DeliveryAddressSelector extends StatelessWidget {
           color: showError ? colorScheme.error : colorScheme.onSurfaceVariant,
         ),
         title: Text(
-          'Add delivery address',
+          'Ajouter une adresse de livraison',
           style: Theme.of(context).textTheme.titleSmall?.copyWith(
                 color: showError
                     ? colorScheme.error

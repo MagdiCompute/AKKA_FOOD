@@ -49,7 +49,7 @@ class DeliveryFeeDisplay extends ConsumerWidget {
     final textTheme = Theme.of(context).textTheme;
 
     final isPickup = deliveryOption == DeliveryOption.pickup;
-    final feeText = isPickup ? 'Free' : '${fee.toStringAsFixed(0)} XOF';
+    final feeText = isPickup ? 'Gratuit' : '${fee.toStringAsFixed(0)} XOF';
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -65,7 +65,7 @@ class DeliveryFeeDisplay extends ConsumerWidget {
               ),
               const SizedBox(width: 8),
               Text(
-                'Delivery Fee',
+                'Frais de livraison',
                 style: textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.w500,
                 ),
@@ -101,7 +101,7 @@ class DeliveryFeeDisplay extends ConsumerWidget {
               ),
               const SizedBox(width: 8),
               Text(
-                'Delivery Fee',
+                'Frais de livraison',
                 style: textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.w500,
                 ),

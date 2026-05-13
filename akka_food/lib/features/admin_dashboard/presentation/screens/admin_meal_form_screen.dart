@@ -188,8 +188,8 @@ class _AdminMealFormScreenState extends ConsumerState<AdminMealFormScreen> {
         SnackBar(
           content: Text(
             widget.mealId == null
-                ? 'Meal created successfully.'
-                : 'Meal updated successfully.',
+                ? 'Plat créé avec succès.'
+                : 'Plat mis à jour avec succès.',
           ),
         ),
       );
@@ -198,9 +198,9 @@ class _AdminMealFormScreenState extends ConsumerState<AdminMealFormScreen> {
       final error = ref.read(adminMealFormNotifierProvider).errorMessage;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(error ?? 'Failed to save meal. Please try again.'),
+          content: Text(error ?? 'Échec de l\'enregistrement. Veuillez réessayer.'),
           action: SnackBarAction(
-            label: 'Retry',
+            label: 'Réessayer',
             onPressed: _onSave,
           ),
         ),
@@ -214,14 +214,14 @@ class _AdminMealFormScreenState extends ConsumerState<AdminMealFormScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Delete Meal'),
+        title: const Text('Supprimer le plat'),
         content: const Text(
-          'Are you sure you want to delete this meal? This action cannot be undone.',
+          'Êtes-vous sûr de vouloir supprimer ce plat ? Cette action est irréversible.',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Cancel'),
+            child: const Text('Annuler'),
           ),
           FilledButton(
             style: FilledButton.styleFrom(
@@ -229,7 +229,7 @@ class _AdminMealFormScreenState extends ConsumerState<AdminMealFormScreen> {
               foregroundColor: Theme.of(ctx).colorScheme.onError,
             ),
             onPressed: () => Navigator.of(ctx).pop(true),
-            child: const Text('Delete'),
+            child: const Text('Supprimer'),
           ),
         ],
       ),
@@ -244,14 +244,14 @@ class _AdminMealFormScreenState extends ConsumerState<AdminMealFormScreen> {
 
     if (success) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Meal deleted.')),
+        const SnackBar(content: Text('Plat supprimé.')),
       );
       context.pop();
     } else {
       final error = ref.read(adminMealFormNotifierProvider).errorMessage;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(error ?? 'Failed to delete meal. Please try again.'),
+          content: Text(error ?? 'Échec de la suppression. Veuillez réessayer.'),
         ),
       );
     }
@@ -272,13 +272,13 @@ class _AdminMealFormScreenState extends ConsumerState<AdminMealFormScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(isEditMode ? 'Edit Meal' : 'New Meal'),
+        title: Text(isEditMode ? 'Modifier le plat' : 'Nouveau plat'),
         actions: [
           // ── Delete button (edit mode only) ───────────────────────────────
           if (isEditMode)
             IconButton(
               icon: const Icon(Icons.delete_outline),
-              tooltip: 'Delete meal',
+              tooltip: 'Supprimer le plat',
               onPressed: isBusy ? null : _onDelete,
             ),
           // ── Save button ──────────────────────────────────────────────────
@@ -293,7 +293,7 @@ class _AdminMealFormScreenState extends ConsumerState<AdminMealFormScreen> {
                 )
               : TextButton(
                   onPressed: _onSave,
-                  child: const Text('Save'),
+                  child: const Text('Enregistrer'),
                 ),
         ],
       ),
@@ -305,18 +305,18 @@ class _AdminMealFormScreenState extends ConsumerState<AdminMealFormScreen> {
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
                 children: [
                   // ── Name ─────────────────────────────────────────────────
-                  _SectionHeader(label: 'Basic Info'),
+                  _SectionHeader(label: 'Informations de base'),
                   const SizedBox(height: 8),
                   TextFormField(
                     controller: _nameController,
                     decoration: const InputDecoration(
-                      labelText: 'Name *',
+                      labelText: 'Nom *',
                       border: OutlineInputBorder(),
                     ),
                     textCapitalization: TextCapitalization.words,
                     onChanged: notifier.setName,
                     validator: (v) =>
-                        (v == null || v.trim().isEmpty) ? 'Name is required' : null,
+                        (v == null || v.trim().isEmpty) ? 'Le nom est requis' : null,
                   ),
                   const SizedBox(height: 12),
 
@@ -338,7 +338,7 @@ class _AdminMealFormScreenState extends ConsumerState<AdminMealFormScreen> {
                   TextFormField(
                     controller: _priceController,
                     decoration: const InputDecoration(
-                      labelText: 'Price *',
+                      labelText: 'Prix *',
                       border: OutlineInputBorder(),
                       suffixText: 'XOF',
                     ),
@@ -353,11 +353,11 @@ class _AdminMealFormScreenState extends ConsumerState<AdminMealFormScreen> {
                     onChanged: notifier.setPrice,
                     validator: (v) {
                       if (v == null || v.trim().isEmpty) {
-                        return 'Price is required';
+                        return 'Le prix est requis';
                       }
                       final parsed = double.tryParse(v.trim());
                       if (parsed == null || parsed < 0) {
-                        return 'Enter a valid price';
+                        return 'Entrez un prix valide';
                       }
                       return null;
                     },
@@ -380,7 +380,7 @@ class _AdminMealFormScreenState extends ConsumerState<AdminMealFormScreen> {
                   const SizedBox(height: 24),
 
                   // ── Dietary tags ──────────────────────────────────────────
-                  _SectionHeader(label: 'Dietary Tags'),
+                  _SectionHeader(label: 'Tags alimentaires'),
                   const SizedBox(height: 8),
                   _DietaryTagsWrap(
                     selectedTags: formState.dietaryTags,
@@ -389,7 +389,7 @@ class _AdminMealFormScreenState extends ConsumerState<AdminMealFormScreen> {
                   const SizedBox(height: 24),
 
                   // ── Nutritional info ──────────────────────────────────────
-                  _SectionHeader(label: 'Nutritional Info (per serving)'),
+                  _SectionHeader(label: 'Info nutritionnelle (par portion)'),
                   const SizedBox(height: 8),
                   _NutritionalInfoFields(
                     caloriesController: _caloriesController,
@@ -404,11 +404,11 @@ class _AdminMealFormScreenState extends ConsumerState<AdminMealFormScreen> {
                   const SizedBox(height: 24),
 
                   // ── Availability ──────────────────────────────────────────
-                  _SectionHeader(label: 'Availability & Visibility'),
+                  _SectionHeader(label: 'Disponibilité & Visibilité'),
                   SwitchListTile(
-                    title: const Text('Available'),
+                    title: const Text('Disponible'),
                     subtitle: const Text(
-                      'Customers can see and order this meal',
+                      'Les clients peuvent voir et commander ce plat',
                     ),
                     value: formState.isAvailable,
                     onChanged: notifier.setIsAvailable,
@@ -417,9 +417,9 @@ class _AdminMealFormScreenState extends ConsumerState<AdminMealFormScreen> {
 
                   // ── Featured ──────────────────────────────────────────────
                   SwitchListTile(
-                    title: const Text('Featured'),
+                    title: const Text('À la une'),
                     subtitle: const Text(
-                      'Show this meal in the Featured section',
+                      'Afficher ce plat dans la section À la une',
                     ),
                     value: formState.isFeatured,
                     onChanged: notifier.setIsFeatured,
@@ -432,9 +432,9 @@ class _AdminMealFormScreenState extends ConsumerState<AdminMealFormScreen> {
                     TextFormField(
                       controller: _featuredOrderController,
                       decoration: const InputDecoration(
-                        labelText: 'Featured Order',
+                        labelText: 'Ordre d\'affichage',
                         helperText:
-                            'Lower numbers appear first (0 = highest priority)',
+                            'Les nombres plus petits apparaissent en premier (0 = priorité maximale)',
                         border: OutlineInputBorder(),
                       ),
                       keyboardType: TextInputType.number,
@@ -446,7 +446,7 @@ class _AdminMealFormScreenState extends ConsumerState<AdminMealFormScreen> {
                         if (v == null || v.trim().isEmpty) return null;
                         final parsed = int.tryParse(v.trim());
                         if (parsed == null || parsed < 0) {
-                          return 'Enter a non-negative integer';
+                          return 'Entrez un nombre entier positif';
                         }
                         return null;
                       },
@@ -479,7 +479,7 @@ class _CategoryDropdown extends ConsumerWidget {
 
     return categoriesAsync.when(
       loading: () => const LinearProgressIndicator(),
-      error: (e, _) => Text('Failed to load categories: $e'),
+      error: (e, _) => Text('Échec du chargement des catégories : $e'),
       data: (categories) {
         return DropdownButtonFormField<String>(
           value: (selectedCategory != null &&
@@ -487,10 +487,10 @@ class _CategoryDropdown extends ConsumerWidget {
               ? selectedCategory
               : null,
           decoration: const InputDecoration(
-            labelText: 'Category *',
+            labelText: 'Catégorie *',
             border: OutlineInputBorder(),
           ),
-          hint: const Text('Select a category'),
+          hint: const Text('Sélectionner une catégorie'),
           items: categories
               .map(
                 (cat) => DropdownMenuItem<String>(
@@ -501,7 +501,7 @@ class _CategoryDropdown extends ConsumerWidget {
               .toList(),
           onChanged: onChanged,
           validator: (v) =>
-              (v == null || v.trim().isEmpty) ? 'Category is required' : null,
+              (v == null || v.trim().isEmpty) ? 'La catégorie est requise' : null,
         );
       },
     );
@@ -582,7 +582,7 @@ class _NutritionalInfoFields extends StatelessWidget {
             Expanded(
               child: _NutrientField(
                 controller: proteinController,
-                label: 'Protein',
+                label: 'Protéines',
                 suffix: 'g',
                 onChanged: onProteinChanged,
               ),
@@ -595,7 +595,7 @@ class _NutritionalInfoFields extends StatelessWidget {
             Expanded(
               child: _NutrientField(
                 controller: carbsController,
-                label: 'Carbs',
+                label: 'Glucides',
                 suffix: 'g',
                 onChanged: onCarbsChanged,
               ),
@@ -604,7 +604,7 @@ class _NutritionalInfoFields extends StatelessWidget {
             Expanded(
               child: _NutrientField(
                 controller: fatController,
-                label: 'Fat',
+                label: 'Lipides',
                 suffix: 'g',
                 onChanged: onFatChanged,
               ),

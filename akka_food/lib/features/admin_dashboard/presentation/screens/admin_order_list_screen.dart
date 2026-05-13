@@ -34,7 +34,7 @@ class _AdminOrderListScreenState extends ConsumerState<AdminOrderListScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Orders'),
+        title: const Text('Commandes'),
         actions: [
           // Clear filters button — only shown when a filter or search is active.
           orderState.whenOrNull(
@@ -46,7 +46,7 @@ class _AdminOrderListScreenState extends ConsumerState<AdminOrderListScreen> {
                   if (!hasFilter) return null;
                   return IconButton(
                     icon: const Icon(Icons.filter_alt_off_outlined),
-                    tooltip: 'Clear filters',
+                    tooltip: 'Effacer les filtres',
                     onPressed: () {
                       _searchController.clear();
                       ref
@@ -67,13 +67,13 @@ class _AdminOrderListScreenState extends ConsumerState<AdminOrderListScreen> {
             child: TextField(
               controller: _searchController,
               decoration: InputDecoration(
-                hintText: 'Search by order ID or customer name…',
+                hintText: 'Rechercher par ID ou nom du client…',
                 prefixIcon: const Icon(Icons.search_outlined),
                 suffixIcon: orderState.whenOrNull(
                   data: (state) => state.searchQuery.isNotEmpty
                       ? IconButton(
                           icon: const Icon(Icons.clear),
-                          tooltip: 'Clear search',
+                          tooltip: 'Effacer la recherche',
                           onPressed: () {
                             _searchController.clear();
                             ref
@@ -132,8 +132,8 @@ class _AdminOrderListScreenState extends ConsumerState<AdminOrderListScreen> {
                         const SizedBox(height: 16),
                         Text(
                           state.allOrders.isEmpty
-                              ? 'No active orders right now.'
-                              : 'No orders match the current filters.',
+                              ? 'Aucune commande active pour le moment.'
+                              : 'Aucune commande ne correspond aux filtres.',
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             color: colorScheme.onSurfaceVariant,
@@ -173,7 +173,7 @@ class _AdminOrderListScreenState extends ConsumerState<AdminOrderListScreen> {
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        'Failed to load orders.\n$error',
+                        'Échec du chargement des commandes.\n$error',
                         textAlign: TextAlign.center,
                         style: TextStyle(color: colorScheme.error),
                       ),
@@ -303,8 +303,7 @@ class _DateRangeButton extends StatelessWidget {
         color: hasRange ? colorScheme.onSecondaryContainer : null,
       ),
       label: Text(
-        hasRange ? _formatRange(dateRange!) : 'Date',
-        style: hasRange
+        hasRange ? _formatRange(dateRange!) : 'Date',        style: hasRange
             ? TextStyle(color: colorScheme.onSecondaryContainer)
             : null,
       ),

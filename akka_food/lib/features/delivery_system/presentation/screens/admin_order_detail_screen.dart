@@ -74,7 +74,7 @@ class _AdminOrderDetailScreenState
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Order Details'),
+        title: const Text('Détails de la commande'),
       ),
       body: orderAsync.when(
         loading: _buildLoading,
@@ -130,7 +130,7 @@ class _AdminOrderDetailScreenState
             ),
             const SizedBox(height: 16),
             Text(
-              'Unable to load order details',
+              'Impossible de charger les détails de la commande',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -138,7 +138,7 @@ class _AdminOrderDetailScreenState
             ),
             const SizedBox(height: 8),
             Text(
-              'Please check your connection and try again.',
+              'Veuillez vérifier votre connexion et réessayer.',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: colorScheme.outline,
                   ),
@@ -152,7 +152,7 @@ class _AdminOrderDetailScreenState
                     .watchOrder(widget.orderId);
               },
               icon: const Icon(Icons.refresh),
-              label: const Text('Retry'),
+              label: const Text('Réessayer'),
             ),
           ],
         ),
@@ -214,7 +214,7 @@ class _AdminOrderDetailScreenState
             Semantics(
               label: 'Order ID: ${order.id}',
               child: Text(
-                'Order #${order.id}',
+                'Commande #${order.id}',
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
@@ -235,7 +235,7 @@ class _AdminOrderDetailScreenState
                   child: Semantics(
                     label: 'Customer ID: ${order.uid}',
                     child: Text(
-                      'Customer: ${order.uid}',
+                      'Client : ${order.uid}',
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: colorScheme.outline,
                       ),
@@ -258,7 +258,7 @@ class _AdminOrderDetailScreenState
                 Semantics(
                   label: 'Created at ${_formatDateTime(order.createdAt)}',
                   child: Text(
-                    'Created: ${_formatDateTime(order.createdAt)}',
+                    'Créée : ${_formatDateTime(order.createdAt)}',
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: colorScheme.outline,
                     ),
@@ -280,7 +280,7 @@ class _AdminOrderDetailScreenState
                     label:
                         'Delivered at ${_formatDateTime(order.deliveredAt!)}',
                     child: Text(
-                      'Delivered: ${_formatDateTime(order.deliveredAt!)}',
+                      'Livrée : ${_formatDateTime(order.deliveredAt!)}',
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: colorScheme.outline,
                       ),
@@ -313,7 +313,7 @@ class _AdminOrderDetailScreenState
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Update Status',
+              'Mettre à jour le statut',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -357,9 +357,9 @@ class _AdminOrderDetailScreenState
           FilteringTextInputFormatter.digitsOnly,
         ],
         decoration: const InputDecoration(
-          labelText: 'ETA (minutes) *',
-          hintText: 'Enter estimated delivery time in minutes',
-          helperText: 'Required — must be a positive number',
+          labelText: 'Temps estimé (minutes) *',
+          hintText: 'Entrez le temps de livraison estimé en minutes',
+          helperText: 'Requis — doit être un nombre positif',
           border: OutlineInputBorder(),
           prefixIcon: Icon(Icons.timer_outlined),
         ),
@@ -382,12 +382,12 @@ class _AdminOrderDetailScreenState
     if (targetStatus == DeliveryStatus.outForDelivery) {
       final etaText = _etaController.text.trim();
       if (etaText.isEmpty) {
-        _showSnackBar('Please enter an ETA in minutes before marking as out for delivery.');
+        _showSnackBar('Veuillez entrer un temps estimé avant de marquer comme en livraison.');
         return;
       }
       etaMinutes = int.tryParse(etaText);
       if (etaMinutes == null || etaMinutes <= 0) {
-        _showSnackBar('ETA must be a positive number of minutes.');
+        _showSnackBar('Le temps estimé doit être un nombre positif de minutes.');
         return;
       }
     }
@@ -415,29 +415,29 @@ class _AdminOrderDetailScreenState
     int? etaMinutes,
   ) {
     String message =
-        'Update order status from "${order.status.label}" to "${targetStatus.label}"?';
+        'Mettre à jour le statut de "${order.status.label}" à "${targetStatus.label}" ?';
 
     if (targetStatus == DeliveryStatus.outForDelivery && etaMinutes != null) {
-      message += '\n\nETA: $etaMinutes minutes';
+      message += '\n\nTemps estimé : $etaMinutes minutes';
     }
 
     if (targetStatus == DeliveryStatus.delivered) {
-      message += '\n\nThis will record the delivery timestamp.';
+      message += '\n\nCela enregistrera l\'horodatage de livraison.';
     }
 
     return showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Confirm Status Update'),
+        title: const Text('Confirmer la mise à jour'),
         content: Text(message),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: const Text('Cancel'),
+            child: const Text('Annuler'),
           ),
           FilledButton(
             onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: const Text('Update'),
+            child: const Text('Mettre à jour'),
           ),
         ],
       ),
@@ -474,18 +474,18 @@ class _AdminOrderDetailScreenState
 
       _etaController.clear();
       _showSnackBar(
-        'Status updated to "${newStatus.label}" successfully.',
+        'Statut mis à jour : "${newStatus.label}".',
       );
     } on FirebaseFunctionsException catch (e) {
       if (!mounted) return;
       _showSnackBar(
-        'Failed to update status: ${e.message ?? e.code}',
+        'Échec de la mise à jour : ${e.message ?? e.code}',
         isError: true,
       );
     } catch (e) {
       if (!mounted) return;
       _showSnackBar(
-        'An unexpected error occurred. Please try again.',
+        'Une erreur inattendue est survenue. Veuillez réessayer.',
         isError: true,
       );
     } finally {
@@ -509,7 +509,7 @@ class _AdminOrderDetailScreenState
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Items (${order.items.length})',
+              'Articles (${order.items.length})',
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -591,16 +591,16 @@ class _AdminOrderDetailScreenState
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Order Summary',
+              'Résumé de la commande',
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: 12),
-            _buildTotalRow(context, 'Subtotal', order.subtotal),
-            _buildTotalRow(context, 'Delivery Fee', order.deliveryFee),
+            _buildTotalRow(context, 'Sous-total', order.subtotal),
+            _buildTotalRow(context, 'Frais de livraison', order.deliveryFee),
             if (order.discount > 0)
-              _buildTotalRow(context, 'Discount', -order.discount),
+              _buildTotalRow(context, 'Réduction', -order.discount),
             const Divider(height: 20),
             Semantics(
               label: 'Total: ${order.total.toStringAsFixed(0)} XOF',
@@ -671,7 +671,7 @@ class _AdminOrderDetailScreenState
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Delivery Information',
+              'Informations de livraison',
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -682,7 +682,7 @@ class _AdminOrderDetailScreenState
             _buildInfoRow(
               context,
               icon: Icons.local_shipping_outlined,
-              label: 'Method',
+              label: 'Méthode',
               value: order.deliveryOption.label,
             ),
 
@@ -693,7 +693,7 @@ class _AdminOrderDetailScreenState
               _buildInfoRow(
                 context,
                 icon: Icons.location_on_outlined,
-                label: 'Address',
+                label: 'Adresse',
                 value:
                     '${order.deliveryAddress!.street}, ${order.deliveryAddress!.city}',
               ),
@@ -717,8 +717,8 @@ class _AdminOrderDetailScreenState
               _buildInfoRow(
                 context,
                 icon: Icons.store_outlined,
-                label: 'Pickup',
-                value: 'Customer will pick up at restaurant',
+                label: 'À emporter',
+                value: 'Le client récupérera au restaurant',
               ),
             ],
 
@@ -728,7 +728,7 @@ class _AdminOrderDetailScreenState
               _buildInfoRow(
                 context,
                 icon: Icons.timer_outlined,
-                label: 'ETA',
+                label: 'Temps estimé',
                 value: '${order.etaMinutes} minutes',
               ),
             ],
@@ -740,7 +740,7 @@ class _AdminOrderDetailScreenState
               _buildInfoRow(
                 context,
                 icon: Icons.warning_amber_outlined,
-                label: 'Failure Reason',
+                label: 'Raison de l\'échec',
                 value: order.failureReason!,
               ),
             ],
@@ -854,7 +854,7 @@ class _StatusTransitionButton extends StatelessWidget {
                 child: CircularProgressIndicator(strokeWidth: 2),
               )
             : Icon(icon),
-        label: Text('Mark as ${targetStatus.label}'),
+        label: Text('Passer à ${targetStatus.label}'),
       ),
     );
   }

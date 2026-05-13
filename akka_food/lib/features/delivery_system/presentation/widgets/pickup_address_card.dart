@@ -71,7 +71,7 @@ class PickupAddressCard extends StatelessWidget {
                           ),
                           const SizedBox(width: 4),
                           Text(
-                            'Get directions',
+                            'Itinéraire',
                             style: theme.textTheme.bodySmall?.copyWith(
                               color: colorScheme.primary,
                             ),

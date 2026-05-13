@@ -34,19 +34,19 @@ class AdminHomeScreen extends ConsumerWidget {
   static const _navItems = [
     BottomNavigationBarItem(
       icon: Icon(Icons.receipt_long),
-      label: 'Orders',
+      label: 'Commandes',
     ),
     BottomNavigationBarItem(
       icon: Icon(Icons.restaurant_menu),
-      label: 'Meals',
+      label: 'Plats',
     ),
     BottomNavigationBarItem(
       icon: Icon(Icons.bar_chart),
-      label: 'Analytics',
+      label: 'Statistiques',
     ),
     BottomNavigationBarItem(
       icon: Icon(Icons.people),
-      label: 'Users',
+      label: 'Utilisateurs',
     ),
   ];
 

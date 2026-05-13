@@ -158,7 +158,7 @@ class _AdminCategoryFormScreenState
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Upload failed: $e'),
+          content: Text('Échec de l\'envoi : $e'),
           backgroundColor: Theme.of(context).colorScheme.error,
         ),
       );
@@ -207,8 +207,8 @@ class _AdminCategoryFormScreenState
         SnackBar(
           content: Text(
             widget.categoryId == null
-                ? 'Category created successfully.'
-                : 'Category updated successfully.',
+                ? 'Catégorie créée avec succès.'
+                : 'Catégorie mise à jour avec succès.',
           ),
         ),
       );
@@ -219,10 +219,10 @@ class _AdminCategoryFormScreenState
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            error ?? 'Failed to save category. Please try again.',
+            error ?? 'Échec de l\'enregistrement. Veuillez réessayer.',
           ),
           action: SnackBarAction(
-            label: 'Retry',
+            label: 'Réessayer',
             onPressed: _onSave,
           ),
         ),
@@ -236,15 +236,15 @@ class _AdminCategoryFormScreenState
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Delete Category'),
+        title: const Text('Supprimer la catégorie'),
         content: const Text(
-          'Are you sure you want to delete this category? '
-          'Meals in this category will not be deleted but will become uncategorized.',
+          'Êtes-vous sûr de vouloir supprimer cette catégorie ? '
+          'Les plats de cette catégorie ne seront pas supprimés mais deviendront non catégorisés.',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Cancel'),
+            child: const Text('Annuler'),
           ),
           FilledButton(
             style: FilledButton.styleFrom(
@@ -252,7 +252,7 @@ class _AdminCategoryFormScreenState
               foregroundColor: Theme.of(ctx).colorScheme.onError,
             ),
             onPressed: () => Navigator.of(ctx).pop(true),
-            child: const Text('Delete'),
+            child: const Text('Supprimer'),
           ),
         ],
       ),
@@ -268,14 +268,14 @@ class _AdminCategoryFormScreenState
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Category deleted.')),
+        const SnackBar(content: Text('Catégorie supprimée.')),
       );
       context.pop();
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Failed to delete category: $e'),
+          content: Text('Échec de la suppression : $e'),
           backgroundColor: Theme.of(context).colorScheme.error,
         ),
       );
@@ -296,7 +296,7 @@ class _AdminCategoryFormScreenState
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            error ?? 'Failed to update category status. Please try again.',
+            error ?? 'Échec de la mise à jour du statut. Veuillez réessayer.',
           ),
         ),
       );
@@ -318,13 +318,13 @@ class _AdminCategoryFormScreenState
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(isEditMode ? 'Edit Category' : 'New Category'),
+        title: Text(isEditMode ? 'Modifier la catégorie' : 'Nouvelle catégorie'),
         actions: [
           // Delete button (edit mode only)
           if (isEditMode)
             IconButton(
               icon: const Icon(Icons.delete_outline),
-              tooltip: 'Delete category',
+              tooltip: 'Supprimer la catégorie',
               onPressed: isBusy ? null : _onDelete,
             ),
           isBusy
@@ -338,7 +338,7 @@ class _AdminCategoryFormScreenState
                 )
               : TextButton(
                   onPressed: _onSave,
-                  child: const Text('Save'),
+                  child: const Text('Enregistrer'),
                 ),
         ],
       ),
@@ -354,25 +354,24 @@ class _AdminCategoryFormScreenState
                   TextFormField(
                     controller: _nameController,
                     decoration: const InputDecoration(
-                      labelText: 'Name *',
+                      labelText: 'Nom *',
                       border: OutlineInputBorder(),
                     ),
                     textCapitalization: TextCapitalization.words,
                     onChanged: notifier.setName,
                     validator: (v) => (v == null || v.trim().isEmpty)
-                        ? 'Name is required'
+                        ? 'Le nom est requis'
                         : null,
                   ),
                   const SizedBox(height: 24),
 
                   // ── Image ─────────────────────────────────────────────────
-                  _SectionHeader(label: 'Image'),
-                  const SizedBox(height: 8),
+                  _SectionHeader(label: 'Image'),                  const SizedBox(height: 8),
                   // Image URL text field with live preview
                   TextFormField(
                     controller: _imageUrlController,
                     decoration: InputDecoration(
-                      labelText: 'Image URL',
+                      labelText: 'URL de l\'image',
                       border: const OutlineInputBorder(),
                       hintText: 'https://images.unsplash.com/...',
                       suffixIcon: _imageUrlController.text.isNotEmpty
@@ -412,7 +411,7 @@ class _AdminCategoryFormScreenState
                               Icon(Icons.broken_image, color: Theme.of(context).colorScheme.error),
                               const SizedBox(height: 4),
                               Text(
-                                'Cannot preview (CORS). Image will still be saved.',
+                                'Aperçu impossible (CORS). L\'image sera quand même enregistrée.',
                                 style: Theme.of(context).textTheme.bodySmall,
                                 textAlign: TextAlign.center,
                               ),
@@ -434,18 +433,18 @@ class _AdminCategoryFormScreenState
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: const Center(
-                        child: Text('No image — paste a URL above'),
+                        child: Text('Aucune image — collez une URL ci-dessus'),
                       ),
                     ),
                   const SizedBox(height: 24),
 
                   // ── Active toggle (edit mode only) ────────────────────────
                   if (isEditMode) ...[
-                    _SectionHeader(label: 'Visibility'),
+                    _SectionHeader(label: 'Visibilité'),
                     SwitchListTile(
                       title: const Text('Active'),
                       subtitle: const Text(
-                        'Active categories are visible to customers',
+                        'Les catégories actives sont visibles par les clients',
                       ),
                       value: formState.isActive,
                       onChanged: isBusy ? null : _onToggleActive,
@@ -518,7 +517,7 @@ class _CategoryImageUpload extends StatelessWidget {
           LinearProgressIndicator(value: uploadProgress),
           const SizedBox(height: 4),
           Text(
-            'Uploading… ${(uploadProgress * 100).toStringAsFixed(0)}%',
+            'Envoi… ${(uploadProgress * 100).toStringAsFixed(0)}%',
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: colorScheme.onSurfaceVariant,
                 ),
@@ -623,7 +622,7 @@ class _AddImageButton extends StatelessWidget {
             ),
             const SizedBox(height: 4),
             Text(
-              'Add',
+              'Ajouter',
               style: TextStyle(
                 color: colorScheme.primary,
                 fontSize: 11,

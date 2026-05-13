@@ -34,9 +34,9 @@ enum DeliveryOption {
   String get label {
     switch (this) {
       case DeliveryOption.delivery:
-        return 'Delivery';
+        return 'Livraison';
       case DeliveryOption.pickup:
-        return 'Pickup';
+        return 'À emporter';
     }
   }
 }
@@ -96,19 +96,19 @@ enum DeliveryStatus {
   String get label {
     switch (this) {
       case DeliveryStatus.pending:
-        return 'Pending';
+        return 'En attente';
       case DeliveryStatus.confirmed:
-        return 'Confirmed';
+        return 'Confirmée';
       case DeliveryStatus.preparing:
-        return 'Preparing';
+        return 'En préparation';
       case DeliveryStatus.readyForPickup:
-        return 'Ready for Pickup';
+        return 'Prêt à récupérer';
       case DeliveryStatus.outForDelivery:
-        return 'Out for Delivery';
+        return 'En livraison';
       case DeliveryStatus.delivered:
-        return 'Delivered';
+        return 'Livrée';
       case DeliveryStatus.cancelled:
-        return 'Cancelled';
+        return 'Annulée';
     }
   }
 

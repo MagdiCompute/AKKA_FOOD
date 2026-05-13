@@ -59,7 +59,7 @@ class _OrderTrackingScreenState extends ConsumerState<OrderTrackingScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Order Tracking'),
+        title: const Text('Suivi de commande'),
       ),
       body: orderAsync.when(
         loading: _buildLoading,
@@ -116,7 +116,7 @@ class _OrderTrackingScreenState extends ConsumerState<OrderTrackingScreen> {
             ),
             const SizedBox(height: 16),
             Text(
-              'Unable to load order tracking',
+              'Impossible de charger le suivi de commande',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -124,7 +124,7 @@ class _OrderTrackingScreenState extends ConsumerState<OrderTrackingScreen> {
             ),
             const SizedBox(height: 8),
             Text(
-              'Please check your connection and try again.',
+              'Veuillez vérifier votre connexion et réessayer.',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: Theme.of(context).colorScheme.outline,
                   ),
@@ -134,7 +134,7 @@ class _OrderTrackingScreenState extends ConsumerState<OrderTrackingScreen> {
             FilledButton.icon(
               onPressed: _onRetry,
               icon: const Icon(Icons.refresh),
-              label: const Text('Retry'),
+              label: const Text('Réessayer'),
             ),
           ],
         ),
@@ -184,7 +184,7 @@ class _OrderTrackingScreenState extends ConsumerState<OrderTrackingScreen> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      'Reconnecting...',
+                      'Reconnexion en cours...',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color: Theme.of(context)
                                 .colorScheme
@@ -220,7 +220,7 @@ class _OrderTrackingScreenState extends ConsumerState<OrderTrackingScreen> {
           Semantics(
             label: 'Order ${order.id}',
             child: Text(
-              'Order #${order.id}',
+              'Commande #${order.id}',
               style: Theme.of(context).textTheme.titleSmall?.copyWith(
                     color: Theme.of(context).colorScheme.outline,
                   ),
@@ -323,7 +323,7 @@ class _OrderTrackingScreenState extends ConsumerState<OrderTrackingScreen> {
               ),
               const SizedBox(height: 12),
               Text(
-                'Order Delivered!',
+                'Commande livrée !',
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.bold,
                       color:
@@ -332,8 +332,8 @@ class _OrderTrackingScreenState extends ConsumerState<OrderTrackingScreen> {
               ),
               const SizedBox(height: 8),
               Text(
-                'Your order has been delivered successfully. '
-                'We hope you enjoy your meal!',
+                'Votre commande a été livrée avec succès. '
+                'Nous espérons que vous apprécierez votre repas !',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color:
                           Theme.of(context).colorScheme.onPrimaryContainer,
@@ -346,7 +346,7 @@ class _OrderTrackingScreenState extends ConsumerState<OrderTrackingScreen> {
                 child: FilledButton.icon(
                   onPressed: () => _onRateOrder(order.id),
                   icon: const Icon(Icons.star_outline),
-                  label: const Text('Rate Order'),
+                  label: const Text('Noter la commande'),
                 ),
               ),
             ],
@@ -362,7 +362,7 @@ class _OrderTrackingScreenState extends ConsumerState<OrderTrackingScreen> {
     // For now, this is a placeholder action.
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text('Rating screen coming soon'),
+        content: Text('Écran de notation bientôt disponible'),
         behavior: SnackBarBehavior.floating,
       ),
     );
@@ -388,7 +388,7 @@ class _OrderTrackingScreenState extends ConsumerState<OrderTrackingScreen> {
               ),
               const SizedBox(height: 12),
               Text(
-                'Delivery Failed',
+                'Livraison échouée',
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: Theme.of(context).colorScheme.onErrorContainer,
@@ -407,7 +407,7 @@ class _OrderTrackingScreenState extends ConsumerState<OrderTrackingScreen> {
               ],
               const SizedBox(height: 16),
               Text(
-                'We will contact you shortly to resolve this issue.',
+                'Nous vous contacterons sous peu pour résoudre ce problème.',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: Theme.of(context).colorScheme.onErrorContainer,
                     ),

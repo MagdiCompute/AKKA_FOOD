@@ -124,9 +124,47 @@ class _ProfileBody extends ConsumerWidget {
           onTap: () => _showDeleteDialog(context, ref),
         ),
 
+        const Divider(height: 32),
+
+        // ── Sign out ──────────────────────────────────────────────────
+        _NavTile(
+          icon: Icons.logout,
+          title: 'Se déconnecter',
+          onTap: () => _showSignOutDialog(context, ref),
+        ),
+
         const SizedBox(height: 32),
       ],
     );
+  }
+
+  // ---------------------------------------------------------------------------
+  // Sign out dialog
+  // ---------------------------------------------------------------------------
+
+  Future<void> _showSignOutDialog(BuildContext context, WidgetRef ref) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Se déconnecter'),
+        content: const Text('Voulez-vous vraiment vous déconnecter ?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Annuler'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: const Text('Se déconnecter'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true || !context.mounted) return;
+
+    await ref.read(authNotifierProvider.notifier).signOut();
+    if (context.mounted) context.go(AppRoutes.login);
   }
 
   // ---------------------------------------------------------------------------

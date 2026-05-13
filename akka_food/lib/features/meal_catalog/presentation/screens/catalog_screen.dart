@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:akka_food/core/router/app_router.dart';
 import 'package:akka_food/core/widgets/animated_list_item.dart';
 import 'package:akka_food/core/widgets/shimmer_loading.dart';
 import 'package:akka_food/features/auth/presentation/notifiers/auth_notifier.dart';
+import 'package:akka_food/features/cart/presentation/notifiers/cart_notifier.dart';
 import 'package:akka_food/features/meal_catalog/domain/entities/category.dart';
 import 'package:akka_food/features/meal_catalog/domain/entities/meal.dart';
 import 'package:akka_food/features/meal_catalog/domain/entities/meal_filter.dart';
@@ -282,6 +284,9 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
     return AppBar(
       title: const Text('Menu'),
       actions: [
+        // Cart icon with item count badge
+        _CartBadgeIcon(),
+
         // Search toggle
         IconButton(
           icon: Icon(_showSearch ? Icons.search_off : Icons.search),
@@ -560,6 +565,33 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
       },
       tooltip: 'Admin actions',
       child: const Icon(Icons.admin_panel_settings),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Cart badge icon — shows item count and navigates to cart
+// ---------------------------------------------------------------------------
+
+class _CartBadgeIcon extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final cart = ref.watch(cartNotifierProvider);
+    final itemCount = cart.itemCount;
+
+    return IconButton(
+      icon: Badge(
+        isLabelVisible: itemCount > 0,
+        label: Text(
+          itemCount > 99 ? '99+' : '$itemCount',
+          style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
+        ),
+        child: const Icon(Icons.shopping_cart_outlined),
+      ),
+      tooltip: 'Panier',
+      onPressed: () {
+        context.push(AppRoutes.cart);
+      },
     );
   }
 }

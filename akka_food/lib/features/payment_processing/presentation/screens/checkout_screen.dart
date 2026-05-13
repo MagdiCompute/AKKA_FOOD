@@ -591,12 +591,23 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
         });
       }
 
-      // Update leaderboard — increment order count for the user
+      // Update leaderboard — count total orders for the user
       try {
         final now = DateTime.now();
         final monthKey = 'monthly_${now.year}_${now.month.toString().padLeft(2, '0')}';
-        final weekNumber = ((now.difference(DateTime(now.year, 1, 1)).inDays) / 7).ceil();
-        final weekKey = 'weekly_${now.year}_${weekNumber.toString().padLeft(2, '0')}';
+        // ISO 8601 week number (same as LeaderboardPaths)
+        final thursday = now.add(Duration(days: DateTime.thursday - now.weekday));
+        final jan4 = DateTime(thursday.year, 1, 4);
+        final jan4Thursday = jan4.add(Duration(days: DateTime.thursday - jan4.weekday));
+        final isoWeek = ((thursday.difference(jan4Thursday).inDays) ~/ 7) + 1;
+        final weekKey = 'weekly_${now.year}_${isoWeek.toString().padLeft(2, '0')}';
+
+        // Count actual total orders for this user from Firestore
+        final ordersSnapshot = await firestore
+            .collection('orders')
+            .where('uid', isEqualTo: user.uid)
+            .get();
+        final totalOrders = ordersSnapshot.docs.length;
 
         // Update all three leaderboard documents
         for (final docId in ['all_time', monthKey, weekKey]) {
@@ -609,11 +620,14 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
             (e) => (e as Map<String, dynamic>)['uid'] == user.uid,
           );
           
+          // For all_time, use total orders count; for monthly/weekly, increment by 1
+          final score = docId == 'all_time' ? totalOrders : null;
+          
           if (existingIndex >= 0) {
             final existing = currentEntries[existingIndex] as Map<String, dynamic>;
             currentEntries[existingIndex] = {
               ...existing,
-              'score': ((existing['score'] as num?)?.toInt() ?? 0) + 1,
+              'score': score ?? (((existing['score'] as num?)?.toInt() ?? 0) + 1),
               'displayName': customerName,
             };
           } else {
@@ -621,7 +635,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
               'uid': user.uid,
               'displayName': customerName,
               'avatarUrl': null,
-              'score': 1,
+              'score': score ?? 1,
             });
           }
           

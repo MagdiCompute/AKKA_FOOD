@@ -239,17 +239,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           label: Text(itemCount > 99 ? '99+' : '$itemCount'),
           child: const Icon(Icons.shopping_cart),
         ),
-        label: 'Cart',
+        label: 'Panier',
       ),
       const NavigationDestination(
         icon: Icon(Icons.leaderboard_outlined),
         selectedIcon: Icon(Icons.leaderboard),
-        label: 'Ranks',
+        label: 'Classement',
       ),
       const NavigationDestination(
         icon: Icon(Icons.person_outline),
         selectedIcon: Icon(Icons.person),
-        label: 'Profile',
+        label: 'Profil',
       ),
       if (isAdmin)
         const NavigationDestination(

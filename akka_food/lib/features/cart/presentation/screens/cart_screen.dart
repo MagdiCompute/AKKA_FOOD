@@ -107,14 +107,14 @@ class _CartScreenState extends ConsumerState<CartScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Clear cart?'),
+        title: const Text('Vider le panier ?'),
         content: const Text(
-          'All items will be removed from your cart. This cannot be undone.',
+          'Tous les articles seront supprimés. Cette action est irréversible.',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Cancel'),
+            child: const Text('Annuler'),
           ),
           FilledButton(
             onPressed: () => Navigator.of(context).pop(true),
@@ -122,7 +122,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
               backgroundColor: Theme.of(context).colorScheme.error,
               foregroundColor: Theme.of(context).colorScheme.onError,
             ),
-            child: const Text('Clear'),
+            child: const Text('Vider'),
           ),
         ],
       ),
@@ -155,12 +155,12 @@ class _CartScreenState extends ConsumerState<CartScreen> {
 
   PreferredSizeWidget _buildAppBar(BuildContext context, Cart cart) {
     return AppBar(
-      title: const Text('My Cart'),
+      title: const Text('Mon Panier'),
       actions: [
         if (cart.items.isNotEmpty)
           IconButton(
             icon: const Icon(Icons.delete_sweep_outlined),
-            tooltip: 'Clear cart',
+            tooltip: 'Vider le panier',
             onPressed: _onClearCartTapped,
           ),
       ],
@@ -185,7 +185,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
             ),
             const SizedBox(height: 24),
             Text(
-              'Your cart is empty',
+              'Votre panier est vide',
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -193,7 +193,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
             ),
             const SizedBox(height: 8),
             Text(
-              'Add some delicious meals to get started.',
+              'Ajoutez des plats délicieux pour commencer.',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: Theme.of(context).colorScheme.outline,
                   ),
@@ -203,7 +203,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
             FilledButton.icon(
               onPressed: () => context.go(AppRoutes.catalog),
               icon: const Icon(Icons.restaurant_menu),
-              label: const Text('Browse Menu'),
+              label: const Text('Parcourir le menu'),
             ),
           ],
         ),
@@ -334,7 +334,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                     ),
                   )
                 : const Text(
-                    'Checkout',
+                    'Commander',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,

@@ -205,8 +205,8 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
                   padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
                   child: Text(
                     state.activeFilter.isEmpty
-                        ? 'All Meals'
-                        : 'Filtered Meals',
+                        ? 'Tous les plats'
+                        : 'Plats filtrés',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
@@ -280,7 +280,7 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
         // Search toggle
         IconButton(
           icon: Icon(_showSearch ? Icons.search_off : Icons.search),
-          tooltip: 'Search',
+          tooltip: 'Rechercher',
           onPressed: () {
             setState(() {
               _showSearch = !_showSearch;
@@ -359,7 +359,7 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
         controller: _searchController,
         autofocus: true,
         decoration: InputDecoration(
-          hintText: 'Search meals…',
+          hintText: 'Rechercher un plat…',
           prefixIcon: const Icon(Icons.search),
           suffixIcon: _searchController.text.isNotEmpty
               ? IconButton(
@@ -445,7 +445,7 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
             const Icon(Icons.error_outline, size: 48, color: Colors.red),
             const SizedBox(height: 16),
             Text(
-              'Something went wrong',
+              'Une erreur est survenue',
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 8),
@@ -498,8 +498,8 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
             const SizedBox(height: 16),
             Text(
               hasFilter
-                  ? 'No meals match your filters'
-                  : 'No meals available',
+                  ? 'Aucun plat ne correspond à vos filtres'
+                  : 'Aucun plat disponible',
               style: Theme.of(context).textTheme.titleMedium,
               textAlign: TextAlign.center,
             ),
@@ -509,7 +509,7 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
                 onPressed: () =>
                     ref.read(catalogNotifierProvider.notifier).clearFilter(),
                 icon: const Icon(Icons.filter_alt_off),
-                label: const Text('Clear filters'),
+                label: const Text('Effacer les filtres'),
               ),
             ],
           ],

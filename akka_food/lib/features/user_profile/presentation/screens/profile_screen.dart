@@ -26,7 +26,7 @@ class ProfileScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My Profile'),
+        title: const Text('Mon Profil'),
         centerTitle: true,
       ),
       body: profileAsync.when(
@@ -69,25 +69,25 @@ class _ProfileBody extends ConsumerWidget {
         const SizedBox(height: 8),
 
         // ── Navigation tiles ──────────────────────────────────────────
-        _SectionHeader(title: 'Account'),
+        _SectionHeader(title: 'Compte'),
         _NavTile(
           icon: Icons.person_outline,
-          title: 'Edit Profile',
+          title: 'Modifier le profil',
           onTap: () => context.push(AppRoutes.editProfile),
         ),
         _NavTile(
           icon: Icons.location_on_outlined,
-          title: 'My Addresses',
+          title: 'Mes adresses',
           onTap: () => context.push(AppRoutes.addresses),
         ),
         _NavTile(
           icon: Icons.receipt_long_outlined,
-          title: 'Order History',
+          title: 'Historique des commandes',
           onTap: () => context.push(AppRoutes.orderHistory),
         ),
         _NavTile(
           icon: Icons.monetization_on_outlined,
-          title: 'My Coins',
+          title: 'Mes coins',
           trailing: coinBalanceAsync.when(
             data: (balance) => _CoinBadge(balance: balance),
             loading: () => const SizedBox(
@@ -108,17 +108,17 @@ class _ProfileBody extends ConsumerWidget {
         const Divider(height: 32),
 
         // ── Account lifecycle ─────────────────────────────────────────
-        _SectionHeader(title: 'Account Management'),
+        _SectionHeader(title: 'Gestion du compte'),
         _NavTile(
           icon: Icons.pause_circle_outline,
-          title: 'Deactivate Account',
+          title: 'Désactiver le compte',
           iconColor: Colors.orange,
           titleColor: Colors.orange,
           onTap: () => _showDeactivateDialog(context, ref),
         ),
         _NavTile(
           icon: Icons.delete_outline,
-          title: 'Delete Account',
+          title: 'Supprimer le compte',
           iconColor: Colors.red,
           titleColor: Colors.red,
           onTap: () => _showDeleteDialog(context, ref),
@@ -444,7 +444,7 @@ class _ConnectivityBanner extends StatelessWidget {
           const SizedBox(width: 8),
           Expanded(
             child: Text(
-              'You\'re offline. Showing cached profile data.',
+              'Vous êtes hors ligne. Données en cache affichées.',
               style: TextStyle(
                 color: Colors.orange.shade900,
                 fontSize: 13,
@@ -579,7 +579,7 @@ class _ErrorView extends ConsumerWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'Failed to load profile',
+              'Échec du chargement du profil',
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 8),
@@ -594,7 +594,7 @@ class _ErrorView extends ConsumerWidget {
             FilledButton.icon(
               onPressed: onRetry,
               icon: const Icon(Icons.refresh),
-              label: const Text('Retry'),
+              label: const Text('Réessayer'),
             ),
             const SizedBox(height: 16),
             OutlinedButton.icon(
@@ -603,7 +603,7 @@ class _ErrorView extends ConsumerWidget {
                 if (context.mounted) context.go(AppRoutes.login);
               },
               icon: const Icon(Icons.logout),
-              label: const Text('Sign Out'),
+              label: const Text('Se déconnecter'),
             ),
           ],
         ),

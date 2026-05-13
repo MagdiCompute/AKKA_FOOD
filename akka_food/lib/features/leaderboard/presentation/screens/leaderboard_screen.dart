@@ -81,13 +81,13 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
 
   PreferredSizeWidget _buildAppBar(BuildContext context) {
     return AppBar(
-      title: const Text('Leaderboard'),
+      title: const Text('Classement'),
       bottom: TabBar(
         controller: _tabController,
         tabs: const [
-          Tab(text: 'All-Time'),
-          Tab(text: 'Monthly'),
-          Tab(text: 'Weekly'),
+          Tab(text: 'Tout le temps'),
+          Tab(text: 'Ce mois'),
+          Tab(text: 'Cette semaine'),
         ],
       ),
     );
@@ -197,11 +197,11 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
   String _emptyStateHeading(LeaderboardPeriod period) {
     switch (period) {
       case LeaderboardPeriod.allTime:
-        return 'No rankings yet';
+        return 'Aucun classement pour le moment';
       case LeaderboardPeriod.monthly:
-        return 'No rankings this month yet';
+        return 'Aucun classement ce mois-ci';
       case LeaderboardPeriod.weekly:
-        return 'No rankings this week yet';
+        return 'Aucun classement cette semaine';
     }
   }
 
@@ -209,11 +209,11 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
   String _emptyStateSubtitle(LeaderboardPeriod period) {
     switch (period) {
       case LeaderboardPeriod.allTime:
-        return 'Be the first to place an order and claim the top spot!';
+        return 'Soyez le premier à passer une commande !';
       case LeaderboardPeriod.monthly:
-        return 'A new month has started. Place an order to lead the rankings!';
+        return 'Un nouveau mois commence. Passez une commande pour mener le classement !';
       case LeaderboardPeriod.weekly:
-        return 'A new week has started. Place an order to lead the rankings!';
+        return 'Une nouvelle semaine commence. Passez une commande pour mener le classement !';
     }
   }
 
@@ -235,7 +235,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
             ),
             const SizedBox(height: 16),
             Text(
-              'Failed to load leaderboard',
+              'Échec du chargement du classement',
               style: Theme.of(context).textTheme.titleMedium,
               textAlign: TextAlign.center,
             ),
@@ -255,7 +255,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
                 leaderboardStreamProvider(_selectedPeriod),
               ),
               icon: const Icon(Icons.refresh),
-              label: const Text('Retry'),
+              label: const Text('Réessayer'),
             ),
           ],
         ),
@@ -341,7 +341,7 @@ class _OutsideTop100Section extends ConsumerWidget {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12),
             child: Text(
-              '• • •  Your position  • • •',
+              '• • •  Votre position  • • •',
               style: theme.textTheme.bodySmall?.copyWith(
                 color: colorScheme.outline,
                 fontWeight: FontWeight.w500,

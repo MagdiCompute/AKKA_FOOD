@@ -10,6 +10,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import 'core/router/app_router.dart';
+import 'core/theme/app_theme.dart';
 import 'features/cart/data/datasources/hive_cart_datasource.dart';
 import 'features/cart/data/datasources/remote_config_service.dart';
 import 'features/delivery_system/data/datasources/fcm_service.dart';
@@ -107,9 +108,9 @@ class _AkkaFoodAppState extends ConsumerState<AkkaFoodApp> {
     return MaterialApp.router(
       title: 'AKKA Food',
       scaffoldMessengerKey: rootScaffoldMessengerKey,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepOrange),
-      ),
+      debugShowCheckedModeBanner: false,
+      locale: const Locale('fr', 'ML'),
+      theme: akkaFoodTheme(),
       routerConfig: router,
     );
   }

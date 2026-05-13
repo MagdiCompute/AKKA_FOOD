@@ -41,18 +41,18 @@ class _MealDetailScreenState extends ConsumerState<MealDetailScreen> {
 
     return mealAsync.when(
       loading: () => Scaffold(
-        appBar: AppBar(title: const Text('Meal Detail')),
+        appBar: AppBar(title: const Text('Détail du plat')),
         body: const Center(child: CircularProgressIndicator()),
       ),
       error: (error, _) => Scaffold(
-        appBar: AppBar(title: const Text('Meal Detail')),
+        appBar: AppBar(title: const Text('Détail du plat')),
         body: _ErrorBody(error: error.toString()),
       ),
       data: (meal) {
         if (meal == null) {
           return Scaffold(
-            appBar: AppBar(title: const Text('Meal Detail')),
-            body: const Center(child: Text('Meal not found.')),
+            appBar: AppBar(title: const Text('Détail du plat')),
+            body: const Center(child: Text('Plat introuvable.')),
           );
         }
         return _MealDetailBody(
@@ -280,7 +280,7 @@ class _AvailabilityBadge extends StatelessWidget {
         ),
       ),
       child: Text(
-        isAvailable ? 'Available' : 'Unavailable',
+        isAvailable ? 'Disponible' : 'Indisponible',
         style: TextStyle(
           color: isAvailable ? Colors.green.shade700 : Colors.red.shade700,
           fontWeight: FontWeight.w600,
@@ -360,7 +360,7 @@ class _NutritionalInfoSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Nutritional Info',
+          'Informations nutritionnelles',
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -382,21 +382,21 @@ class _NutritionalInfoSection extends StatelessWidget {
               color: Colors.orange,
             ),
             _NutrientCard(
-              label: 'Proteins',
+              label: 'Protéines',
               value: info.proteins.toStringAsFixed(1),
               unit: 'g',
               icon: Icons.fitness_center,
               color: Colors.blue,
             ),
             _NutrientCard(
-              label: 'Carbohydrates',
+              label: 'Glucides',
               value: info.carbohydrates.toStringAsFixed(1),
               unit: 'g',
               icon: Icons.grain,
               color: Colors.amber,
             ),
             _NutrientCard(
-              label: 'Fats',
+              label: 'Lipides',
               value: info.fats.toStringAsFixed(1),
               unit: 'g',
               icon: Icons.opacity,
@@ -492,7 +492,7 @@ class _AddToCartBar extends ConsumerWidget {
                   ref.read(cartNotifierProvider.notifier).addItem(meal);
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                      content: Text('Added to cart'),
+                      content: Text('Ajouté au panier'),
                       duration: Duration(seconds: 2),
                     ),
                   );
@@ -500,7 +500,7 @@ class _AddToCartBar extends ConsumerWidget {
               : null,
           icon: const Icon(Icons.shopping_cart_outlined),
           label: Text(
-            meal.isAvailable ? 'Add to Cart' : 'Unavailable',
+            meal.isAvailable ? 'Ajouter au panier' : 'Indisponible',
           ),
           style: FilledButton.styleFrom(
             minimumSize: const Size.fromHeight(48),
@@ -531,7 +531,7 @@ class _ErrorBody extends StatelessWidget {
             const Icon(Icons.error_outline, size: 48, color: Colors.red),
             const SizedBox(height: 16),
             Text(
-              'Failed to load meal',
+              'Échec du chargement du plat',
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 8),

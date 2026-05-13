@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:akka_food/features/auth/presentation/notifiers/auth_notifier.dart';
 import 'package:akka_food/features/cart/presentation/notifiers/cart_notifier.dart';
 import 'package:akka_food/features/user_profile/domain/entities/delivery_address.dart';
 import 'package:akka_food/features/user_profile/presentation/notifiers/address_notifier.dart';
@@ -152,6 +153,17 @@ class _AddressPickerScreen extends ConsumerWidget {
         title: const Text('Sélectionner une adresse'),
         centerTitle: true,
       ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () async {
+          await Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => const _InlineAddressForm(),
+            ),
+          );
+        },
+        icon: const Icon(Icons.add),
+        label: const Text('Ajouter'),
+      ),
       body: addressAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, _) => _PickerErrorView(
@@ -172,7 +184,7 @@ class _AddressPickerScreen extends ConsumerWidget {
             });
 
           return ListView.separated(
-            padding: const EdgeInsets.symmetric(vertical: 8),
+            padding: const EdgeInsets.only(top: 8, bottom: 80),
             itemCount: sorted.length,
             separatorBuilder: (_, __) => const Divider(height: 1),
             itemBuilder: (context, index) {
@@ -268,11 +280,11 @@ class _DefaultBadge extends StatelessWidget {
 // _PickerEmptyState
 // ---------------------------------------------------------------------------
 
-class _PickerEmptyState extends StatelessWidget {
+class _PickerEmptyState extends ConsumerWidget {
   const _PickerEmptyState();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     return Center(
       child: Padding(
@@ -292,11 +304,23 @@ class _PickerEmptyState extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              'Allez dans votre profil pour ajouter une adresse de livraison.',
+              'Ajoutez une adresse de livraison pour continuer.',
               textAlign: TextAlign.center,
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
+            ),
+            const SizedBox(height: 24),
+            FilledButton.icon(
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => const _InlineAddressForm(),
+                  ),
+                );
+              },
+              icon: const Icon(Icons.add),
+              label: const Text('Ajouter une adresse'),
             ),
           ],
         ),
@@ -348,6 +372,134 @@ class _PickerErrorView extends StatelessWidget {
               label: const Text('Réessayer'),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+
+// ---------------------------------------------------------------------------
+// _InlineAddressForm — quick add address from cart
+// ---------------------------------------------------------------------------
+
+/// A simple form to add a new delivery address directly from the cart flow.
+/// The address is saved to Firestore (same as profile addresses).
+class _InlineAddressForm extends ConsumerStatefulWidget {
+  const _InlineAddressForm();
+
+  @override
+  ConsumerState<_InlineAddressForm> createState() => _InlineAddressFormState();
+}
+
+class _InlineAddressFormState extends ConsumerState<_InlineAddressForm> {
+  final _formKey = GlobalKey<FormState>();
+  final _labelController = TextEditingController();
+  final _streetController = TextEditingController();
+  final _cityController = TextEditingController();
+  bool _isSaving = false;
+
+  @override
+  void dispose() {
+    _labelController.dispose();
+    _streetController.dispose();
+    _cityController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _save() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    final currentUser = ref.read(currentUserProvider);
+    if (currentUser == null) return;
+
+    setState(() => _isSaving = true);
+
+    final newAddress = DeliveryAddress(
+      id: '',
+      uid: currentUser.uid,
+      label: _labelController.text.trim(),
+      streetAddress: _streetController.text.trim(),
+      city: _cityController.text.trim(),
+      isDefault: false,
+      createdAt: DateTime.now(),
+    );
+
+    try {
+      await ref.read(addressNotifierProvider.notifier).addAddress(newAddress);
+      if (mounted) {
+        Navigator.of(context).pop();
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isSaving = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erreur : $e')),
+        );
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Nouvelle adresse'),
+        centerTitle: true,
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                TextFormField(
+                  controller: _labelController,
+                  textCapitalization: TextCapitalization.words,
+                  decoration: const InputDecoration(
+                    labelText: 'Libellé',
+                    hintText: 'Ex: Maison, Bureau',
+                    prefixIcon: Icon(Icons.label_outline),
+                  ),
+                  validator: (v) =>
+                      (v == null || v.trim().isEmpty) ? 'Requis' : null,
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _streetController,
+                  textCapitalization: TextCapitalization.sentences,
+                  decoration: const InputDecoration(
+                    labelText: 'Adresse',
+                    hintText: 'Ex: Rue 312, Porte 45',
+                    prefixIcon: Icon(Icons.home_outlined),
+                  ),
+                  validator: (v) =>
+                      (v == null || v.trim().isEmpty) ? 'Requis' : null,
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _cityController,
+                  textCapitalization: TextCapitalization.words,
+                  decoration: const InputDecoration(
+                    labelText: 'Ville',
+                    hintText: 'Ex: Bamako',
+                    prefixIcon: Icon(Icons.location_city_outlined),
+                  ),
+                  validator: (v) =>
+                      (v == null || v.trim().isEmpty) ? 'Requis' : null,
+                ),
+                const SizedBox(height: 32),
+                _isSaving
+                    ? const Center(child: CircularProgressIndicator())
+                    : FilledButton(
+                        onPressed: _save,
+                        child: const Text('Enregistrer l\'adresse'),
+                      ),
+              ],
+            ),
+          ),
         ),
       ),
     );

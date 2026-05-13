@@ -273,9 +273,9 @@ class CartNotifier extends _$CartNotifier {
   void setDeliveryOption(DeliveryOption option) {
     if (option == DeliveryOption.pickup) {
       // Req 6.3 — Pickup: zero delivery fee, no address required.
+      // Keep the address in state so it's restored when switching back.
       state = state.copyWith(
         deliveryOption: option,
-        selectedAddress: null,
       );
     } else {
       // Req 6.2 — Delivery: apply delivery fee, keep existing address if any.

@@ -37,6 +37,9 @@ class Order {
   /// Estimated time of arrival in minutes; set when status is outForDelivery.
   final int? etaMinutes;
 
+  /// Phone number of the delivery person; set when status is outForDelivery.
+  final String? deliveryPhone;
+
   /// Timestamp when the order was created.
   final DateTime createdAt;
 
@@ -58,6 +61,7 @@ class Order {
     this.deliveryAddress,
     required this.status,
     this.etaMinutes,
+    this.deliveryPhone,
     required this.createdAt,
     this.deliveredAt,
     this.failureReason,
@@ -90,6 +94,7 @@ class Order {
           rawAddress != null ? DeliveryAddress.fromMap(rawAddress) : null,
       status: DeliveryStatus.fromString(map['status'] as String?),
       etaMinutes: (map['etaMinutes'] as num?)?.toInt(),
+      deliveryPhone: map['deliveryPhone'] as String?,
       createdAt: _parseDateTime(map['createdAt']),
       deliveredAt: map['deliveredAt'] != null
           ? _parseDateTime(map['deliveredAt'])
@@ -110,6 +115,7 @@ class Order {
       if (deliveryAddress != null) 'deliveryAddress': deliveryAddress!.toMap(),
       'status': status.toFirestoreString(),
       if (etaMinutes != null) 'etaMinutes': etaMinutes,
+      if (deliveryPhone != null) 'deliveryPhone': deliveryPhone,
       'createdAt': createdAt.toIso8601String(),
       if (deliveredAt != null) 'deliveredAt': deliveredAt!.toIso8601String(),
       if (failureReason != null) 'failureReason': failureReason,
@@ -132,6 +138,7 @@ class Order {
     Object? deliveryAddress = _sentinel,
     DeliveryStatus? status,
     Object? etaMinutes = _sentinel,
+    Object? deliveryPhone = _sentinel,
     DateTime? createdAt,
     Object? deliveredAt = _sentinel,
     Object? failureReason = _sentinel,
@@ -151,6 +158,8 @@ class Order {
       status: status ?? this.status,
       etaMinutes:
           etaMinutes == _sentinel ? this.etaMinutes : etaMinutes as int?,
+      deliveryPhone:
+          deliveryPhone == _sentinel ? this.deliveryPhone : deliveryPhone as String?,
       createdAt: createdAt ?? this.createdAt,
       deliveredAt:
           deliveredAt == _sentinel ? this.deliveredAt : deliveredAt as DateTime?,

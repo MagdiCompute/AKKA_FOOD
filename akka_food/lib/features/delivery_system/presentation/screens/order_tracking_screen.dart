@@ -237,8 +237,47 @@ class _OrderTrackingScreenState extends ConsumerState<OrderTrackingScreen> {
 
           // ── ETA card (Req 2 AC4) ────────────────────────────────────────
           // Shown only when status is outForDelivery
-          if (order.status == DeliveryStatus.outForDelivery)
+          if (order.status == DeliveryStatus.outForDelivery) ...[
             ETACard(etaMinutes: order.etaMinutes),
+            const SizedBox(height: 12),
+            // Delivery person phone number
+            if (order.deliveryPhone != null && order.deliveryPhone!.isNotEmpty)
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    children: [
+                      Icon(Icons.phone, color: Theme.of(context).colorScheme.primary),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Numéro du livreur',
+                              style: Theme.of(context).textTheme.bodySmall,
+                            ),
+                            Text(
+                              order.deliveryPhone!,
+                              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.call),
+                        onPressed: () {
+                          // TODO: launch phone dialer
+                        },
+                        tooltip: 'Appeler le livreur',
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+          ],
 
           // ── Delivery confirmation + Rate Order (Req 2 AC5) ──────────────
           if (order.status == DeliveryStatus.delivered)

@@ -3,14 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../features/user_profile/presentation/notifiers/profile_notifier.dart';
 import '../theme/app_theme.dart';
+import 'avatar_bank.dart';
 
 /// A circular profile avatar button that appears in the AppBar.
 ///
-/// Shows the user's avatar image if available, or their initials on a
-/// branded blue circle. Tapping it calls [onTap] (typically navigates
-/// to the profile screen).
-///
-/// Designed to look like the circular logo in food delivery apps.
+/// Shows the user's avatar from the avatar bank, or their initials.
+/// Tapping it calls [onTap] (typically navigates to the profile screen).
 class ProfileAvatarButton extends ConsumerWidget {
   const ProfileAvatarButton({super.key, required this.onTap});
 
@@ -22,8 +20,7 @@ class ProfileAvatarButton extends ConsumerWidget {
     final profile = profileAsync.valueOrNull;
 
     final avatarUrl = profile?.avatarUrl;
-    final hasAvatar = avatarUrl != null && avatarUrl.isNotEmpty;
-    final initials = _getInitials(profile?.displayName ?? '');
+    final displayName = profile?.displayName ?? '';
 
     return Padding(
       padding: const EdgeInsets.only(left: 8),
@@ -34,7 +31,6 @@ class ProfileAvatarButton extends ConsumerWidget {
           height: 36,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: AppColors.white,
             border: Border.all(
               color: AppColors.white.withValues(alpha: 0.8),
               width: 2,
@@ -48,44 +44,11 @@ class ProfileAvatarButton extends ConsumerWidget {
             ],
           ),
           clipBehavior: Clip.antiAlias,
-          child: hasAvatar
-              ? Image.network(
-                  avatarUrl,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => _InitialsAvatar(initials: initials),
-                )
-              : _InitialsAvatar(initials: initials),
-        ),
-      ),
-    );
-  }
-
-  String _getInitials(String name) {
-    if (name.isEmpty) return '?';
-    final parts = name.trim().split(' ');
-    if (parts.length >= 2) {
-      return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
-    }
-    return parts[0][0].toUpperCase();
-  }
-}
-
-class _InitialsAvatar extends StatelessWidget {
-  const _InitialsAvatar({required this.initials});
-
-  final String initials;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: AppColors.primaryBlue,
-      alignment: Alignment.center,
-      child: Text(
-        initials,
-        style: const TextStyle(
-          color: AppColors.white,
-          fontSize: 14,
-          fontWeight: FontWeight.w700,
+          child: AvatarBankDisplay(
+            avatarUrl: avatarUrl,
+            radius: 16,
+            displayName: displayName,
+          ),
         ),
       ),
     );

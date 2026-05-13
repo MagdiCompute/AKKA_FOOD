@@ -327,9 +327,12 @@ class _StatusBadge extends StatelessWidget {
   static (String, Color) _statusStyle(String status) {
     return switch (status.toLowerCase()) {
       'pending' => ('En attente', Colors.orange),
-      'preparing' => ('En préparation', Colors.blue),
-      'delivered' => ('Livré', Colors.green),
-      'cancelled' => ('Annulé', Colors.red),
+      'confirmed' => ('Confirmée', Colors.blue),
+      'preparing' => ('En préparation', Colors.purple),
+      'ready_for_pickup' => ('Prêt à récupérer', Colors.indigo),
+      'out_for_delivery' => ('En livraison', Colors.teal),
+      'delivered' => ('Livrée', Colors.green),
+      'cancelled' => ('Annulée', Colors.red),
       _ => (status, Colors.grey),
     };
   }

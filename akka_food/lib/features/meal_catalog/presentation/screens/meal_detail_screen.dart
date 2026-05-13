@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:akka_food/core/widgets/animated_add_to_cart_button.dart';
 import 'package:akka_food/features/cart/presentation/notifiers/cart_notifier.dart';
 import 'package:akka_food/features/meal_catalog/domain/entities/meal.dart';
 import 'package:akka_food/features/meal_catalog/domain/entities/nutritional_info.dart';
@@ -483,30 +484,11 @@ class _AddToCartBar extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
-        child: FilledButton.icon(
-          onPressed: meal.isAvailable
-              ? () {
-                  ref.read(cartNotifierProvider.notifier).addItem(meal);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Ajouté au panier'),
-                      duration: Duration(seconds: 2),
-                    ),
-                  );
-                }
-              : null,
-          icon: const Icon(Icons.shopping_cart_outlined),
-          label: Text(
-            meal.isAvailable ? 'Ajouter au panier' : 'Indisponible',
-          ),
-          style: FilledButton.styleFrom(
-            minimumSize: const Size.fromHeight(48),
-          ),
-        ),
-      ),
+    return AnimatedAddToCartButton(
+      enabled: meal.isAvailable,
+      onPressed: () {
+        ref.read(cartNotifierProvider.notifier).addItem(meal);
+      },
     );
   }
 }

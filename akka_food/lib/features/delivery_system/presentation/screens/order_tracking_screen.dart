@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../domain/entities/delivery_option.dart';
 import '../../domain/entities/delivery_status.dart';
 import '../../domain/entities/order.dart';
 import '../notifiers/delivery_tracking_notifier.dart';
@@ -227,7 +228,10 @@ class _OrderTrackingScreenState extends ConsumerState<OrderTrackingScreen> {
           const SizedBox(height: 16),
 
           // ── Status timeline (Req 2 AC3) ─────────────────────────────────
-          DeliveryStatusTimeline(currentStatus: order.status),
+          DeliveryStatusTimeline(
+            currentStatus: order.status,
+            isPickup: order.deliveryOption == DeliveryOption.pickup,
+          ),
 
           const SizedBox(height: 24),
 

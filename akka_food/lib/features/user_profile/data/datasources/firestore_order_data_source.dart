@@ -74,11 +74,13 @@ class FirestoreOrderDataSource {
       return orders;
     } on FirebaseException catch (e) {
       // Firestore throws FAILED_PRECONDITION when a composite index is missing.
-      // Return empty list instead of crashing — the user has no orders yet anyway.
       if (e.code == 'failed-precondition' || e.message?.contains('index') == true) {
         return [];
       }
       rethrow;
+    } catch (e) {
+      // Catch deserialization errors — return empty rather than crashing.
+      return [];
     }
   }
 

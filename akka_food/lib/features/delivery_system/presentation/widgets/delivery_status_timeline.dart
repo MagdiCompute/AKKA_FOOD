@@ -8,10 +8,17 @@ import '../../domain/entities/tracking_update.dart';
 /// Highlights the current stage, marks past stages as completed (with checkmark),
 /// and greys out future stages. Optionally shows timestamps from tracking updates.
 ///
+/// The stages shown depend on [isPickup]:
+/// - Pickup: pending → confirmed → preparing → readyForPickup → delivered
+/// - Delivery: pending → confirmed → preparing → outForDelivery → delivered
+///
 /// Satisfies Requirement 2 AC3.
 class DeliveryStatusTimeline extends StatelessWidget {
   /// The current delivery status to highlight in the timeline.
   final DeliveryStatus currentStatus;
+
+  /// Whether this order is a pickup (true) or delivery (false).
+  final bool isPickup;
 
   /// Optional list of tracking updates to display timestamps for each stage.
   final List<TrackingUpdate>? trackingUpdates;
@@ -19,18 +26,30 @@ class DeliveryStatusTimeline extends StatelessWidget {
   const DeliveryStatusTimeline({
     super.key,
     required this.currentStatus,
+    this.isPickup = false,
     this.trackingUpdates,
   });
 
-  /// Ordered stages displayed in the timeline (excluding failed — shown separately).
-  static const List<DeliveryStatus> stages = [
-    DeliveryStatus.pending,
-    DeliveryStatus.confirmed,
-    DeliveryStatus.preparing,
-    DeliveryStatus.readyForPickup,
-    DeliveryStatus.outForDelivery,
-    DeliveryStatus.delivered,
-  ];
+  /// Returns the stages based on the delivery option.
+  List<DeliveryStatus> get stages {
+    if (isPickup) {
+      return const [
+        DeliveryStatus.pending,
+        DeliveryStatus.confirmed,
+        DeliveryStatus.preparing,
+        DeliveryStatus.readyForPickup,
+        DeliveryStatus.delivered,
+      ];
+    } else {
+      return const [
+        DeliveryStatus.pending,
+        DeliveryStatus.confirmed,
+        DeliveryStatus.preparing,
+        DeliveryStatus.outForDelivery,
+        DeliveryStatus.delivered,
+      ];
+    }
+  }
 
   /// Returns the appropriate icon for each delivery stage.
   static IconData _iconForStage(DeliveryStatus stage) {

@@ -507,23 +507,31 @@ class _StatusBadge extends StatelessWidget {
 // Status transition map
 // ---------------------------------------------------------------------------
 
-/// Returns the valid next statuses for a given [current] status.
+/// Returns the valid next statuses for a given [current] status and [deliveryOption].
+///
+/// - Pickup orders: preparing → readyForPickup → delivered
+/// - Delivery orders: preparing → outForDelivery → delivered
 ///
 /// Encodes the business rules from Requirements 4.3 and 4.5.
-List<DeliveryStatus> _validNextStatuses(DeliveryStatus current) {
+List<DeliveryStatus> _validNextStatuses(
+  DeliveryStatus current, {
+  DeliveryOption deliveryOption = DeliveryOption.delivery,
+}) {
+  final isPickup = deliveryOption == DeliveryOption.pickup;
+
   switch (current) {
     case DeliveryStatus.pending:
       return [DeliveryStatus.confirmed, DeliveryStatus.cancelled];
     case DeliveryStatus.confirmed:
       return [DeliveryStatus.preparing, DeliveryStatus.cancelled];
     case DeliveryStatus.preparing:
-      return [DeliveryStatus.readyForPickup, DeliveryStatus.cancelled];
+      if (isPickup) {
+        return [DeliveryStatus.readyForPickup, DeliveryStatus.cancelled];
+      } else {
+        return [DeliveryStatus.outForDelivery, DeliveryStatus.cancelled];
+      }
     case DeliveryStatus.readyForPickup:
-      return [
-        DeliveryStatus.outForDelivery,
-        DeliveryStatus.delivered,
-        DeliveryStatus.cancelled,
-      ];
+      return [DeliveryStatus.delivered, DeliveryStatus.cancelled];
     case DeliveryStatus.outForDelivery:
       return [DeliveryStatus.delivered, DeliveryStatus.cancelled];
     case DeliveryStatus.delivered:
@@ -606,7 +614,10 @@ class _StatusUpdateControlsState
 
   @override
   Widget build(BuildContext context) {
-    final nextStatuses = _validNextStatuses(widget.order.status);
+    final nextStatuses = _validNextStatuses(
+      widget.order.status,
+      deliveryOption: widget.order.deliveryOption,
+    );
     final disabled = widget.isUpdating;
 
     if (nextStatuses.isEmpty) {

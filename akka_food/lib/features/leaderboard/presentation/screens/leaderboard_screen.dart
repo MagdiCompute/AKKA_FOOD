@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/widgets/animated_list_item.dart';
 import '../../domain/entities/leaderboard_entry.dart';
 import '../../domain/entities/leaderboard_period.dart';
 import '../notifiers/leaderboard_notifier.dart';
@@ -132,7 +133,10 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
             padding: const EdgeInsets.symmetric(vertical: 8),
             itemBuilder: (context, index) {
               final entry = entries[index];
-              return _buildEntryTile(context, entry);
+              return AnimatedListItem(
+                index: index,
+                child: _buildEntryTile(context, entry),
+              );
             },
           ),
         ),

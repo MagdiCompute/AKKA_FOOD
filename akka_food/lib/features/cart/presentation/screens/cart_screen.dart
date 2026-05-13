@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:akka_food/core/router/app_router.dart';
+import 'package:akka_food/core/widgets/animated_list_item.dart';
 import 'package:akka_food/features/cart/domain/entities/cart.dart';
 import 'package:akka_food/features/cart/domain/entities/delivery_option.dart';
 import 'package:akka_food/features/cart/domain/entities/cart_validation_result.dart';
@@ -227,8 +228,11 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
                 sliver: SliverList(
                   delegate: SliverChildBuilderDelegate(
-                    (context, index) => CartItemTile(
-                      item: cart.items[index],
+                    (context, index) => AnimatedListItem(
+                      index: index,
+                      child: CartItemTile(
+                        item: cart.items[index],
+                      ),
                     ),
                     childCount: cart.items.length,
                   ),
@@ -289,7 +293,9 @@ class _CartScreenState extends ConsumerState<CartScreen> {
 
               // ── Cart summary card (Req 2.2) ───────────────────────────
               SliverToBoxAdapter(
-                child: CartSummaryCard(cart: cart),
+                child: FadeInWidget(
+                  child: CartSummaryCard(cart: cart),
+                ),
               ),
 
               // Bottom padding so content isn't hidden behind the button

@@ -112,7 +112,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Create Account'),
+        title: const Text('Créer un compte'),
         leading: BackButton(
           onPressed: () => context.canPop() ? context.pop() : null,
         ),
@@ -130,12 +130,12 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                   segments: const [
                     ButtonSegment(
                       value: _RegistrationMode.email,
-                      label: Text('Email'),
+                      label: Text('E-mail'),
                       icon: Icon(Icons.email_outlined),
                     ),
                     ButtonSegment(
                       value: _RegistrationMode.phone,
-                      label: Text('Phone'),
+                      label: Text('Téléphone'),
                       icon: Icon(Icons.phone_outlined),
                     ),
                   ],
@@ -156,8 +156,8 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                   textCapitalization: TextCapitalization.words,
                   validator: validateDisplayName,
                   decoration: const InputDecoration(
-                    labelText: 'Display Name',
-                    hintText: 'Your name',
+                    labelText: 'Nom complet',
+                    hintText: 'Votre nom',
                     prefixIcon: Icon(Icons.person_outlined),
                   ),
                 ),
@@ -172,8 +172,8 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                     autocorrect: false,
                     validator: validateEmail,
                     decoration: const InputDecoration(
-                      labelText: 'Email',
-                      hintText: 'you@example.com',
+                      labelText: 'Adresse e-mail',
+                      hintText: 'vous@exemple.com',
                       prefixIcon: Icon(Icons.email_outlined),
                     ),
                   ),
@@ -186,7 +186,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                     textInputAction: TextInputAction.next,
                     validator: validatePassword,
                     decoration: InputDecoration(
-                      labelText: 'Password',
+                      labelText: 'Mot de passe',
                       prefixIcon: const Icon(Icons.lock_outlined),
                       suffixIcon: IconButton(
                         icon: Icon(
@@ -195,8 +195,8 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                               : Icons.visibility_off_outlined,
                         ),
                         tooltip: _obscurePassword
-                            ? 'Show password'
-                            : 'Hide password',
+                            ? 'Afficher'
+                            : 'Masquer',
                         onPressed: () {
                           setState(() {
                             _obscurePassword = !_obscurePassword;
@@ -218,7 +218,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                       _passwordController.text,
                     ),
                     decoration: InputDecoration(
-                      labelText: 'Confirm Password',
+                      labelText: 'Confirmer le mot de passe',
                       prefixIcon: const Icon(Icons.lock_outlined),
                       suffixIcon: IconButton(
                         icon: Icon(
@@ -227,8 +227,8 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                               : Icons.visibility_off_outlined,
                         ),
                         tooltip: _obscureConfirmPassword
-                            ? 'Show password'
-                            : 'Hide password',
+                            ? 'Afficher'
+                            : 'Masquer',
                         onPressed: () {
                           setState(() {
                             _obscureConfirmPassword = !_obscureConfirmPassword;
@@ -246,8 +246,8 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                     onFieldSubmitted: (_) => _signUp(),
                     validator: validatePhoneNumber,
                     decoration: const InputDecoration(
-                      labelText: 'Phone Number',
-                      hintText: '+22670000000',
+                      labelText: 'Numéro de téléphone',
+                      hintText: '+22370000000',
                       prefixIcon: Icon(Icons.phone_outlined),
                     ),
                   ),
@@ -258,12 +258,12 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                 isLoading
                     ? const Center(
                         child: CircularProgressIndicator(
-                          semanticsLabel: 'Creating account',
+                          semanticsLabel: 'Création du compte',
                         ),
                       )
-                    : ElevatedButton(
+                    : FilledButton(
                         onPressed: _signUp,
-                        child: const Text('Sign Up'),
+                        child: const Text('S\'inscrire'),
                       ),
                 const SizedBox(height: 16),
 
@@ -271,10 +271,10 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text('Already have an account?'),
+                    const Text('Déjà un compte ?'),
                     TextButton(
                       onPressed: () => context.pushReplacement(AppRoutes.login),
-                      child: const Text('Sign In'),
+                      child: const Text('Se connecter'),
                     ),
                   ],
                 ),

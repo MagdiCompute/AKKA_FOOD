@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:akka_food/core/widgets/animated_list_item.dart';
+import 'package:akka_food/core/widgets/shimmer_loading.dart';
 import 'package:akka_food/features/auth/presentation/notifiers/auth_notifier.dart';
 import 'package:akka_food/features/meal_catalog/domain/entities/category.dart';
 import 'package:akka_food/features/meal_catalog/domain/entities/meal.dart';
@@ -141,12 +143,12 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
       appBar: _buildAppBar(context, catalogAsync),
       floatingActionButton: isAdmin ? _buildAdminFab(context) : null,
       body: catalogAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const CatalogLoadingSkeleton(),
         error: (error, _) => _buildErrorState(error.toString()),
         data: (state) {
           // Full-screen loading on initial load with no data yet.
           if (state.isLoading && state.allMeals.isEmpty) {
-            return const Center(child: CircularProgressIndicator());
+            return const CatalogLoadingSkeleton();
           }
 
           // Full-screen error state.
@@ -235,9 +237,12 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
                     delegate: SliverChildBuilderDelegate(
                       (context, index) {
                         final meal = state.filteredMeals[index];
-                        return MealCard(
-                          meal: meal,
-                          onTap: () => _navigateToMealDetail(context, meal),
+                        return AnimatedListItem(
+                          index: index,
+                          child: MealCard(
+                            meal: meal,
+                            onTap: () => _navigateToMealDetail(context, meal),
+                          ),
                         );
                       },
                       childCount: state.filteredMeals.length,

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/router/app_router.dart';
+import '../../../../core/widgets/animated_list_item.dart';
 import '../notifiers/auth_notifier.dart';
 import '../notifiers/auth_state.dart';
 import '../widgets/auth_validators.dart';
@@ -98,52 +99,76 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   // ── Title ──────────────────────────────────────────────
-                  Text(
-                    'Sign In',
-                    style: Theme.of(context).textTheme.headlineMedium,
-                    textAlign: TextAlign.center,
+                  FadeInWidget(
+                    child: Column(
+                      children: [
+                        Icon(
+                          Icons.restaurant,
+                          size: 64,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'AKKA Food',
+                          style: Theme.of(context).textTheme.headlineLarge,
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Savourez le meilleur du Mali',
+                          style: Theme.of(context).textTheme.bodyMedium,
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
                   ),
                   const SizedBox(height: 32),
 
                   // ── Email field ────────────────────────────────────────
-                  TextFormField(
-                    controller: _emailController,
-                    keyboardType: TextInputType.emailAddress,
-                    textInputAction: TextInputAction.next,
-                    autocorrect: false,
-                    validator: validateEmail,
-                    decoration: const InputDecoration(
-                      labelText: 'Email',
-                      hintText: 'you@example.com',
-                      prefixIcon: Icon(Icons.email_outlined),
+                  FadeInWidget(
+                    delay: const Duration(milliseconds: 100),
+                    child: TextFormField(
+                      controller: _emailController,
+                      keyboardType: TextInputType.emailAddress,
+                      textInputAction: TextInputAction.next,
+                      autocorrect: false,
+                      validator: validateEmail,
+                      decoration: const InputDecoration(
+                        labelText: 'Adresse e-mail',
+                        hintText: 'vous@exemple.com',
+                        prefixIcon: Icon(Icons.email_outlined),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 16),
 
                   // ── Password field ─────────────────────────────────────
-                  TextFormField(
-                    controller: _passwordController,
-                    obscureText: _obscurePassword,
-                    textInputAction: TextInputAction.done,
-                    onFieldSubmitted: (_) => _signIn(),
-                    validator: validatePassword,
-                    decoration: InputDecoration(
-                      labelText: 'Password',
-                      prefixIcon: const Icon(Icons.lock_outlined),
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _obscurePassword
-                              ? Icons.visibility_outlined
-                              : Icons.visibility_off_outlined,
+                  FadeInWidget(
+                    delay: const Duration(milliseconds: 200),
+                    child: TextFormField(
+                      controller: _passwordController,
+                      obscureText: _obscurePassword,
+                      textInputAction: TextInputAction.done,
+                      onFieldSubmitted: (_) => _signIn(),
+                      validator: validatePassword,
+                      decoration: InputDecoration(
+                        labelText: 'Mot de passe',
+                        prefixIcon: const Icon(Icons.lock_outlined),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _obscurePassword
+                                ? Icons.visibility_outlined
+                                : Icons.visibility_off_outlined,
+                          ),
+                          tooltip: _obscurePassword
+                              ? 'Afficher'
+                              : 'Masquer',
+                          onPressed: () {
+                            setState(() {
+                              _obscurePassword = !_obscurePassword;
+                            });
+                          },
                         ),
-                        tooltip: _obscurePassword
-                            ? 'Show password'
-                            : 'Hide password',
-                        onPressed: () {
-                          setState(() {
-                            _obscurePassword = !_obscurePassword;
-                          });
-                        },
                       ),
                     ),
                   ),
@@ -154,22 +179,25 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     alignment: Alignment.centerRight,
                     child: TextButton(
                       onPressed: () => context.push(AppRoutes.forgotPassword),
-                      child: const Text('Forgot password?'),
+                      child: const Text('Mot de passe oublié ?'),
                     ),
                   ),
                   const SizedBox(height: 16),
 
                   // ── Sign In button ─────────────────────────────────────
-                  isLoading
-                      ? const Center(
-                          child: CircularProgressIndicator(
-                            semanticsLabel: 'Signing in',
+                  FadeInWidget(
+                    delay: const Duration(milliseconds: 300),
+                    child: isLoading
+                        ? const Center(
+                            child: CircularProgressIndicator(
+                              semanticsLabel: 'Connexion en cours',
+                            ),
+                          )
+                        : FilledButton(
+                            onPressed: _signIn,
+                            child: const Text('Se connecter'),
                           ),
-                        )
-                      : ElevatedButton(
-                          onPressed: _signIn,
-                          child: const Text('Sign In'),
-                        ),
+                  ),
                   const SizedBox(height: 16),
 
                   // ── Divider ────────────────────────────────────────────
@@ -179,7 +207,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 12),
                         child: Text(
-                          'or',
+                          'ou',
                           style: Theme.of(context).textTheme.bodySmall,
                         ),
                       ),
@@ -189,31 +217,40 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   const SizedBox(height: 16),
 
                   // ── Google sign-in ─────────────────────────────────────
-                  OutlinedButton.icon(
-                    onPressed: isLoading ? null : _signInWithGoogle,
-                    icon: const Icon(Icons.g_mobiledata),
-                    label: const Text('Continue with Google'),
+                  FadeInWidget(
+                    delay: const Duration(milliseconds: 400),
+                    child: OutlinedButton.icon(
+                      onPressed: isLoading ? null : _signInWithGoogle,
+                      icon: const Icon(Icons.g_mobiledata),
+                      label: const Text('Continuer avec Google'),
+                    ),
                   ),
                   const SizedBox(height: 12),
 
                   // ── Facebook sign-in ───────────────────────────────────
-                  OutlinedButton.icon(
-                    onPressed: isLoading ? null : _signInWithFacebook,
-                    icon: const Icon(Icons.facebook),
-                    label: const Text('Continue with Facebook'),
+                  FadeInWidget(
+                    delay: const Duration(milliseconds: 450),
+                    child: OutlinedButton.icon(
+                      onPressed: isLoading ? null : _signInWithFacebook,
+                      icon: const Icon(Icons.facebook),
+                      label: const Text('Continuer avec Facebook'),
+                    ),
                   ),
                   const SizedBox(height: 24),
 
                   // ── Sign Up link ───────────────────────────────────────
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text("Don't have an account?"),
-                      TextButton(
-                        onPressed: () => context.push(AppRoutes.signup),
-                        child: const Text('Sign Up'),
-                      ),
-                    ],
+                  FadeInWidget(
+                    delay: const Duration(milliseconds: 500),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text('Pas encore de compte ?'),
+                        TextButton(
+                          onPressed: () => context.push(AppRoutes.signup),
+                          child: const Text('Créer un compte'),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),

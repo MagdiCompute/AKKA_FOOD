@@ -173,7 +173,7 @@ class _FilterBottomSheetState extends ConsumerState<FilterBottomSheet> {
       child: Row(
         children: [
           Text(
-            'Filters',
+            'Filtres',
             style: theme.textTheme.titleLarge?.copyWith(
               fontWeight: FontWeight.bold,
             ),
@@ -181,7 +181,7 @@ class _FilterBottomSheetState extends ConsumerState<FilterBottomSheet> {
           const Spacer(),
           IconButton(
             icon: const Icon(Icons.close),
-            tooltip: 'Close',
+            tooltip: 'Fermer',
             onPressed: () => Navigator.pop(context),
           ),
         ],
@@ -200,7 +200,7 @@ class _FilterBottomSheetState extends ConsumerState<FilterBottomSheet> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Categories',
+          'Catégories',
           style: theme.textTheme.titleSmall?.copyWith(
             fontWeight: FontWeight.w600,
           ),
@@ -217,10 +217,10 @@ class _FilterBottomSheetState extends ConsumerState<FilterBottomSheet> {
               ),
             ),
           ),
-          error: (_, __) => const Text('Could not load categories'),
+          error: (_, __) => const Text('Impossible de charger les catégories'),
           data: (categories) {
             if (categories.isEmpty) {
-              return const Text('No categories available');
+              return const Text('Aucune catégorie disponible');
             }
             return SingleChildScrollView(
               scrollDirection: Axis.horizontal,
@@ -256,7 +256,7 @@ class _FilterBottomSheetState extends ConsumerState<FilterBottomSheet> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Price Range',
+          'Fourchette de prix',
           style: theme.textTheme.titleSmall?.copyWith(
             fontWeight: FontWeight.w600,
           ),
@@ -310,7 +310,7 @@ class _FilterBottomSheetState extends ConsumerState<FilterBottomSheet> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Dietary',
+          'Régime alimentaire',
           style: theme.textTheme.titleSmall?.copyWith(
             fontWeight: FontWeight.w600,
           ),
@@ -343,8 +343,8 @@ class _FilterBottomSheetState extends ConsumerState<FilterBottomSheet> {
   Widget _buildAvailabilitySection() {
     return SwitchListTile(
       contentPadding: EdgeInsets.zero,
-      title: const Text('Available only'),
-      subtitle: const Text('Show only meals currently in stock'),
+      title: const Text('Disponibles uniquement'),
+      subtitle: const Text('Afficher uniquement les plats en stock'),
       value: _availableOnly,
       onChanged: (value) {
         setState(() {
@@ -371,7 +371,7 @@ class _FilterBottomSheetState extends ConsumerState<FilterBottomSheet> {
             Expanded(
               child: OutlinedButton(
                 onPressed: _clear,
-                child: const Text('Clear'),
+                child: const Text('Effacer'),
               ),
             ),
             const SizedBox(width: 12),
@@ -379,7 +379,7 @@ class _FilterBottomSheetState extends ConsumerState<FilterBottomSheet> {
               flex: 2,
               child: FilledButton(
                 onPressed: _apply,
-                child: const Text('Apply'),
+                child: const Text('Appliquer'),
               ),
             ),
           ],

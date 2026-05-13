@@ -20,16 +20,34 @@ class FirestoreCategoryDataSource {
   /// Returns all categories where [Category.isActive] is `true`, ordered by
   /// [Category.name] ascending.
   Future<List<Category>> getActiveCategories() async {
-    final snapshot = await _firestore
-        .collection(_collection)
-        .where('isActive', isEqualTo: true)
-        .orderBy('name', descending: false)
-        .get();
+    try {
+      final snapshot = await _firestore
+          .collection(_collection)
+          .where('isActive', isEqualTo: true)
+          .get();
 
-    return snapshot.docs.map((doc) {
-      final data = doc.data();
-      return Category.fromMap({...data, 'id': doc.id});
-    }).toList();
+      final categories = snapshot.docs.map((doc) {
+        final data = doc.data();
+        return Category.fromMap({...data, 'id': doc.id});
+      }).toList();
+
+      // Sort client-side to avoid composite index requirement
+      categories.sort((a, b) => a.name.compareTo(b.name));
+      return categories;
+    } catch (e) {
+      // Fallback: fetch all categories without filter
+      try {
+        final snapshot = await _firestore.collection(_collection).get();
+        final categories = snapshot.docs.map((doc) {
+          final data = doc.data();
+          return Category.fromMap({...data, 'id': doc.id});
+        }).toList();
+        categories.sort((a, b) => a.name.compareTo(b.name));
+        return categories;
+      } catch (_) {
+        return [];
+      }
+    }
   }
 
   /// Returns the [Category] with the given [id], or `null` if not found.

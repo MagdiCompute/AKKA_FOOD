@@ -121,13 +121,13 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
   String _sortOptionLabel(MealSortOption option) {
     switch (option) {
       case MealSortOption.priceAsc:
-        return 'Sort: Price Low to High';
+        return 'Tri : prix croissant';
       case MealSortOption.priceDesc:
-        return 'Sort: Price High to Low';
+        return 'Tri : prix décroissant';
       case MealSortOption.popularityDesc:
-        return 'Sort: Most Popular';
+        return 'Tri : plus populaires';
       case MealSortOption.newestFirst:
-        return 'Sort: Newest First';
+        return 'Tri : plus récents';
     }
   }
 
@@ -312,7 +312,7 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
           children: [
             IconButton(
               icon: const Icon(Icons.tune),
-              tooltip: 'Filter',
+              tooltip: 'Filtrer',
               onPressed: () {
                 showModalBottomSheet<void>(
                   context: context,
@@ -548,7 +548,7 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
               children: [
                 ListTile(
                   leading: const Icon(Icons.add),
-                  title: const Text('Add Meal'),
+                  title: const Text('Ajouter un plat'),
                   onTap: () {
                     Navigator.pop(context);
                     context.push('/admin/meals/new');
@@ -556,7 +556,7 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
                 ),
                 ListTile(
                   leading: const Icon(Icons.category),
-                  title: const Text('Manage Categories'),
+                  title: const Text('Gérer les catégories'),
                   onTap: () {
                     Navigator.pop(context);
                     context.push('/admin/categories');
@@ -567,7 +567,7 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
           ),
         );
       },
-      tooltip: 'Admin actions',
+      tooltip: 'Actions admin',
       child: const Icon(Icons.admin_panel_settings),
     );
   }

@@ -6,10 +6,10 @@ import 'package:akka_food/features/meal_catalog/presentation/notifiers/catalog_n
 
 /// Human-readable labels for each [MealSortOption].
 const _kSortLabels = {
-  MealSortOption.priceAsc: 'Price: Low to High',
-  MealSortOption.priceDesc: 'Price: High to Low',
-  MealSortOption.popularityDesc: 'Most Popular',
-  MealSortOption.newestFirst: 'Newest First',
+  MealSortOption.priceAsc: 'Prix : croissant',
+  MealSortOption.priceDesc: 'Prix : décroissant',
+  MealSortOption.popularityDesc: 'Plus populaires',
+  MealSortOption.newestFirst: 'Plus récents',
 };
 
 /// Icons associated with each [MealSortOption].
@@ -85,7 +85,7 @@ class SortBottomSheet extends ConsumerWidget {
       child: Row(
         children: [
           Text(
-            'Sort by',
+            'Trier par',
             style: theme.textTheme.titleLarge?.copyWith(
               fontWeight: FontWeight.bold,
             ),
@@ -93,7 +93,7 @@ class SortBottomSheet extends ConsumerWidget {
           const Spacer(),
           IconButton(
             icon: const Icon(Icons.close),
-            tooltip: 'Close',
+            tooltip: 'Fermer',
             onPressed: () => Navigator.pop(context),
           ),
         ],

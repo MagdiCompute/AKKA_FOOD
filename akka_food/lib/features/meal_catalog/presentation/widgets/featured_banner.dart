@@ -86,7 +86,7 @@ class FeaturedBanner extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(4),
                               ),
                               child: Text(
-                                'FEATURED',
+                                'PLAT DU JOUR',
                                 style: theme.textTheme.labelSmall?.copyWith(
                                   color: colorScheme.onPrimaryContainer,
                                   fontWeight: FontWeight.bold,

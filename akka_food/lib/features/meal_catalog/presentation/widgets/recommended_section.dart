@@ -52,7 +52,7 @@ class RecommendedSection extends ConsumerWidget {
           child: Row(
             children: [
               Text(
-                'Recommended for You',
+                'Recommandé pour vous',
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
@@ -165,7 +165,7 @@ class _PersonalizedBadge extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
       ),
       child: Text(
-        isPersonalized ? '✨ Personalized' : '🔥 Popular',
+        isPersonalized ? '✨ Personnalisé' : '🔥 Populaire',
         style: Theme.of(context).textTheme.labelSmall?.copyWith(
               color: isPersonalized
                   ? colorScheme.onPrimaryContainer

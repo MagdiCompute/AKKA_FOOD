@@ -591,45 +591,51 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
         });
       }
 
-      // Update leaderboard — add/update user's score in all_time document
+      // Update leaderboard — increment order count for the user
       try {
-        final leaderboardRef = firestore.collection('leaderboard').doc('all_time');
-        final leaderboardDoc = await leaderboardRef.get();
-        final currentEntries = (leaderboardDoc.data()?['entries'] as List<dynamic>?) ?? [];
-        
-        // Find existing entry or create new one
-        final existingIndex = currentEntries.indexWhere(
-          (e) => (e as Map<String, dynamic>)['uid'] == user.uid,
-        );
-        
-        final newScore = (coinsEarned > 0 ? coinsEarned : cart.total.round());
-        
-        if (existingIndex >= 0) {
-          final existing = currentEntries[existingIndex] as Map<String, dynamic>;
-          currentEntries[existingIndex] = {
-            ...existing,
-            'score': ((existing['score'] as num?)?.toInt() ?? 0) + newScore,
-            'displayName': customerName,
-          };
-        } else {
-          currentEntries.add({
-            'uid': user.uid,
-            'displayName': customerName,
-            'avatarUrl': null,
-            'score': newScore,
+        final now = DateTime.now();
+        final monthKey = 'monthly_${now.year}_${now.month.toString().padLeft(2, '0')}';
+        final weekNumber = ((now.difference(DateTime(now.year, 1, 1)).inDays) / 7).ceil();
+        final weekKey = 'weekly_${now.year}_${weekNumber.toString().padLeft(2, '0')}';
+
+        // Update all three leaderboard documents
+        for (final docId in ['all_time', monthKey, weekKey]) {
+          final leaderboardRef = firestore.collection('leaderboard').doc(docId);
+          final leaderboardDoc = await leaderboardRef.get();
+          final currentEntries = (leaderboardDoc.data()?['entries'] as List<dynamic>?) ?? [];
+          
+          // Find existing entry or create new one
+          final existingIndex = currentEntries.indexWhere(
+            (e) => (e as Map<String, dynamic>)['uid'] == user.uid,
+          );
+          
+          if (existingIndex >= 0) {
+            final existing = currentEntries[existingIndex] as Map<String, dynamic>;
+            currentEntries[existingIndex] = {
+              ...existing,
+              'score': ((existing['score'] as num?)?.toInt() ?? 0) + 1,
+              'displayName': customerName,
+            };
+          } else {
+            currentEntries.add({
+              'uid': user.uid,
+              'displayName': customerName,
+              'avatarUrl': null,
+              'score': 1,
+            });
+          }
+          
+          // Sort by score descending and keep top 100
+          currentEntries.sort((a, b) => 
+            ((b as Map<String, dynamic>)['score'] as num).compareTo(
+              (a as Map<String, dynamic>)['score'] as num));
+          final top100 = currentEntries.take(100).toList();
+          
+          await leaderboardRef.set({
+            'entries': top100,
+            'updatedAt': FieldValue.serverTimestamp(),
           });
         }
-        
-        // Sort by score descending and keep top 100
-        currentEntries.sort((a, b) => 
-          ((b as Map<String, dynamic>)['score'] as num).compareTo(
-            (a as Map<String, dynamic>)['score'] as num));
-        final top100 = currentEntries.take(100).toList();
-        
-        await leaderboardRef.set({
-          'entries': top100,
-          'updatedAt': FieldValue.serverTimestamp(),
-        });
       } catch (_) {
         // Leaderboard update is non-critical
       }

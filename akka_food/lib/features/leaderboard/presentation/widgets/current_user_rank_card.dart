@@ -94,14 +94,14 @@ class CurrentUserRankCard extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Your rank',
+                  'Votre classement',
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: colorScheme.onPrimaryContainer.withValues(alpha: 0.7),
                   ),
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  'Your rank: #${entry.rank} | Score: ${entry.score} orders',
+                  'Rang #${entry.rank} | ${entry.score} commandes',
                   style: theme.textTheme.titleSmall?.copyWith(
                     fontWeight: FontWeight.w600,
                     color: colorScheme.onPrimaryContainer,
@@ -118,7 +118,7 @@ class CurrentUserRankCard extends ConsumerWidget {
               borderRadius: BorderRadius.circular(20),
             ),
             child: Text(
-              '${entry.score} orders',
+              '${entry.score} cmd',
               style: theme.textTheme.labelLarge?.copyWith(
                 fontWeight: FontWeight.bold,
                 color: colorScheme.primary,

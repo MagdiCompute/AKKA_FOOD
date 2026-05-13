@@ -123,13 +123,13 @@ class LeaderboardEntryTile extends StatelessWidget {
   String _rankSemanticsLabel(int rank) {
     switch (rank) {
       case 1:
-        return 'Gold medal, rank 1';
+        return 'Médaille d\'or, rang 1';
       case 2:
-        return 'Silver medal, rank 2';
+        return 'Médaille d\'argent, rang 2';
       case 3:
-        return 'Bronze medal, rank 3';
+        return 'Médaille de bronze, rang 3';
       default:
-        return 'Rank $rank';
+        return 'Rang $rank';
     }
   }
 
@@ -185,7 +185,7 @@ class LeaderboardEntryTile extends StatelessWidget {
     final colorScheme = theme.colorScheme;
 
     return Text(
-      '${entry.score} orders',
+      '${entry.score} commandes',
       style: theme.textTheme.bodyMedium?.copyWith(
         fontWeight: FontWeight.w600,
         color: colorScheme.primary,

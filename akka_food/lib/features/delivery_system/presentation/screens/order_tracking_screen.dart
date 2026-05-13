@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../domain/entities/delivery_option.dart';
 import '../../domain/entities/delivery_status.dart';
@@ -257,7 +258,7 @@ class _OrderTrackingScreenState extends ConsumerState<OrderTrackingScreen> {
                               'Numéro du livreur',
                               style: Theme.of(context).textTheme.bodySmall,
                             ),
-                            Text(
+                            SelectableText(
                               order.deliveryPhone!,
                               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                     fontWeight: FontWeight.bold,
@@ -267,9 +268,20 @@ class _OrderTrackingScreenState extends ConsumerState<OrderTrackingScreen> {
                         ),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.call),
-                        onPressed: () {
-                          // TODO: launch phone dialer
+                        icon: const Icon(Icons.call, color: Colors.green),
+                        onPressed: () async {
+                          final uri = Uri.parse('tel:${order.deliveryPhone}');
+                          if (await canLaunchUrl(uri)) {
+                            await launchUrl(uri);
+                          } else {
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Numéro : ${order.deliveryPhone}'),
+                                ),
+                              );
+                            }
+                          }
                         },
                         tooltip: 'Appeler le livreur',
                       ),

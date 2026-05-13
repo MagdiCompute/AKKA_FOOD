@@ -4,12 +4,11 @@ import 'package:flutter/material.dart';
 
 /// Displays the estimated time of arrival with a live countdown timer.
 ///
-/// Hides itself (returns [SizedBox.shrink]) when [etaMinutes] is null.
-/// Shows a countdown that decrements every minute from the initial ETA.
+/// Counts down in seconds, showing MM:SS format.
+/// Hides itself when [etaMinutes] is null.
 ///
 /// Satisfies Requirement 2 AC4.
 class ETACard extends StatefulWidget {
-  /// Estimated time of arrival in minutes; may be null if not yet set by admin.
   final int? etaMinutes;
 
   const ETACard({super.key, this.etaMinutes});
@@ -20,12 +19,12 @@ class ETACard extends StatefulWidget {
 
 class _ETACardState extends State<ETACard> {
   Timer? _timer;
-  late int _remainingMinutes;
+  late int _remainingSeconds;
 
   @override
   void initState() {
     super.initState();
-    _remainingMinutes = widget.etaMinutes ?? 0;
+    _remainingSeconds = (widget.etaMinutes ?? 0) * 60;
     _startCountdown();
   }
 
@@ -33,24 +32,24 @@ class _ETACardState extends State<ETACard> {
   void didUpdateWidget(ETACard oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.etaMinutes != oldWidget.etaMinutes) {
-      _remainingMinutes = widget.etaMinutes ?? 0;
+      _remainingSeconds = (widget.etaMinutes ?? 0) * 60;
       _startCountdown();
     }
   }
 
   void _startCountdown() {
     _timer?.cancel();
-    if (_remainingMinutes <= 0) return;
+    if (_remainingSeconds <= 0) return;
 
-    _timer = Timer.periodic(const Duration(minutes: 1), (timer) {
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (!mounted) {
         timer.cancel();
         return;
       }
       setState(() {
-        _remainingMinutes--;
-        if (_remainingMinutes <= 0) {
-          _remainingMinutes = 0;
+        _remainingSeconds--;
+        if (_remainingSeconds <= 0) {
+          _remainingSeconds = 0;
           timer.cancel();
         }
       });
@@ -63,12 +62,23 @@ class _ETACardState extends State<ETACard> {
     super.dispose();
   }
 
+  String _formatTime(int totalSeconds) {
+    if (totalSeconds <= 0) return '00:00';
+    final minutes = totalSeconds ~/ 60;
+    final seconds = totalSeconds % 60;
+    return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
+  }
+
   @override
   Widget build(BuildContext context) {
     if (widget.etaMinutes == null) return const SizedBox.shrink();
 
     final colorScheme = Theme.of(context).colorScheme;
-    final isLate = _remainingMinutes <= 0;
+    final isLate = _remainingSeconds <= 0;
+    final totalSeconds = (widget.etaMinutes ?? 1) * 60;
+    final progress = totalSeconds > 0
+        ? (1.0 - (_remainingSeconds / totalSeconds)).clamp(0.0, 1.0)
+        : 1.0;
 
     return Card(
       color: isLate
@@ -78,20 +88,28 @@ class _ETACardState extends State<ETACard> {
         padding: const EdgeInsets.all(20),
         child: Row(
           children: [
-            // Animated clock icon
-            TweenAnimationBuilder<double>(
-              tween: Tween(begin: 0.0, end: 1.0),
-              duration: const Duration(milliseconds: 800),
-              builder: (context, value, child) {
-                return Transform.scale(
-                  scale: 0.8 + (0.2 * value),
-                  child: child,
-                );
-              },
-              child: Icon(
-                isLate ? Icons.timer_off : Icons.access_time_filled,
-                size: 40,
-                color: isLate ? colorScheme.error : colorScheme.secondary,
+            // Countdown circle
+            SizedBox(
+              width: 64,
+              height: 64,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  CircularProgressIndicator(
+                    value: progress,
+                    strokeWidth: 5,
+                    backgroundColor:
+                        colorScheme.onSecondaryContainer.withValues(alpha: 0.1),
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      isLate ? colorScheme.error : colorScheme.secondary,
+                    ),
+                  ),
+                  Icon(
+                    isLate ? Icons.timer_off : Icons.delivery_dining,
+                    size: 24,
+                    color: isLate ? colorScheme.error : colorScheme.secondary,
+                  ),
+                ],
               ),
             ),
             const SizedBox(width: 16),
@@ -107,32 +125,22 @@ class _ETACardState extends State<ETACard> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    isLate
-                        ? 'Votre commande arrive !'
-                        : '$_remainingMinutes min restantes',
-                    style:
-                        Theme.of(context).textTheme.headlineSmall?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: isLate
-                                  ? colorScheme.error
-                                  : colorScheme.onSecondaryContainer,
-                            ),
+                    isLate ? 'Votre commande arrive !' : _formatTime(_remainingSeconds),
+                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'monospace',
+                          color: isLate
+                              ? colorScheme.error
+                              : colorScheme.onSecondaryContainer,
+                        ),
                   ),
                   if (!isLate) ...[
-                    const SizedBox(height: 8),
-                    // Progress bar
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(4),
-                      child: LinearProgressIndicator(
-                        value: 1.0 -
-                            (_remainingMinutes / (widget.etaMinutes ?? 1)),
-                        backgroundColor:
-                            colorScheme.onSecondaryContainer.withValues(alpha: 0.1),
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                          colorScheme.secondary,
-                        ),
-                        minHeight: 6,
-                      ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '${_remainingSeconds ~/ 60} min restantes',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: colorScheme.onSecondaryContainer.withValues(alpha: 0.7),
+                          ),
                     ),
                   ],
                 ],

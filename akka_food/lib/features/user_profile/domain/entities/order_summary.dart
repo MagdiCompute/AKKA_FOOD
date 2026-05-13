@@ -25,7 +25,7 @@ abstract class OrderItem with _$OrderItem {
 
   factory OrderItem.fromMap(Map<String, dynamic> map) {
     return OrderItem(
-      name: map['name'] as String? ?? '',
+      name: map['name'] as String? ?? map['mealName'] as String? ?? '',
       quantity: (map['quantity'] as num?)?.toInt() ?? 0,
       unitPrice: (map['unitPrice'] as num?)?.toDouble() ?? 0.0,
     );
@@ -82,13 +82,28 @@ abstract class OrderSummary with _$OrderSummary {
       items = const [];
     }
 
+    // Handle deliveryAddress as either a String or a Map
+    String? deliveryAddress;
+    final rawAddress = map['deliveryAddress'];
+    if (rawAddress is String) {
+      deliveryAddress = rawAddress;
+    } else if (rawAddress is Map) {
+      final parts = <String>[
+        if (rawAddress['label'] != null) rawAddress['label'] as String,
+        if (rawAddress['streetAddress'] != null) rawAddress['streetAddress'] as String,
+        if (rawAddress['city'] != null) rawAddress['city'] as String,
+      ];
+      deliveryAddress = parts.join(', ');
+    }
+
     return OrderSummary(
       orderId: map['orderId'] as String? ?? '',
       orderDate: _parseDateTime(map['createdAt'] ?? map['orderDate']),
       items: items,
-      totalAmount: (map['totalAmount'] as num?)?.toDouble() ?? 0.0,
+      totalAmount: (map['totalAmount'] as num?)?.toDouble() ??
+          (map['total'] as num?)?.toDouble() ?? 0.0,
       status: map['status'] as String? ?? 'pending',
-      deliveryAddress: map['deliveryAddress'] as String?,
+      deliveryAddress: deliveryAddress,
       paymentMethod: map['paymentMethod'] as String? ?? '',
     );
   }

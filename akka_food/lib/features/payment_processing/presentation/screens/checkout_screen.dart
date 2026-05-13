@@ -535,6 +535,49 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
         });
       }
 
+      // Update leaderboard — add/update user's score in all_time document
+      try {
+        final leaderboardRef = firestore.collection('leaderboard').doc('all_time');
+        final leaderboardDoc = await leaderboardRef.get();
+        final currentEntries = (leaderboardDoc.data()?['entries'] as List<dynamic>?) ?? [];
+        
+        // Find existing entry or create new one
+        final existingIndex = currentEntries.indexWhere(
+          (e) => (e as Map<String, dynamic>)['uid'] == user.uid,
+        );
+        
+        final newScore = (coinsEarned > 0 ? coinsEarned : cart.total.round());
+        
+        if (existingIndex >= 0) {
+          final existing = currentEntries[existingIndex] as Map<String, dynamic>;
+          currentEntries[existingIndex] = {
+            ...existing,
+            'score': ((existing['score'] as num?)?.toInt() ?? 0) + newScore,
+            'displayName': customerName,
+          };
+        } else {
+          currentEntries.add({
+            'uid': user.uid,
+            'displayName': customerName,
+            'avatarUrl': null,
+            'score': newScore,
+          });
+        }
+        
+        // Sort by score descending and keep top 100
+        currentEntries.sort((a, b) => 
+          ((b as Map<String, dynamic>)['score'] as num).compareTo(
+            (a as Map<String, dynamic>)['score'] as num));
+        final top100 = currentEntries.take(100).toList();
+        
+        await leaderboardRef.set({
+          'entries': top100,
+          'updatedAt': FieldValue.serverTimestamp(),
+        });
+      } catch (_) {
+        // Leaderboard update is non-critical
+      }
+
       // Clear the cart
       ref.read(cartNotifierProvider.notifier).clearCart();
 

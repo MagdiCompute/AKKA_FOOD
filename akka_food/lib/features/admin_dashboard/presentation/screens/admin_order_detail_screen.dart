@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -567,6 +568,7 @@ class _StatusUpdateControlsState
     extends ConsumerState<_StatusUpdateControls> {
   DeliveryStatus? _selectedStatus;
   final _etaController = TextEditingController();
+  final _phoneController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
   @override
@@ -577,16 +579,19 @@ class _StatusUpdateControlsState
     if (oldWidget.order.status != widget.order.status) {
       _selectedStatus = null;
       _etaController.clear();
+      _phoneController.clear();
     }
   }
 
   @override
   void dispose() {
     _etaController.dispose();
+    _phoneController.dispose();
     super.dispose();
   }
 
   bool get _needsEta => _selectedStatus == DeliveryStatus.outForDelivery;
+  bool get _needsPhone => _selectedStatus == DeliveryStatus.outForDelivery;
 
   Future<void> _submit() async {
     if (_selectedStatus == null) return;
@@ -594,10 +599,22 @@ class _StatusUpdateControlsState
 
     final etaMinutes =
         _needsEta ? int.tryParse(_etaController.text.trim()) : null;
+    final deliveryPhone =
+        _needsPhone ? _phoneController.text.trim() : null;
 
     await ref
         .read(adminOrderDetailNotifierProvider(widget.orderId).notifier)
         .updateStatus(_selectedStatus!, etaMinutes: etaMinutes);
+
+    // Save delivery phone number directly to Firestore
+    if (deliveryPhone != null && deliveryPhone.isNotEmpty) {
+      try {
+        await FirebaseFirestore.instance
+            .collection('orders')
+            .doc(widget.orderId)
+            .update({'deliveryPhone': deliveryPhone});
+      } catch (_) {}
+    }
 
     // Show success snackbar only if still mounted and no error was set.
     if (!mounted) return;
@@ -682,6 +699,22 @@ class _StatusUpdateControlsState
                 }
                 return null;
               },
+            ),
+          ],
+
+          // ── Delivery phone input (when outForDelivery is selected) ─────
+          if (_needsPhone) ...[
+            const SizedBox(height: 16),
+            TextFormField(
+              controller: _phoneController,
+              enabled: !disabled,
+              keyboardType: TextInputType.phone,
+              decoration: const InputDecoration(
+                labelText: 'Numéro du livreur',
+                hintText: '+223 76 XX XX XX',
+                border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.phone_outlined),
+              ),
             ),
           ],
 

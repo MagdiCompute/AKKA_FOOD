@@ -143,7 +143,8 @@ class _OrderList extends ConsumerWidget {
               return _OrderTile(
                 order: order,
                 onTap: () => context.push(
-                  '/orders/${order.orderId}/tracking',
+                  AppRoutes.orderDetail
+                      .replaceFirst(':orderId', order.orderId),
                 ),
               );
             },

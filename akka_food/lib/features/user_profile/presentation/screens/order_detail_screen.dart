@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -203,6 +204,18 @@ class _OrderDetailBody extends StatelessWidget {
         ),
 
         const SizedBox(height: 24),
+
+        // ── Track order button ─────────────────────────────────────────
+        SizedBox(
+          width: double.infinity,
+          child: FilledButton.icon(
+            onPressed: () => context.push('/orders/${order.orderId}/tracking'),
+            icon: const Icon(Icons.local_shipping_outlined),
+            label: const Text('Suivi de commande'),
+          ),
+        ),
+
+        const SizedBox(height: 16),
       ],
     );
   }

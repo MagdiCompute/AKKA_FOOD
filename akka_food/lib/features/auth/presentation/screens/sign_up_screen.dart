@@ -3,20 +3,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/router/app_router.dart';
+import '../../../../core/theme/app_theme.dart';
+import '../../../../core/widgets/animated_list_item.dart';
 import '../notifiers/auth_notifier.dart';
 import '../notifiers/auth_state.dart';
 import '../widgets/auth_validators.dart';
 
-/// Registration mode — email/password or phone number.
-enum _RegistrationMode { email, phone }
-
-/// Sign-up screen.
-///
-/// Supports registration via email/password or phone number (E.164 format).
-/// A [SegmentedButton] lets the user toggle between the two modes.
-///
-/// Satisfies Requirement 1 (User Registration with Email and Password) and
-/// Requirement 2 (User Registration with Phone Number).
+/// Sign-up screen — clean, minimal design matching the login screen.
 class SignUpScreen extends ConsumerStatefulWidget {
   const SignUpScreen({super.key});
 
@@ -28,47 +21,23 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
   final _formKey = GlobalKey<FormState>();
   final _displayNameController = TextEditingController();
   final _emailController = TextEditingController();
-  final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
-  final _confirmPasswordController = TextEditingController();
-
   bool _obscurePassword = true;
-  bool _obscureConfirmPassword = true;
-  _RegistrationMode _mode = _RegistrationMode.email;
 
   @override
   void dispose() {
     _displayNameController.dispose();
     _emailController.dispose();
-    _phoneController.dispose();
     _passwordController.dispose();
-    _confirmPasswordController.dispose();
     super.dispose();
   }
 
-  // ---------------------------------------------------------------------------
-  // Side-effect listener
-  // ---------------------------------------------------------------------------
-
   void _handleAuthStateChange(AuthState? previous, AuthState next) {
     if (!mounted) return;
-
     if (next.status == AuthStatus.authenticated) {
       context.go(AppRoutes.home);
       return;
     }
-
-    // Phone OTP flow: navigate to OTP screen when a pending request is set.
-    if (next.status == AuthStatus.loading &&
-        next.pendingOtpRequest != null &&
-        (previous == null || previous.pendingOtpRequest == null)) {
-      context.push(
-        AppRoutes.otp,
-        extra: _phoneController.text.trim(),
-      );
-      return;
-    }
-
     if (next.status == AuthStatus.error && next.errorMessage != null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -79,210 +48,284 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
     }
   }
 
-  // ---------------------------------------------------------------------------
-  // Actions
-  // ---------------------------------------------------------------------------
-
   Future<void> _signUp() async {
     if (!_formKey.currentState!.validate()) return;
-
-    final notifier = ref.read(authNotifierProvider.notifier);
-
-    if (_mode == _RegistrationMode.email) {
-      await notifier.signUp(
-        _emailController.text.trim(),
-        _passwordController.text,
-        _displayNameController.text.trim(),
-      );
-    } else {
-      await notifier.signInWithPhone(_phoneController.text.trim());
-    }
+    await ref.read(authNotifierProvider.notifier).signUp(
+          _emailController.text.trim(),
+          _passwordController.text,
+          _displayNameController.text.trim(),
+        );
   }
 
-  // ---------------------------------------------------------------------------
-  // Build
-  // ---------------------------------------------------------------------------
+  Future<void> _signUpWithGoogle() async {
+    await ref.read(authNotifierProvider.notifier).signInWithGoogle();
+  }
+
+  InputDecoration _fieldDecoration(String hint) {
+    return InputDecoration(
+      hintText: hint,
+      hintStyle: TextStyle(color: AppColors.textLight, fontSize: 14),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: BorderSide(color: AppColors.textLight.withValues(alpha: 0.3)),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: BorderSide(color: AppColors.textLight.withValues(alpha: 0.3)),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     ref.listen<AuthState>(authNotifierProvider, _handleAuthStateChange);
-
     final authState = ref.watch(authNotifierProvider);
     final isLoading = authState.status == AuthStatus.loading;
 
     return Scaffold(
+      backgroundColor: AppColors.offWhite,
       appBar: AppBar(
-        title: const Text('Créer un compte'),
+        backgroundColor: AppColors.offWhite,
+        foregroundColor: AppColors.textDark,
+        elevation: 0,
         leading: BackButton(
           onPressed: () => context.canPop() ? context.pop() : null,
+        ),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.restaurant, size: 20, color: AppColors.primaryBlue),
+            const SizedBox(width: 6),
+            Text(
+              'AKKA Food',
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+                color: AppColors.primaryBlue,
+              ),
+            ),
+          ],
         ),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+          padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 16),
           child: Form(
             key: _formKey,
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // ── Mode toggle ────────────────────────────────────────
-                SegmentedButton<_RegistrationMode>(
-                  segments: const [
-                    ButtonSegment(
-                      value: _RegistrationMode.email,
-                      label: Text('E-mail'),
-                      icon: Icon(Icons.email_outlined),
+                // ── Title ──────────────────────────────────────────────
+                FadeInWidget(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Créer un compte',
+                        style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                              fontWeight: FontWeight.w700,
+                            ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Entrez vos informations pour créer votre compte.',
+                        style: TextStyle(fontSize: 13, color: AppColors.textLight),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 24),
+
+                // ── Google sign-up ─────────────────────────────────────
+                FadeInWidget(
+                  delay: const Duration(milliseconds: 100),
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: 48,
+                    child: OutlinedButton.icon(
+                      onPressed: isLoading ? null : _signUpWithGoogle,
+                      icon: const Icon(Icons.g_mobiledata, size: 22),
+                      label: const Text('Google'),
+                      style: OutlinedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        side: BorderSide(
+                          color: AppColors.textLight.withValues(alpha: 0.3),
+                        ),
+                      ),
                     ),
-                    ButtonSegment(
-                      value: _RegistrationMode.phone,
-                      label: Text('Téléphone'),
-                      icon: Icon(Icons.phone_outlined),
+                  ),
+                ),
+                const SizedBox(height: 20),
+
+                // ── Divider ────────────────────────────────────────────
+                Row(
+                  children: [
+                    Expanded(child: Divider(color: AppColors.textLight.withValues(alpha: 0.3))),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Text('Ou', style: TextStyle(color: AppColors.textLight, fontSize: 13)),
                     ),
+                    Expanded(child: Divider(color: AppColors.textLight.withValues(alpha: 0.3))),
                   ],
-                  selected: {_mode},
-                  onSelectionChanged: (selected) {
-                    setState(() {
-                      _mode = selected.first;
-                      _formKey.currentState?.reset();
-                    });
-                  },
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 20),
 
-                // ── Display name ───────────────────────────────────────
-                TextFormField(
-                  controller: _displayNameController,
-                  textInputAction: TextInputAction.next,
-                  textCapitalization: TextCapitalization.words,
-                  validator: validateDisplayName,
-                  decoration: const InputDecoration(
-                    labelText: 'Nom complet',
-                    hintText: 'Votre nom',
-                    prefixIcon: Icon(Icons.person_outlined),
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                // ── Email or Phone field ───────────────────────────────
-                if (_mode == _RegistrationMode.email) ...[
-                  TextFormField(
-                    controller: _emailController,
-                    keyboardType: TextInputType.emailAddress,
-                    textInputAction: TextInputAction.next,
-                    autocorrect: false,
-                    validator: validateEmail,
-                    decoration: const InputDecoration(
-                      labelText: 'Adresse e-mail',
-                      hintText: 'vous@exemple.com',
-                      prefixIcon: Icon(Icons.email_outlined),
+                // ── Name field ─────────────────────────────────────────
+                FadeInWidget(
+                  delay: const Duration(milliseconds: 200),
+                  child: _LabeledField(
+                    label: 'Nom complet',
+                    child: TextFormField(
+                      controller: _displayNameController,
+                      textCapitalization: TextCapitalization.words,
+                      textInputAction: TextInputAction.next,
+                      validator: validateDisplayName,
+                      style: const TextStyle(fontSize: 14),
+                      decoration: _fieldDecoration('Nom complet'),
                     ),
                   ),
-                  const SizedBox(height: 16),
+                ),
+                const SizedBox(height: 14),
 
-                  // ── Password ─────────────────────────────────────────
-                  TextFormField(
-                    controller: _passwordController,
-                    obscureText: _obscurePassword,
-                    textInputAction: TextInputAction.next,
-                    validator: validatePassword,
-                    decoration: InputDecoration(
-                      labelText: 'Mot de passe',
-                      prefixIcon: const Icon(Icons.lock_outlined),
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _obscurePassword
-                              ? Icons.visibility_outlined
-                              : Icons.visibility_off_outlined,
+                // ── Email field ────────────────────────────────────────
+                FadeInWidget(
+                  delay: const Duration(milliseconds: 250),
+                  child: _LabeledField(
+                    label: 'Adresse e-mail',
+                    child: TextFormField(
+                      controller: _emailController,
+                      keyboardType: TextInputType.emailAddress,
+                      textInputAction: TextInputAction.next,
+                      autocorrect: false,
+                      validator: validateEmail,
+                      style: const TextStyle(fontSize: 14),
+                      decoration: _fieldDecoration('Adresse e-mail'),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 14),
+
+                // ── Password field ─────────────────────────────────────
+                FadeInWidget(
+                  delay: const Duration(milliseconds: 300),
+                  child: _LabeledField(
+                    label: 'Mot de passe',
+                    child: TextFormField(
+                      controller: _passwordController,
+                      obscureText: _obscurePassword,
+                      textInputAction: TextInputAction.done,
+                      onFieldSubmitted: (_) => _signUp(),
+                      validator: validatePassword,
+                      style: const TextStyle(fontSize: 14),
+                      decoration: _fieldDecoration('Mot de passe').copyWith(
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _obscurePassword
+                                ? Icons.visibility_off_outlined
+                                : Icons.visibility_outlined,
+                            size: 20,
+                            color: AppColors.textLight,
+                          ),
+                          onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
                         ),
-                        tooltip: _obscurePassword
-                            ? 'Afficher'
-                            : 'Masquer',
-                        onPressed: () {
-                          setState(() {
-                            _obscurePassword = !_obscurePassword;
-                          });
-                        },
                       ),
                     ),
                   ),
-                  const SizedBox(height: 16),
-
-                  // ── Confirm password ──────────────────────────────────
-                  TextFormField(
-                    controller: _confirmPasswordController,
-                    obscureText: _obscureConfirmPassword,
-                    textInputAction: TextInputAction.done,
-                    onFieldSubmitted: (_) => _signUp(),
-                    validator: (value) => validateConfirmPassword(
-                      value,
-                      _passwordController.text,
-                    ),
-                    decoration: InputDecoration(
-                      labelText: 'Confirmer le mot de passe',
-                      prefixIcon: const Icon(Icons.lock_outlined),
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _obscureConfirmPassword
-                              ? Icons.visibility_outlined
-                              : Icons.visibility_off_outlined,
-                        ),
-                        tooltip: _obscureConfirmPassword
-                            ? 'Afficher'
-                            : 'Masquer',
-                        onPressed: () {
-                          setState(() {
-                            _obscureConfirmPassword = !_obscureConfirmPassword;
-                          });
-                        },
-                      ),
-                    ),
-                  ),
-                ] else ...[
-                  // ── Phone number ──────────────────────────────────────
-                  TextFormField(
-                    controller: _phoneController,
-                    keyboardType: TextInputType.phone,
-                    textInputAction: TextInputAction.done,
-                    onFieldSubmitted: (_) => _signUp(),
-                    validator: validatePhoneNumber,
-                    decoration: const InputDecoration(
-                      labelText: 'Numéro de téléphone',
-                      hintText: '+22370000000',
-                      prefixIcon: Icon(Icons.phone_outlined),
-                    ),
-                  ),
-                ],
-                const SizedBox(height: 24),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Doit contenir au moins 6 caractères.',
+                  style: TextStyle(fontSize: 11, color: AppColors.textLight),
+                ),
+                const SizedBox(height: 28),
 
                 // ── Sign Up button ─────────────────────────────────────
-                isLoading
-                    ? const Center(
-                        child: CircularProgressIndicator(
-                          semanticsLabel: 'Création du compte',
-                        ),
-                      )
-                    : FilledButton(
-                        onPressed: _signUp,
-                        child: const Text('S\'inscrire'),
-                      ),
-                const SizedBox(height: 16),
+                FadeInWidget(
+                  delay: const Duration(milliseconds: 350),
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: 48,
+                    child: isLoading
+                        ? const Center(child: CircularProgressIndicator())
+                        : FilledButton(
+                            onPressed: _signUp,
+                            style: FilledButton.styleFrom(
+                              backgroundColor: AppColors.primaryBlue,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                            child: const Text(
+                              'S\'inscrire',
+                              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+                            ),
+                          ),
+                  ),
+                ),
+                const SizedBox(height: 24),
 
                 // ── Sign In link ───────────────────────────────────────
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text('Déjà un compte ?'),
-                    TextButton(
-                      onPressed: () => context.pushReplacement(AppRoutes.login),
-                      child: const Text('Se connecter'),
-                    ),
-                  ],
+                FadeInWidget(
+                  delay: const Duration(milliseconds: 400),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Déjà un compte ? ',
+                        style: TextStyle(fontSize: 13, color: AppColors.textMedium),
+                      ),
+                      GestureDetector(
+                        onTap: () => context.pushReplacement(AppRoutes.login),
+                        child: Text(
+                          'Se connecter',
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.primaryBlue,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
           ),
         ),
       ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Labeled field helper
+// ---------------------------------------------------------------------------
+
+class _LabeledField extends StatelessWidget {
+  const _LabeledField({required this.label, required this.child});
+
+  final String label;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w500,
+            color: AppColors.textDark,
+          ),
+        ),
+        const SizedBox(height: 6),
+        child,
+      ],
     );
   }
 }

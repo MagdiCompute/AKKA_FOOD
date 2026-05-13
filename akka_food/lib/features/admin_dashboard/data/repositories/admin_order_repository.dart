@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 import '../../domain/entities/admin_order_view.dart';
 import '../../domain/repositories/i_admin_order_repository.dart';
 import '../datasources/cloud_function_admin_data_source.dart';
@@ -5,8 +7,8 @@ import '../datasources/firestore_admin_order_data_source.dart';
 
 /// Concrete implementation of [IAdminOrderRepository].
 ///
-/// Delegates read operations to [FirestoreAdminOrderDataSource] and
-/// write operations to [CloudFunctionAdminDataSource].
+/// Delegates read operations to [FirestoreAdminOrderDataSource].
+/// Write operations go directly to Firestore (Cloud Functions not yet deployed).
 class AdminOrderRepository implements IAdminOrderRepository {
   AdminOrderRepository(
     this._firestoreDataSource, {
@@ -30,10 +32,17 @@ class AdminOrderRepository implements IAdminOrderRepository {
     String orderId,
     DeliveryStatus status, {
     int? etaMinutes,
-  }) =>
-      _cloudFunctionDataSource.updateOrderStatus(
-        orderId,
-        status.toFirestoreString(),
-        etaMinutes: etaMinutes,
-      );
+  }) async {
+    final data = <String, dynamic>{
+      'status': status.toFirestoreString(),
+      'updatedAt': FieldValue.serverTimestamp(),
+    };
+    if (etaMinutes != null) {
+      data['etaMinutes'] = etaMinutes;
+    }
+    await FirebaseFirestore.instance
+        .collection('orders')
+        .doc(orderId)
+        .update(data);
+  }
 }

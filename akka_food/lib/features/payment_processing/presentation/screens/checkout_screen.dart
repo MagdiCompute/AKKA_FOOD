@@ -467,6 +467,8 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
       // Create order document
       final orderData = <String, dynamic>{
         'uid': user.uid,
+        'userDisplayName': user.displayName ?? user.email ?? 'Client',
+        'userPhone': user.phoneNumber,
         'status': 'confirmed',
         'items': cart.items.map((item) => {
           'mealId': item.mealId,

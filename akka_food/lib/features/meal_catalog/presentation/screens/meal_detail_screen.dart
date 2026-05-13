@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:akka_food/core/widgets/animated_add_to_cart_button.dart';
 import 'package:akka_food/features/cart/presentation/notifiers/cart_notifier.dart';
@@ -71,7 +72,7 @@ class _MealDetailScreenState extends ConsumerState<MealDetailScreen> {
 // Main body — extracted to keep build() readable.
 // ---------------------------------------------------------------------------
 
-class _MealDetailBody extends StatelessWidget {
+class _MealDetailBody extends ConsumerWidget {
   const _MealDetailBody({
     required this.meal,
     required this.pageController,
@@ -85,7 +86,10 @@ class _MealDetailBody extends StatelessWidget {
   final ValueChanged<int> onPageChanged;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final cart = ref.watch(cartNotifierProvider);
+    final itemCount = cart.itemCount;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -93,6 +97,20 @@ class _MealDetailBody extends StatelessWidget {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
+        actions: [
+          IconButton(
+            icon: Badge(
+              isLabelVisible: itemCount > 0,
+              label: Text(
+                itemCount > 99 ? '99+' : '$itemCount',
+                style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
+              ),
+              child: const Icon(Icons.shopping_cart_outlined),
+            ),
+            tooltip: 'Panier',
+            onPressed: () => context.push('/cart'),
+          ),
+        ],
       ),
       bottomNavigationBar: _AddToCartBar(meal: meal),
       body: CustomScrollView(

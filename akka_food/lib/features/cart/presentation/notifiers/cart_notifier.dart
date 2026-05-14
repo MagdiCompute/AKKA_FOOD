@@ -145,24 +145,38 @@ class CartNotifier extends _$CartNotifier {
       final savedCart = await repository.load();
       if (savedCart != null) {
         state = savedCart;
-
-        // Auto-select default address if none is set
-        if (savedCart.selectedAddress == null) {
-          try {
-            final addressState = ref.read(addressNotifierProvider);
-            final addresses = addressState.valueOrNull ?? [];
-            final defaultAddr = addresses.where((a) => a.isDefault).firstOrNull;
-            if (defaultAddr != null) {
-              state = state.copyWith(selectedAddress: defaultAddr);
-            }
-          } catch (_) {}
-        }
       }
       _restored = true;
+
+      // Auto-select default address if none is set (after restore completes)
+      if (state.selectedAddress == null) {
+        _autoSelectDefaultAddress();
+      }
     } catch (e) {
       // Log silently — cart still works in-memory.
       debugPrint('CartNotifier: failed to restore cart from Hive: $e');
       _restored = true;
+    }
+  }
+
+  /// Attempts to auto-select the user's default delivery address.
+  Future<void> _autoSelectDefaultAddress() async {
+    try {
+      // Wait for addresses to load
+      final addressRepo = await ref.read(addressRepositoryProvider.future);
+      final currentUser = ref.read(currentUserProvider);
+      if (currentUser == null) return;
+
+      // Fetch addresses directly
+      final addresses = await addressRepo.getAddresses(currentUser.uid);
+      final defaultAddr = addresses.where((a) => a.isDefault).firstOrNull
+          ?? (addresses.isNotEmpty ? addresses.first : null);
+
+      if (defaultAddr != null && state.selectedAddress == null) {
+        state = state.copyWith(selectedAddress: defaultAddr);
+      }
+    } catch (_) {
+      // Non-critical — user can select manually
     }
   }
 

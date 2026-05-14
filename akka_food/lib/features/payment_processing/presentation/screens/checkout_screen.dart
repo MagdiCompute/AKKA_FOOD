@@ -610,6 +610,13 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
             .get();
         final totalOrders = ordersSnapshot.docs.length;
 
+        // Get user's avatar URL from profile
+        String? userAvatarUrl;
+        try {
+          final userDoc = await firestore.collection('users').doc(user.uid).get();
+          userAvatarUrl = userDoc.data()?['avatarUrl'] as String?;
+        } catch (_) {}
+
         // Update all three leaderboard documents
         for (final docId in ['all_time', monthKey, weekKey]) {
           final leaderboardRef = firestore.collection('leaderboard').doc(docId);
@@ -630,12 +637,13 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
               ...existing,
               'score': score ?? (((existing['score'] as num?)?.toInt() ?? 0) + 1),
               'displayName': customerName,
+              'avatarUrl': userAvatarUrl,
             };
           } else {
             currentEntries.add({
               'uid': user.uid,
               'displayName': customerName,
-              'avatarUrl': null,
+              'avatarUrl': userAvatarUrl,
               'score': score ?? 1,
             });
           }

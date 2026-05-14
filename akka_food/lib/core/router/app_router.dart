@@ -309,7 +309,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
   final routerNotifier = RouterNotifier(ref);
 
   return GoRouter(
-    initialLocation: AppRoutes.login,
+    initialLocation: AppRoutes.home,
     refreshListenable: routerNotifier,
     routes: [
       // ── Auth routes ────────────────────────────────────────────────────

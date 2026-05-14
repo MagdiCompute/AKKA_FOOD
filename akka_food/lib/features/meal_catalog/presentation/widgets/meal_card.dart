@@ -80,7 +80,7 @@ class MealCard extends StatelessWidget {
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Text(
-                            'Unavailable',
+                            'Indisponible',
                             style: theme.textTheme.labelSmall?.copyWith(
                               color: colorScheme.onErrorContainer,
                             ),

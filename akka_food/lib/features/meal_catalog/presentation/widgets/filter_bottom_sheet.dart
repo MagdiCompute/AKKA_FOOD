@@ -222,21 +222,17 @@ class _FilterBottomSheetState extends ConsumerState<FilterBottomSheet> {
             if (categories.isEmpty) {
               return const Text('Aucune catégorie disponible');
             }
-            return SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: categories.map((category) {
-                  final isSelected = _categoryIds.contains(category.id);
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: FilterChip(
-                      label: Text(category.name),
-                      selected: isSelected,
-                      onSelected: (_) => _toggleCategory(category.id),
-                    ),
-                  );
-                }).toList(),
-              ),
+            return Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: categories.map((category) {
+                final isSelected = _categoryIds.contains(category.id);
+                return FilterChip(
+                  label: Text(category.name),
+                  selected: isSelected,
+                  onSelected: (_) => _toggleCategory(category.id),
+                );
+              }).toList(),
             );
           },
         ),

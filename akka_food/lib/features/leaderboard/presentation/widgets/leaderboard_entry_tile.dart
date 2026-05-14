@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:akka_food/core/widgets/avatar_bank.dart';
 import '../../domain/entities/leaderboard_entry.dart';
 
 /// A tile displaying a single leaderboard entry row.
@@ -133,50 +134,13 @@ class LeaderboardEntryTile extends StatelessWidget {
     }
   }
 
-  /// Builds the circular avatar.
-  ///
-  /// Shows a network image if [LeaderboardEntry.avatarUrl] is available,
-  /// otherwise shows the user's initials or a default person icon.
+  /// Builds the circular avatar using the avatar bank system.
   Widget _buildAvatar(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
-    if (entry.avatarUrl != null && entry.avatarUrl!.isNotEmpty) {
-      return CircleAvatar(
-        radius: 20,
-        backgroundImage: NetworkImage(entry.avatarUrl!),
-        backgroundColor: colorScheme.surfaceContainerHighest,
-        onBackgroundImageError: (_, __) {},
-      );
-    }
-
-    final initials = _getInitials(entry.displayName);
-
-    return CircleAvatar(
+    return AvatarBankDisplay(
+      avatarUrl: entry.avatarUrl,
       radius: 20,
-      backgroundColor: colorScheme.primaryContainer,
-      child: initials.isNotEmpty
-          ? Text(
-              initials,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-                color: colorScheme.onPrimaryContainer,
-              ),
-            )
-          : Icon(
-              Icons.person,
-              size: 20,
-              color: colorScheme.onPrimaryContainer,
-            ),
+      displayName: entry.displayName,
     );
-  }
-
-  /// Extracts up to 2 initials from the display name.
-  String _getInitials(String name) {
-    final parts = name.trim().split(RegExp(r'\s+'));
-    if (parts.isEmpty || parts.first.isEmpty) return '';
-    if (parts.length == 1) return parts.first[0].toUpperCase();
-    return '${parts.first[0]}${parts.last[0]}'.toUpperCase();
   }
 
   /// Builds the score display on the right side.

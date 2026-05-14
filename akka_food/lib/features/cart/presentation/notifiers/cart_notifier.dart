@@ -1,6 +1,7 @@
 import 'dart:math' show min;
 
 import 'package:akka_food/features/auth/presentation/notifiers/auth_notifier.dart';
+import 'package:akka_food/features/user_profile/presentation/notifiers/address_notifier.dart';
 import 'package:akka_food/features/cart/data/datasources/hive_cart_datasource.dart';
 import 'package:akka_food/features/cart/data/repositories/cart_repository.dart';
 import 'package:akka_food/features/cart/domain/entities/cart.dart';
@@ -144,6 +145,18 @@ class CartNotifier extends _$CartNotifier {
       final savedCart = await repository.load();
       if (savedCart != null) {
         state = savedCart;
+
+        // Auto-select default address if none is set
+        if (savedCart.selectedAddress == null) {
+          try {
+            final addressState = ref.read(addressNotifierProvider);
+            final addresses = addressState.valueOrNull ?? [];
+            final defaultAddr = addresses.where((a) => a.isDefault).firstOrNull;
+            if (defaultAddr != null) {
+              state = state.copyWith(selectedAddress: defaultAddr);
+            }
+          } catch (_) {}
+        }
       }
       _restored = true;
     } catch (e) {

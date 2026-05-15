@@ -70,7 +70,7 @@ class LeaderboardEntryTile extends StatelessWidget {
   /// Builds the rank indicator widget.
   ///
   /// Top 3 ranks display medal emojis (🥇, 🥈, 🥉).
-  /// Rank 4+ displays the number in a circular container.
+  /// Rank 4+ displays the user's avatar with a small rank badge.
   Widget _buildRankIndicator(BuildContext context) {
     final theme = Theme.of(context);
 
@@ -88,20 +88,22 @@ class LeaderboardEntryTile extends StatelessWidget {
       );
     }
 
-    return Container(
+    // Rank 4+: show rank number in a small badge
+    return SizedBox(
       width: 36,
       height: 36,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: theme.colorScheme.surfaceContainerHighest,
-      ),
-      alignment: Alignment.center,
-      child: Text(
-        '${entry.rank}',
-        style: theme.textTheme.bodyMedium?.copyWith(
-          fontWeight: FontWeight.w600,
-          color: theme.colorScheme.onSurfaceVariant,
-        ),
+      child: Stack(
+        children: [
+          Center(
+            child: Text(
+              '#${entry.rank}',
+              style: theme.textTheme.bodySmall?.copyWith(
+                fontWeight: FontWeight.w700,
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -274,7 +274,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
           icon: Icons.phone_android,
           iconColor: Colors.orange,
           title: 'Orange Money',
-          subtitle: 'Payez via *144# puis confirmez',
+          subtitle: 'Payez via #144# puis confirmez',
           isSelected: _selectedPaymentMethod == _PaymentMethod.orangeMoney,
           onTap: () => setState(() => _selectedPaymentMethod = _PaymentMethod.orangeMoney),
         ),

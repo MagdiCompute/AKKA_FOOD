@@ -215,10 +215,10 @@ class _ProfileBody extends ConsumerWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'Savourez le meilleur du Mali.\n\n'
-              'AKKA Food est votre application de livraison de repas '
+              'Savourez le meilleur de la cuisine du Mali et du monde.\n\n'
+              'AKKA Food est votre application de restaurant en ligne et de livraison de repas '
               'préférée à Bamako. Commandez vos plats favoris, '
-              'gagnez des coins de fidélité et suivez vos livraisons '
+              'et suivez vos livraisons, montez au classement, gagnez des coins de fidélité '
               'en temps réel.',
               textAlign: TextAlign.center,
               style: Theme.of(ctx).textTheme.bodyMedium,

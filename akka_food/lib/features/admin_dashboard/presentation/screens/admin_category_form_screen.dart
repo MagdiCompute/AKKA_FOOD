@@ -154,6 +154,7 @@ class _AdminCategoryFormScreenState
 
       if (!mounted) return;
       notifier.setImageUrl(downloadUrl);
+      _imageUrlController.text = downloadUrl;
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -367,6 +368,18 @@ class _AdminCategoryFormScreenState
 
                   // ── Image ─────────────────────────────────────────────────
                   _SectionHeader(label: 'Image'),                  const SizedBox(height: 8),
+                  // Gallery picker button
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      onPressed: isBusy ? null : _pickAndUpload,
+                      icon: const Icon(Icons.photo_library_outlined),
+                      label: Text(_isUploading
+                          ? 'Envoi en cours… ${(_uploadProgress * 100).toStringAsFixed(0)}%'
+                          : 'Choisir depuis la galerie'),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
                   // Image URL text field with live preview
                   TextFormField(
                     controller: _imageUrlController,

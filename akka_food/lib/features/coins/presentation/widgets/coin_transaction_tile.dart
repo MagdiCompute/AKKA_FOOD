@@ -40,7 +40,7 @@ class CoinTransactionTile extends StatelessWidget {
         isCredit ? '+${transaction.amount}' : '${transaction.amount}';
     final amountColor = isCredit ? Colors.green[700]! : colorScheme.error;
     final dateFormatted =
-        DateFormat('MMM d, yyyy • HH:mm').format(transaction.timestamp);
+        DateFormat('d MMM yyyy • HH:mm', 'fr_FR').format(transaction.timestamp);
 
     return Semantics(
       label: _buildSemanticsLabel(isCredit, dateFormatted),
@@ -133,11 +133,11 @@ class CoinTransactionTile extends StatelessWidget {
 
   /// Builds a descriptive semantics label for screen readers.
   String _buildSemanticsLabel(bool isCredit, String dateFormatted) {
-    final type = isCredit ? 'Credit' : 'Debit';
+    final type = isCredit ? 'Crédit' : 'Débit';
     final amount = transaction.amount.abs();
     final orderPart = transaction.orderId != null
-        ? ', order ${transaction.orderId}'
+        ? ', commande ${transaction.orderId}'
         : '';
-    return '$type of $amount coins, ${transaction.reason}$orderPart, $dateFormatted';
+    return '$type de $amount coins, ${transaction.reason}$orderPart, $dateFormatted';
   }
 }

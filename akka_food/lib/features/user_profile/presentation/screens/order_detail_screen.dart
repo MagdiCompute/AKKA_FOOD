@@ -98,7 +98,7 @@ class _OrderDetailBody extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final dateStr =
-        DateFormat('dd MMM yyyy, HH:mm').format(order.orderDate);
+        DateFormat('dd MMM yyyy, HH:mm', 'fr_FR').format(order.orderDate);
     final totalStr =
         NumberFormat('#,##0', 'fr_FR').format(order.totalAmount);
 

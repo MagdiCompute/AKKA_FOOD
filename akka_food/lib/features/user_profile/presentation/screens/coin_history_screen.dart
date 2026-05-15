@@ -297,7 +297,7 @@ class _TransactionTile extends StatelessWidget {
     final amountColor = isCredit ? Colors.green.shade700 : Colors.red.shade700;
     final amountPrefix = isCredit ? '+' : '';
     final dateStr =
-        DateFormat('dd MMM yyyy, HH:mm').format(transaction.timestamp);
+        DateFormat('dd MMM yyyy, HH:mm', 'fr_FR').format(transaction.timestamp);
 
     return ListTile(
       contentPadding:

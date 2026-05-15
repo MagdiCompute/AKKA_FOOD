@@ -169,7 +169,7 @@ class _OrderTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final dateStr =
-        DateFormat('dd MMM yyyy, HH:mm').format(order.orderDate);
+        DateFormat('dd MMM yyyy, HH:mm', 'fr_FR').format(order.orderDate);
     final itemCount = order.items.fold<int>(
       0,
       (sum, item) => sum + item.quantity,

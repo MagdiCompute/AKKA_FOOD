@@ -208,11 +208,21 @@ class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+  ConsumerState<HomeScreen> createState() => HomeScreenState();
 }
 
-class _HomeScreenState extends ConsumerState<HomeScreen> {
+class HomeScreenState extends ConsumerState<HomeScreen> {
   int _selectedIndex = 0;
+
+  /// Allows child widgets to switch tabs programmatically.
+  static HomeScreenState? of(BuildContext context) {
+    return context.findAncestorStateOfType<HomeScreenState>();
+  }
+
+  /// Switches to the given tab index.
+  void switchTab(int index) {
+    setState(() => _selectedIndex = index);
+  }
 
   @override
   Widget build(BuildContext context) {

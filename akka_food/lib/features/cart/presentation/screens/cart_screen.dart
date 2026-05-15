@@ -206,7 +206,15 @@ class _CartScreenState extends ConsumerState<CartScreen> {
             ),
             const SizedBox(height: 32),
             FilledButton.icon(
-              onPressed: () => context.go(AppRoutes.catalog),
+              onPressed: () {
+                // Switch to Menu tab in the parent HomeScreen
+                final homeState = context.findAncestorStateOfType<HomeScreenState>();
+                if (homeState != null) {
+                  homeState.switchTab(0);
+                } else {
+                  context.go('/home');
+                }
+              },
               icon: const Icon(Icons.restaurant_menu),
               label: const Text('Parcourir le menu'),
             ),

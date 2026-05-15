@@ -70,6 +70,7 @@ class AvatarPickerWidget extends ConsumerWidget {
   ) async {
     final result = await showModalBottomSheet<String>(
       context: context,
+      isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),

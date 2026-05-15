@@ -10,22 +10,43 @@ import '../theme/app_theme.dart';
 
 /// Available avatar options.
 const List<AvatarOption> kAvatarOptions = [
+  // People & Food
   AvatarOption(emoji: '👨‍🍳', bgColor: Color(0xFF2B6CB0), label: 'Chef'),
   AvatarOption(emoji: '👩‍🍳', bgColor: Color(0xFFE53E3E), label: 'Cheffe'),
+  AvatarOption(emoji: '👨🏿', bgColor: Color(0xFF4A5568), label: 'Homme'),
+  AvatarOption(emoji: '👩🏿', bgColor: Color(0xFF9B2C2C), label: 'Femme'),
+  AvatarOption(emoji: '👦🏿', bgColor: Color(0xFF2C7A7B), label: 'Garçon'),
+  AvatarOption(emoji: '👧🏿', bgColor: Color(0xFFB83280), label: 'Fille'),
+  // Animals
   AvatarOption(emoji: '🦁', bgColor: Color(0xFFF5A623), label: 'Lion'),
   AvatarOption(emoji: '🐘', bgColor: Color(0xFF718096), label: 'Éléphant'),
-  AvatarOption(emoji: '🌍', bgColor: Color(0xFF38A169), label: 'Afrique'),
+  AvatarOption(emoji: '🦅', bgColor: Color(0xFF744210), label: 'Aigle'),
+  AvatarOption(emoji: '🐆', bgColor: Color(0xFFDD6B20), label: 'Léopard'),
+  AvatarOption(emoji: '🦋', bgColor: Color(0xFF6B46C1), label: 'Papillon'),
+  AvatarOption(emoji: '🐢', bgColor: Color(0xFF276749), label: 'Tortue'),
+  // Food & Drinks
   AvatarOption(emoji: '🍕', bgColor: Color(0xFFDD6B20), label: 'Pizza'),
   AvatarOption(emoji: '🍔', bgColor: Color(0xFF975A16), label: 'Burger'),
   AvatarOption(emoji: '🥗', bgColor: Color(0xFF2F855A), label: 'Salade'),
   AvatarOption(emoji: '☕', bgColor: Color(0xFF553C9A), label: 'Café'),
+  AvatarOption(emoji: '🍰', bgColor: Color(0xFFD53F8C), label: 'Gâteau'),
+  AvatarOption(emoji: '🥤', bgColor: Color(0xFF3182CE), label: 'Boisson'),
+  // Culture & Sports
+  AvatarOption(emoji: '🌍', bgColor: Color(0xFF38A169), label: 'Afrique'),
   AvatarOption(emoji: '🎵', bgColor: Color(0xFFB83280), label: 'Musique'),
   AvatarOption(emoji: '⚽', bgColor: Color(0xFF276749), label: 'Football'),
+  AvatarOption(emoji: '🏀', bgColor: Color(0xFFC05621), label: 'Basket'),
+  AvatarOption(emoji: '🎮', bgColor: Color(0xFF4C51BF), label: 'Jeux'),
+  AvatarOption(emoji: '📚', bgColor: Color(0xFF285E61), label: 'Livres'),
+  // Symbols
   AvatarOption(emoji: '🌟', bgColor: Color(0xFFB7791F), label: 'Étoile'),
   AvatarOption(emoji: '🚀', bgColor: Color(0xFF2C5282), label: 'Fusée'),
   AvatarOption(emoji: '🎨', bgColor: Color(0xFF9B2C2C), label: 'Art'),
-  AvatarOption(emoji: '📚', bgColor: Color(0xFF285E61), label: 'Livres'),
   AvatarOption(emoji: '💎', bgColor: Color(0xFF4C51BF), label: 'Diamant'),
+  AvatarOption(emoji: '🔥', bgColor: Color(0xFFE53E3E), label: 'Feu'),
+  AvatarOption(emoji: '💪', bgColor: Color(0xFF2D3748), label: 'Force'),
+  AvatarOption(emoji: '👑', bgColor: Color(0xFFD69E2E), label: 'Roi'),
+  AvatarOption(emoji: '🌙', bgColor: Color(0xFF2A4365), label: 'Lune'),
 ];
 
 /// Represents a single avatar option.
@@ -61,89 +82,98 @@ class AvatarBankSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Handle
-          Container(
-            margin: const EdgeInsets.only(top: 8, bottom: 4),
-            width: 40,
-            height: 4,
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.outlineVariant,
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Text(
-              'Choisir un avatar',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-            ),
-          ),
-          // Avatar grid
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-            child: GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 4,
-                mainAxisSpacing: 12,
-                crossAxisSpacing: 12,
+    return DraggableScrollableSheet(
+      initialChildSize: 0.7,
+      minChildSize: 0.4,
+      maxChildSize: 0.9,
+      expand: false,
+      builder: (context, scrollController) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Handle
+              Container(
+                margin: const EdgeInsets.only(top: 8, bottom: 4),
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.outlineVariant,
+                  borderRadius: BorderRadius.circular(2),
+                ),
               ),
-              itemCount: kAvatarOptions.length,
-              itemBuilder: (context, index) {
-                final option = kAvatarOptions[index];
-                final isSelected = selectedUrl == option.avatarUrl;
-
-                return GestureDetector(
-                  onTap: () => Navigator.of(context).pop(option.avatarUrl),
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    decoration: BoxDecoration(
-                      color: option.bgColor,
-                      shape: BoxShape.circle,
-                      border: isSelected
-                          ? Border.all(
-                              color: AppColors.primaryBlue,
-                              width: 3,
-                            )
-                          : null,
-                      boxShadow: isSelected
-                          ? [
-                              BoxShadow(
-                                color: AppColors.primaryBlue.withValues(alpha: 0.3),
-                                blurRadius: 8,
-                                spreadRadius: 2,
-                              ),
-                            ]
-                          : null,
-                    ),
-                    child: Center(
-                      child: Text(
-                        option.emoji,
-                        style: const TextStyle(fontSize: 28),
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Text(
+                  'Choisir un avatar',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
                       ),
-                    ),
+                ),
+              ),
+              // Scrollable avatar grid
+              Expanded(
+                child: GridView.builder(
+                  controller: scrollController,
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 4,
+                    mainAxisSpacing: 12,
+                    crossAxisSpacing: 12,
                   ),
-                );
-              },
-            ),
+                  itemCount: kAvatarOptions.length,
+                  itemBuilder: (context, index) {
+                    final option = kAvatarOptions[index];
+                    final isSelected = selectedUrl == option.avatarUrl;
+
+                    return GestureDetector(
+                      onTap: () => Navigator.of(context).pop(option.avatarUrl),
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        decoration: BoxDecoration(
+                          color: option.bgColor,
+                          shape: BoxShape.circle,
+                          border: isSelected
+                              ? Border.all(
+                                  color: AppColors.primaryBlue,
+                                  width: 3,
+                                )
+                              : null,
+                          boxShadow: isSelected
+                              ? [
+                                  BoxShadow(
+                                    color: AppColors.primaryBlue.withValues(alpha: 0.3),
+                                    blurRadius: 8,
+                                    spreadRadius: 2,
+                                  ),
+                                ]
+                              : null,
+                        ),
+                        child: Center(
+                          child: Text(
+                            option.emoji,
+                            style: const TextStyle(fontSize: 28),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              // Remove avatar option
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: TextButton.icon(
+                  onPressed: () => Navigator.of(context).pop('remove'),
+                  icon: const Icon(Icons.close, size: 18),
+                  label: const Text('Supprimer l\'avatar'),
+                  style: TextButton.styleFrom(foregroundColor: Colors.red),
+                ),
+              ),
+            ],
           ),
-          // Remove avatar option
-          TextButton.icon(
-            onPressed: () => Navigator.of(context).pop('remove'),
-            icon: const Icon(Icons.close, size: 18),
-            label: const Text('Supprimer l\'avatar'),
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
-          ),
-          const SizedBox(height: 8),
-        ],
-      ),
+        );
+      },
     );
   }
 }

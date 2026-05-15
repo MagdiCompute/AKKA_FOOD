@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../../core/widgets/order_rating_sheet.dart';
 import '../../domain/entities/delivery_option.dart';
 import '../../domain/entities/delivery_status.dart';
 import '../../domain/entities/order.dart';
@@ -373,14 +374,24 @@ class _OrderTrackingScreenState extends ConsumerState<OrderTrackingScreen> {
     );
   }
 
-  /// Navigates to the rating screen for the given order.
+  /// Opens the rating bottom sheet for the delivered order.
   void _onRateOrder(String orderId) {
-    // Navigation to RatingScreen will be wired when that screen is implemented.
-    // For now, this is a placeholder action.
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Écran de notation bientôt disponible'),
-        behavior: SnackBarBehavior.floating,
+    // Get meal names from the current order state
+    final orderState = ref.read(deliveryTrackingNotifierProvider);
+    final mealNames = orderState.valueOrNull?.items
+            .map((item) => item.mealName)
+            .toList() ??
+        <String>[];
+
+    showModalBottomSheet<bool>(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => OrderRatingSheet(
+        orderId: orderId,
+        mealNames: mealNames,
       ),
     );
   }

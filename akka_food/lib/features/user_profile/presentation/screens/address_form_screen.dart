@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/widgets/map_picker_screen.dart';
 import '../../../auth/presentation/notifiers/auth_notifier.dart';
 import '../../domain/entities/delivery_address.dart';
 import '../notifiers/address_notifier.dart';
@@ -185,41 +186,24 @@ class _AddressFormScreenState extends ConsumerState<AddressFormScreen> {
   // Map picker — simple location selection dialog
   // ---------------------------------------------------------------------------
 
-  void _onPickOnMap() {
-    showDialog<Map<String, double>>(
-      context: context,
-      builder: (ctx) => SimpleDialog(
-        title: const Text('Choisir un emplacement'),
-        children: [
-          _LocationOption(
-            label: 'Ouagadougou Centre',
-            lat: 12.3714,
-            lng: -1.5197,
-          ),
-          _LocationOption(
-            label: 'Ouaga 2000',
-            lat: 12.3400,
-            lng: -1.4900,
-          ),
-          _LocationOption(
-            label: 'Koudougou',
-            lat: 12.2533,
-            lng: -2.3625,
-          ),
-          _LocationOption(
-            label: 'Bobo-Dioulasso',
-            lat: 11.1771,
-            lng: -4.2979,
-          ),
-        ],
+  void _onPickOnMap() async {
+    final initialLat = double.tryParse(_latController.text);
+    final initialLng = double.tryParse(_lngController.text);
+
+    final result = await Navigator.of(context).push<Map<String, double>>(
+      MaterialPageRoute(
+        builder: (_) => MapPickerScreen(
+          initialLat: initialLat,
+          initialLng: initialLng,
+        ),
       ),
-    ).then((coords) {
-      if (coords != null) {
-        _latController.text = coords['lat']!.toString();
-        _lngController.text = coords['lng']!.toString();
-        setState(() {});
-      }
-    });
+    );
+
+    if (result != null && mounted) {
+      _latController.text = result['lat']!.toStringAsFixed(5);
+      _lngController.text = result['lng']!.toStringAsFixed(5);
+      setState(() {});
+    }
   }
 
   // ---------------------------------------------------------------------------

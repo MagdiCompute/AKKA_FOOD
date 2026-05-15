@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/widgets/avatar_bank.dart';
 import '../../domain/entities/leaderboard_entry.dart';
 import '../../domain/entities/leaderboard_period.dart';
 import '../notifiers/leaderboard_notifier.dart';
@@ -69,22 +70,11 @@ class CurrentUserRankCard extends ConsumerWidget {
       ),
       child: Row(
         children: [
-          // Rank number (large, bold)
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: colorScheme.primary,
-            ),
-            alignment: Alignment.center,
-            child: Text(
-              '#${entry.rank}',
-              style: theme.textTheme.titleSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: colorScheme.onPrimary,
-              ),
-            ),
+          // User's avatar
+          AvatarBankDisplay(
+            avatarUrl: entry.avatarUrl,
+            radius: 22,
+            displayName: entry.displayName,
           ),
           const SizedBox(width: 16),
           // Label and score

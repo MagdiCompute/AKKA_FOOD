@@ -14,6 +14,12 @@ import 'package:akka_food/features/payment_processing/domain/entities/payment_re
 import 'package:akka_food/features/payment_processing/presentation/notifiers/payment_notifier.dart';
 
 // ---------------------------------------------------------------------------
+// Payment method enum
+// ---------------------------------------------------------------------------
+
+enum _PaymentMethod { orangeMoney, cashOnDelivery }
+
+// ---------------------------------------------------------------------------
 // CheckoutScreen
 // ---------------------------------------------------------------------------
 
@@ -42,8 +48,10 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
   final _formKey = GlobalKey<FormState>();
 
   /// Whether we've already navigated to the processing screen.
-  /// Prevents duplicate navigation from multiple state emissions.
   bool _hasNavigatedToProcessing = false;
+
+  /// Selected payment method.
+  _PaymentMethod _selectedPaymentMethod = _PaymentMethod.orangeMoney;
 
   @override
   void initState() {
@@ -222,8 +230,14 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
 
                     const SizedBox(height: 24),
 
-                    // ── Phone Number Input ─────────────────────────────────
-                    _buildPhoneInputSection(context),
+                    // ── Payment Method Selection ───────────────────────────
+                    _buildPaymentMethodSection(context),
+
+                    const SizedBox(height: 16),
+
+                    // ── Phone Number Input (only for Orange Money) ─────────
+                    if (_selectedPaymentMethod == _PaymentMethod.orangeMoney)
+                      _buildPhoneInputSection(context),
                   ],
                 ),
               ),
@@ -234,6 +248,48 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // Payment method selection
+  // ---------------------------------------------------------------------------
+
+  Widget _buildPaymentMethodSection(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Mode de paiement',
+          style: theme.textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 12),
+
+        // Orange Money option
+        _PaymentMethodTile(
+          icon: Icons.phone_android,
+          iconColor: Colors.orange,
+          title: 'Orange Money',
+          subtitle: 'Payez via *144# puis confirmez',
+          isSelected: _selectedPaymentMethod == _PaymentMethod.orangeMoney,
+          onTap: () => setState(() => _selectedPaymentMethod = _PaymentMethod.orangeMoney),
+        ),
+        const SizedBox(height: 8),
+
+        // Cash on delivery option
+        _PaymentMethodTile(
+          icon: Icons.payments_outlined,
+          iconColor: Colors.green,
+          title: 'Paiement à la livraison',
+          subtitle: 'Payez en espèces à la réception',
+          isSelected: _selectedPaymentMethod == _PaymentMethod.cashOnDelivery,
+          onTap: () => setState(() => _selectedPaymentMethod = _PaymentMethod.cashOnDelivery),
+        ),
+      ],
     );
   }
 
@@ -419,60 +475,34 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
   // ---------------------------------------------------------------------------
 
   Widget _buildPayButton(BuildContext context, Cart cart, bool isInitiating) {
+    final buttonLabel = _selectedPaymentMethod == _PaymentMethod.cashOnDelivery
+        ? 'Commander — Paiement à la livraison'
+        : 'Commander — ${_formatXOF(cart.total)}';
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-      child: Column(
-        children: [
-          // ── Test Mode Button (bypasses payment) ─────────────────────
-          SizedBox(
-            width: double.infinity,
-            height: 48,
-            child: FilledButton.icon(
-              onPressed: isInitiating ? null : () => _createTestOrder(cart),
-              icon: const Icon(Icons.flash_on, size: 20),
-              label: const Text(
-                'Commander (Mode Test)',
-                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
-              ),
-              style: FilledButton.styleFrom(
-                backgroundColor: AppColors.primaryBlue,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
+      child: SizedBox(
+        width: double.infinity,
+        height: 52,
+        child: FilledButton.icon(
+          onPressed: isInitiating ? null : () => _createTestOrder(cart),
+          icon: Icon(
+            _selectedPaymentMethod == _PaymentMethod.cashOnDelivery
+                ? Icons.payments_outlined
+                : Icons.phone_android,
+            size: 20,
+          ),
+          label: Text(
+            buttonLabel,
+            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+          ),
+          style: FilledButton.styleFrom(
+            backgroundColor: AppColors.primaryBlue,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
             ),
           ),
-          const SizedBox(height: 10),
-
-          // ── Real Payment Button ─────────────────────────────────────
-          SizedBox(
-            width: double.infinity,
-            height: 48,
-            child: OutlinedButton(
-              onPressed: isInitiating ? null : () => _onPayTapped(cart),
-              style: OutlinedButton.styleFrom(
-                side: const BorderSide(color: Colors.orange),
-                foregroundColor: Colors.orange,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-              child: isInitiating
-                  ? const SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: CircularProgressIndicator(strokeWidth: 2.5),
-                    )
-                  : Text(
-                      'Payer ${_formatXOF(cart.total)} (Orange Money)',
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -488,6 +518,11 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
         const SnackBar(content: Text('Veuillez vous connecter')),
       );
       return;
+    }
+
+    // Validate phone for Orange Money
+    if (_selectedPaymentMethod == _PaymentMethod.orangeMoney) {
+      if (!_formKey.currentState!.validate()) return;
     }
 
     // Show loading
@@ -543,7 +578,15 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                 'city': cart.selectedAddress!.city,
               }
             : null,
-        'paymentMethod': 'test_mode',
+        'paymentMethod': _selectedPaymentMethod == _PaymentMethod.cashOnDelivery
+            ? 'cash_on_delivery'
+            : 'orange_money',
+        'paymentStatus': _selectedPaymentMethod == _PaymentMethod.cashOnDelivery
+            ? 'pending_delivery'
+            : 'pending_confirmation',
+        'orangeMoneyPhone': _selectedPaymentMethod == _PaymentMethod.orangeMoney
+            ? '+223${_phoneController.text.trim()}'
+            : null,
         'createdAt': FieldValue.serverTimestamp(),
         'updatedAt': FieldValue.serverTimestamp(),
       };
@@ -689,5 +732,92 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
         ),
       );
     }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// _PaymentMethodTile
+// ---------------------------------------------------------------------------
+
+class _PaymentMethodTile extends StatelessWidget {
+  const _PaymentMethodTile({
+    required this.icon,
+    required this.iconColor,
+    required this.title,
+    required this.subtitle,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final Color iconColor;
+  final String title;
+  final String subtitle;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Card(
+      elevation: isSelected ? 2 : 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(
+          color: isSelected ? colorScheme.primary : colorScheme.outlineVariant,
+          width: isSelected ? 2 : 1,
+        ),
+      ),
+      color: isSelected
+          ? colorScheme.primaryContainer.withValues(alpha: 0.3)
+          : null,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.all(14),
+          child: Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: iconColor.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(icon, color: iconColor, size: 22),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                    ),
+                    Text(
+                      subtitle,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: colorScheme.outline,
+                          ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(
+                isSelected
+                    ? Icons.radio_button_checked
+                    : Icons.radio_button_unchecked,
+                color: isSelected ? colorScheme.primary : colorScheme.outline,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

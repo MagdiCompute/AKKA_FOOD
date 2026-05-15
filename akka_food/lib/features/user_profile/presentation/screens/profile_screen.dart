@@ -133,6 +133,16 @@ class _ProfileBody extends ConsumerWidget {
           onTap: () => _showSignOutDialog(context, ref),
         ),
 
+        const Divider(height: 32),
+
+        // ── About ─────────────────────────────────────────────────────
+        _SectionHeader(title: 'À propos'),
+        _NavTile(
+          icon: Icons.info_outline,
+          title: 'À propos d\'AKKA Food',
+          onTap: () => _showAboutDialog(context),
+        ),
+
         const SizedBox(height: 32),
       ],
     );
@@ -165,6 +175,72 @@ class _ProfileBody extends ConsumerWidget {
 
     await ref.read(authNotifierProvider.notifier).signOut();
     if (context.mounted) context.go(AppRoutes.login);
+  }
+
+  // ---------------------------------------------------------------------------
+  // About dialog
+  // ---------------------------------------------------------------------------
+
+  void _showAboutDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Image.asset(
+                'assets/images/logo.png',
+                width: 80,
+                height: 80,
+                errorBuilder: (_, __, ___) => const Icon(
+                  Icons.restaurant,
+                  size: 64,
+                  color: Color(0xFF2B6CB0),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'AKKA Food',
+              style: Theme.of(ctx).textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'Version 1.0.0',
+              style: Theme.of(ctx).textTheme.bodySmall,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Savourez le meilleur du Mali.\n\n'
+              'AKKA Food est votre application de livraison de repas '
+              'préférée à Bamako. Commandez vos plats favoris, '
+              'gagnez des coins de fidélité et suivez vos livraisons '
+              'en temps réel.',
+              textAlign: TextAlign.center,
+              style: Theme.of(ctx).textTheme.bodyMedium,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              '© 2024 AKKA Food. Tous droits réservés.',
+              style: Theme.of(ctx).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(ctx).colorScheme.outline,
+                  ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+        actions: [
+          FilledButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Fermer'),
+          ),
+        ],
+      ),
+    );
   }
 
   // ---------------------------------------------------------------------------

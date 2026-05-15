@@ -159,7 +159,11 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
             return _buildErrorState(state.error!);
           }
 
-          return CustomScrollView(
+          return RefreshIndicator(
+            onRefresh: () async {
+              await ref.read(catalogNotifierProvider.notifier).loadInitial();
+            },
+            child: CustomScrollView(
             controller: _scrollController,
             slivers: [
               // ── Inline search bar ──────────────────────────────────────
@@ -266,6 +270,7 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
                 const SliverToBoxAdapter(child: SizedBox(height: 24)),
               ],
             ],
+          ),
           );
         },
       ),

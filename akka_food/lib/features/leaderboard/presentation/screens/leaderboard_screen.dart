@@ -74,7 +74,10 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: _buildAppBar(context),
-      body: _buildBody(context),
+      body: TabBarView(
+        controller: _tabController,
+        children: _periods.map((period) => _buildPeriodBody(context, period)).toList(),
+      ),
       bottomNavigationBar: CurrentUserRankCard(period: _selectedPeriod),
     );
   }
@@ -104,9 +107,9 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
   // Body — watches the stream provider for the selected period
   // ---------------------------------------------------------------------------
 
-  Widget _buildBody(BuildContext context) {
+  Widget _buildPeriodBody(BuildContext context, LeaderboardPeriod period) {
     final leaderboardAsync = ref.watch(
-      leaderboardStreamProvider(_selectedPeriod),
+      leaderboardStreamProvider(period),
     );
 
     return leaderboardAsync.when(
@@ -134,16 +137,22 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
     return Column(
       children: [
         Expanded(
-          child: ListView.builder(
-            itemCount: entries.length,
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            itemBuilder: (context, index) {
-              final entry = entries[index];
-              return AnimatedListItem(
-                index: index,
-                child: _buildEntryTile(context, entry),
-              );
+          child: RefreshIndicator(
+            onRefresh: () async {
+              ref.invalidate(leaderboardStreamProvider(_selectedPeriod));
+              await Future.delayed(const Duration(milliseconds: 500));
             },
+            child: ListView.builder(
+              itemCount: entries.length,
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              itemBuilder: (context, index) {
+                final entry = entries[index];
+                return AnimatedListItem(
+                  index: index,
+                  child: _buildEntryTile(context, entry),
+                );
+              },
+            ),
           ),
         ),
         // Req 2 AC2: If the current user's rank is outside the top 100,

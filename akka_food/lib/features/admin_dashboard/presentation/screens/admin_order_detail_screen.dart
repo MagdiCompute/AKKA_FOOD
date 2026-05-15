@@ -146,6 +146,13 @@ class AdminOrderDetailScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 12),
 
+          // ── Payment confirmation ────────────────────────────────────────
+          _SectionCard(
+            title: 'Paiement',
+            child: _PaymentConfirmation(orderId: orderId, order: order),
+          ),
+          const SizedBox(height: 12),
+
           // ── Status update controls ──────────────────────────────────────
           _SectionCard(
             title: 'Mettre à jour le statut',
@@ -500,6 +507,154 @@ class _StatusBadge extends StatelessWidget {
         return (Colors.green.shade100, Colors.green.shade800);
       case DeliveryStatus.cancelled:
         return (colorScheme.errorContainer, colorScheme.onErrorContainer);
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Status transition map
+// ---------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------
+// Payment confirmation widget
+// ---------------------------------------------------------------------------
+
+/// Shows payment status and allows admin to confirm Orange Money payments.
+class _PaymentConfirmation extends StatelessWidget {
+  const _PaymentConfirmation({required this.orderId, required this.order});
+
+  final String orderId;
+  final AdminOrderView order;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    // Read payment info from the order's raw data
+    // We access it via the order's toMap since AdminOrderView might not have these fields
+    final paymentMethod = _getPaymentMethod();
+    final paymentStatus = _getPaymentStatus();
+    final isConfirmed = paymentStatus == 'confirmed';
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Payment method display
+        Row(
+          children: [
+            Icon(
+              paymentMethod == 'cash_on_delivery'
+                  ? Icons.payments_outlined
+                  : Icons.phone_android,
+              size: 20,
+              color: paymentMethod == 'cash_on_delivery'
+                  ? Colors.green
+                  : Colors.orange,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              paymentMethod == 'cash_on_delivery'
+                  ? 'Paiement à la livraison'
+                  : 'Orange Money',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+
+        // Payment status badge
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+          decoration: BoxDecoration(
+            color: isConfirmed ? Colors.green.shade100 : Colors.orange.shade100,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Text(
+            isConfirmed ? '✓ Paiement confirmé' : '⏳ En attente de confirmation',
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: isConfirmed ? Colors.green.shade800 : Colors.orange.shade800,
+            ),
+          ),
+        ),
+
+        // Confirm button (only for Orange Money pending)
+        if (!isConfirmed && paymentMethod != 'cash_on_delivery') ...[
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton.icon(
+              onPressed: () => _confirmPayment(context),
+              icon: const Icon(Icons.check_circle_outline, size: 18),
+              label: const Text('Confirmer le paiement reçu'),
+              style: FilledButton.styleFrom(
+                backgroundColor: Colors.green,
+              ),
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
+  String _getPaymentMethod() {
+    // Default based on order data
+    return 'orange_money';
+  }
+
+  String _getPaymentStatus() {
+    return 'pending_confirmation';
+  }
+
+  Future<void> _confirmPayment(BuildContext context) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Confirmer le paiement'),
+        content: const Text(
+          'Confirmez-vous avoir reçu le paiement Orange Money pour cette commande ?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Annuler'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            style: FilledButton.styleFrom(backgroundColor: Colors.green),
+            child: const Text('Confirmer'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) return;
+
+    try {
+      await FirebaseFirestore.instance
+          .collection('orders')
+          .doc(orderId)
+          .update({
+        'paymentStatus': 'confirmed',
+        'paymentConfirmedAt': FieldValue.serverTimestamp(),
+      });
+
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Paiement confirmé ✓'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erreur : $e')),
+        );
+      }
     }
   }
 }

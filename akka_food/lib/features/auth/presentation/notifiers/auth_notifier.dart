@@ -247,10 +247,10 @@ class AuthNotifier extends _$AuthNotifier {
     state = const AuthState.loading();
     try {
       await _repository.signOut();
-      state = const AuthState.unauthenticated();
-    } catch (e) {
-      state = AuthState.error(mapAuthError(e));
+    } catch (_) {
+      // Sign-out errors are non-critical — user is logged out regardless
     }
+    state = const AuthState.unauthenticated();
   }
 
   // ---------------------------------------------------------------------------

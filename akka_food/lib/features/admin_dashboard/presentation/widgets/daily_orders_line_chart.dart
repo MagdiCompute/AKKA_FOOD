@@ -25,7 +25,7 @@ class DailyOrdersLineChart extends StatelessWidget {
         height: 200,
         child: Center(
           child: Text(
-            'No data available',
+            'Aucune donnée disponible',
             style: textTheme.bodyMedium?.copyWith(
               color: colorScheme.onSurfaceVariant,
             ),
@@ -122,7 +122,7 @@ class DailyOrdersLineChart extends StatelessWidget {
                       ? dailyOrders[index].date
                       : '';
                   return LineTooltipItem(
-                    '$date\n${spot.y.toInt()} orders',
+                    '$date\n${spot.y.toInt()} commandes',
                     textTheme.labelSmall?.copyWith(
                           color: colorScheme.onPrimary,
                         ) ??

@@ -74,7 +74,7 @@ class AdminOrderListScreen extends ConsumerWidget {
   Widget _buildLoading(BuildContext context) {
     return Center(
       child: Semantics(
-        label: 'Loading active orders',
+        label: 'Chargement des commandes',
         child: const CircularProgressIndicator(),
       ),
     );
@@ -214,8 +214,8 @@ class _ActiveOrderTile extends StatelessWidget {
     final colorScheme = theme.colorScheme;
 
     return Semantics(
-      label: 'Order ${order.id}, status ${order.status.label}, '
-          'created ${_formatDateTime(order.createdAt)}',
+      label: 'Commande ${order.id}, statut ${order.status.label}, '
+          'créée le ${_formatDateTime(order.createdAt)}',
       button: true,
       child: Card(
         margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),

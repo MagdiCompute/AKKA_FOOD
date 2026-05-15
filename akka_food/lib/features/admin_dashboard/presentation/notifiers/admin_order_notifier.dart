@@ -8,7 +8,6 @@ import '../../data/datasources/firestore_admin_order_data_source.dart';
 import '../../data/repositories/admin_order_repository.dart';
 import '../../domain/entities/admin_order_view.dart';
 import '../../domain/repositories/i_admin_order_repository.dart';
-import '../../domain/usecases/get_active_orders_use_case.dart';
 
 part 'admin_order_notifier.g.dart';
 
@@ -137,13 +136,12 @@ class AdminOrderNotifier extends _$AdminOrderNotifier {
   @override
   AsyncValue<AdminOrderState> build() {
     final repository = ref.watch(adminOrderRepositoryProvider);
-    final useCase = GetActiveOrdersUseCase(repository);
 
     // Cancel any previous subscription when the notifier is rebuilt.
     ref.onDispose(() => _subscription?.cancel());
 
-    // Start listening to the Firestore stream.
-    _subscription = useCase().listen(
+    // Start listening to ALL orders (including delivered/cancelled).
+    _subscription = repository.watchAllOrders().listen(
       (orders) {
         final current = state.valueOrNull;
         state = AsyncData(

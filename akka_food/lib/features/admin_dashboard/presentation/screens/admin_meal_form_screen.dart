@@ -12,10 +12,10 @@ import '../widgets/meal_image_upload_widget.dart';
 // ---------------------------------------------------------------------------
 
 const _kDietaryTags = [
-  'Vegetarian',
-  'Vegan',
-  'Gluten-Free',
-  'Spicy',
+  'Végétarien',
+  'Végan',
+  'Sans gluten',
+  'Épicé',
   'Halal',
 ];
 

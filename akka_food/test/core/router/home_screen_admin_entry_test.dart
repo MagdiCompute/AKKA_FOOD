@@ -87,6 +87,8 @@ class _FakeAdminOrderRepository implements IAdminOrderRepository {
   @override
   Stream<List<AdminOrderView>> watchActiveOrders() => Stream.value([]);
   @override
+  Stream<List<AdminOrderView>> watchAllOrders() => Stream.value([]);
+  @override
   Future<AdminOrderView?> getOrderById(String orderId) async => null;
   @override
   Future<void> updateOrderStatus(String orderId, DeliveryStatus status,

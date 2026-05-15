@@ -24,6 +24,10 @@ class AdminOrderRepository implements IAdminOrderRepository {
       _firestoreDataSource.watchActiveOrders();
 
   @override
+  Stream<List<AdminOrderView>> watchAllOrders() =>
+      _firestoreDataSource.watchAllOrders();
+
+  @override
   Future<AdminOrderView?> getOrderById(String orderId) =>
       _firestoreDataSource.getOrderById(orderId);
 

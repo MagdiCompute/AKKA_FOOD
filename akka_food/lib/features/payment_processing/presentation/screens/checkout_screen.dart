@@ -586,9 +586,15 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
           'timestamp': FieldValue.serverTimestamp(),
         });
 
-        // Update user's coinBalance field
+        // Update user's coinBalance field and increment orderCount
         await firestore.collection('users').doc(user.uid).update({
           'coinBalance': FieldValue.increment(coinsEarned),
+          'orderCount': FieldValue.increment(1),
+        });
+      } else {
+        // No coins earned but still increment orderCount
+        await firestore.collection('users').doc(user.uid).update({
+          'orderCount': FieldValue.increment(1),
         });
       }
 

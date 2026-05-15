@@ -81,7 +81,7 @@ class MealListTile extends StatelessWidget {
                           ),
                           const SizedBox(width: 2),
                           Text(
-                            'Featured',
+                            'À la une',
                             style: theme.textTheme.labelSmall?.copyWith(
                               color: colorScheme.tertiary,
                             ),
@@ -101,7 +101,7 @@ class MealListTile extends StatelessWidget {
                     onChanged: onToggleAvailability,
                   ),
                   Text(
-                    meal.isAvailable ? 'Available' : 'Hidden',
+                    meal.isAvailable ? 'Disponible' : 'Masqué',
                     style: theme.textTheme.labelSmall?.copyWith(
                       color: meal.isAvailable
                           ? colorScheme.primary

@@ -12,6 +12,12 @@ abstract interface class IAdminOrderRepository {
   /// sorted by [AdminOrderView.createdAt] ascending (oldest first).
   Stream<List<AdminOrderView>> watchActiveOrders();
 
+  /// Returns a real-time stream of ALL orders (including delivered/cancelled).
+  ///
+  /// The stream emits a new list whenever the `/orders` collection changes,
+  /// sorted by [AdminOrderView.createdAt] descending (newest first).
+  Stream<List<AdminOrderView>> watchAllOrders();
+
   /// Fetches a single order by its [orderId].
   ///
   /// Returns `null` if no order with the given ID exists.

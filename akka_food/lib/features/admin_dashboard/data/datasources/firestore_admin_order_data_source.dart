@@ -42,6 +42,21 @@ class FirestoreAdminOrderDataSource {
     });
   }
 
+  /// Returns a real-time stream of ALL orders sorted by [createdAt] desc.
+  ///
+  /// Includes delivered and cancelled orders. Used by the admin dashboard
+  /// to provide a complete order history view.
+  Stream<List<AdminOrderView>> watchAllOrders() {
+    return _ordersCollection
+        .orderBy('createdAt', descending: true)
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.docs
+          .map((doc) => AdminOrderView.fromMap(doc.id, doc.data()))
+          .toList();
+    });
+  }
+
   /// Fetches a single order document by [orderId].
   ///
   /// Returns `null` if the document does not exist.

@@ -25,7 +25,7 @@ class TopMealsBarChart extends StatelessWidget {
         height: 200,
         child: Center(
           child: Text(
-            'No data available',
+            'Aucune donnée disponible',
             style: textTheme.bodyMedium?.copyWith(
               color: colorScheme.onSurfaceVariant,
             ),
@@ -135,7 +135,7 @@ class TopMealsBarChart extends StatelessWidget {
               getTooltipItem: (group, groupIndex, rod, rodIndex) {
                 final meal = top[group.x];
                 return BarTooltipItem(
-                  '${meal.mealName}\n${rod.toY.toInt()} orders',
+                  '${meal.mealName}\n${rod.toY.toInt()} commandes',
                   textTheme.labelSmall?.copyWith(
                         color: colorScheme.onPrimary,
                       ) ??

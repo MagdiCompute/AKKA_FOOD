@@ -132,7 +132,7 @@ class _AdminOrderListScreenState extends ConsumerState<AdminOrderListScreen> {
                         const SizedBox(height: 16),
                         Text(
                           state.allOrders.isEmpty
-                              ? 'Aucune commande active pour le moment.'
+                              ? 'Aucune commande pour le moment.'
                               : 'Aucune commande ne correspond aux filtres.',
                           textAlign: TextAlign.center,
                           style: TextStyle(
@@ -214,13 +214,15 @@ class _OrderFilterBar extends StatelessWidget {
   final ValueChanged<DateTimeRange?> onDateRangePicked;
   final ValueChanged<DeliveryOption?> onDeliveryOptionSelected;
 
-  /// Active statuses that can be filtered (excludes terminal statuses).
+  /// Statuses that can be filtered in the admin order list.
   static const _filterableStatuses = [
     DeliveryStatus.pending,
     DeliveryStatus.confirmed,
     DeliveryStatus.preparing,
     DeliveryStatus.readyForPickup,
     DeliveryStatus.outForDelivery,
+    DeliveryStatus.delivered,
+    DeliveryStatus.cancelled,
   ];
 
   @override

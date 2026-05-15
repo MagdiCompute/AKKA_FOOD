@@ -167,6 +167,9 @@ class FakeAdminOrderRepository implements IAdminOrderRepository {
   Stream<List<AdminOrderView>> watchActiveOrders() => _subject.stream;
 
   @override
+  Stream<List<AdminOrderView>> watchAllOrders() => _subject.stream;
+
+  @override
   Future<AdminOrderView?> getOrderById(String orderId) async =>
       _orders.where((o) => o.orderId == orderId).firstOrNull;
 

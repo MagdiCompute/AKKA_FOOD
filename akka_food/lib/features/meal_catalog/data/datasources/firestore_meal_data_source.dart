@@ -116,17 +116,21 @@ class FirestoreMealDataSource {
   /// Searches meals whose [Meal.name] starts with [query] using a Firestore
   /// prefix range filter.
   ///
-  /// This is the fallback implementation used until Algolia is integrated in
-  /// task 3.2. The Unicode sentinel `\uf8ff` ensures the upper bound covers
-  /// all characters that could follow the prefix.
+  /// Fetches all meals and filters client-side for case-insensitive
+  /// "contains" matching. This provides better search results than the
+  /// Firestore prefix approach (which only matches from the start).
   Future<List<Meal>> searchMeals(String query) async {
+    final lowerQuery = query.toLowerCase();
+
+    // Fetch all meals and filter client-side for "contains" matching
     final snapshot = await _firestore
         .collection(_collection)
-        .where('name', isGreaterThanOrEqualTo: query)
-        .where('name', isLessThan: '$query\uf8ff')
         .get();
 
-    return _snapshotToMeals(snapshot);
+    final allMeals = _snapshotToMeals(snapshot);
+    return allMeals
+        .where((meal) => meal.name.toLowerCase().contains(lowerQuery))
+        .toList();
   }
 
   /// Writes a new [meal] document to `/meals/{meal.id}`.

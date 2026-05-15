@@ -146,11 +146,11 @@ ThemeData akkaFoodTheme() {
 
     // Chips
     chipTheme: ChipThemeData(
-      backgroundColor: AppColors.surfaceGrey,
+      backgroundColor: AppColors.white,
       selectedColor: AppColors.primaryBlue.withValues(alpha: 0.15),
-      labelStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+      labelStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: AppColors.textDark),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      side: BorderSide.none,
+      side: BorderSide(color: AppColors.primaryBlue.withValues(alpha: 0.3)),
     ),
 
     // Snackbar

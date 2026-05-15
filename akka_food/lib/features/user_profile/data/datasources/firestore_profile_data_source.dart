@@ -57,11 +57,24 @@ class FirestoreProfileDataSource {
         'phoneNumber': null,
         'avatarUrl': null,
         'role': 'user',
-        'coinBalance': 0,
+        'coinBalance': 500,
         'isDeactivated': false,
         'createdAt': FieldValue.serverTimestamp(),
         'updatedAt': FieldValue.serverTimestamp(),
       });
+
+      // Credit 500 welcome bonus coins
+      await _firestore
+          .collection('users')
+          .doc(uid)
+          .collection('coinTransactions')
+          .add({
+        'amount': 500,
+        'type': 'credit',
+        'reason': 'Bonus de bienvenue 🎉',
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+
       return defaultProfile;
     }
 

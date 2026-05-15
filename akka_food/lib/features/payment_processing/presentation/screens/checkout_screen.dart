@@ -274,7 +274,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
           icon: Icons.phone_android,
           iconColor: Colors.orange,
           title: 'Orange Money',
-          subtitle: 'Payez via #144# puis confirmez',
+          subtitle: 'Code Marchand : 545282',
           isSelected: _selectedPaymentMethod == _PaymentMethod.orangeMoney,
           onTap: () => setState(() => _selectedPaymentMethod = _PaymentMethod.orangeMoney),
         ),
@@ -440,8 +440,42 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
             ),
           ),
           const SizedBox(height: 8),
+          // Payment instructions card
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.orange.shade50,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: Colors.orange.shade200),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Comment payer :',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: Colors.orange.shade800,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '1. Composez #144# sur votre téléphone\n'
+                  '2. Choisissez "Paiement marchand"\n'
+                  '3. Entrez le code marchand : 545282\n'
+                  '4. Entrez le montant à payer\n'
+                  '5. Confirmez avec votre code secret',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: Colors.orange.shade900,
+                    height: 1.5,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
           Text(
-            'Entrez le numéro lié à votre compte Orange Money.',
+            'Entrez votre numéro Orange Money pour le suivi.',
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.outline,
             ),
@@ -581,6 +615,9 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
         'paymentMethod': _selectedPaymentMethod == _PaymentMethod.cashOnDelivery
             ? 'cash_on_delivery'
             : 'orange_money',
+        'merchantCode': _selectedPaymentMethod == _PaymentMethod.orangeMoney
+            ? '545282'
+            : null,
         'paymentStatus': _selectedPaymentMethod == _PaymentMethod.cashOnDelivery
             ? 'pending_delivery'
             : 'pending_confirmation',

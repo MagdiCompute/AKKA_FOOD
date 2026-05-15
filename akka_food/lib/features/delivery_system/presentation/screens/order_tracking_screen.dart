@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../domain/entities/delivery_option.dart';
@@ -60,6 +61,22 @@ class _OrderTrackingScreenState extends ConsumerState<OrderTrackingScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Suivi de commande'),
+        leading: BackButton(
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go('/home');
+            }
+          },
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.home_outlined),
+            tooltip: 'Retour au menu',
+            onPressed: () => context.go('/home'),
+          ),
+        ],
       ),
       body: orderAsync.when(
         loading: _buildLoading,

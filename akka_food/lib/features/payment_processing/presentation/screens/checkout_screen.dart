@@ -676,8 +676,9 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
       if (!mounted) return;
       Navigator.of(context, rootNavigator: true).pop(); // dismiss loading
 
-      // Navigate to order tracking
-      context.go('/orders/${orderRef.id}/tracking');
+      // Navigate to order tracking (replace stack so user goes to home on back)
+      context.go('/home');
+      context.push('/orders/${orderRef.id}/tracking');
     } catch (e) {
       if (!mounted) return;
       Navigator.of(context, rootNavigator: true).pop(); // dismiss loading

@@ -1,0 +1,73 @@
+workflows:
+  # ─── Android Debug Build ────────────────────────────────────────────────────
+  android-build:
+    name: Android Build
+    max_build_duration: 30
+    instance_type: mac_mini_m2
+    environment:
+      flutter: stable
+      groups:
+        - firebase
+    scripts:
+      - name: Get dependencies
+        script: flutter pub get
+      - name: Build APK
+        script: flutter build apk --debug
+    artifacts:
+      - build/**/outputs/**/*.apk
+
+  # ─── iOS Debug Build ────────────────────────────────────────────────────────
+  ios-build:
+    name: iOS Build
+    max_build_duration: 60
+    instance_type: mac_mini_m2
+    environment:
+      flutter: stable
+      xcode: latest
+      cocoapods: default
+      groups:
+        - firebase
+    scripts:
+      - name: Get dependencies
+        script: flutter pub get
+      - name: Install CocoaPods
+        script: |
+          cd ios
+          pod install
+      - name: Build iOS (no codesign for testing)
+        script: flutter build ios --debug --no-codesign
+    artifacts:
+      - build/ios/iphoneos/*.app
+
+  # ─── iOS Release (TestFlight) ───────────────────────────────────────────────
+  ios-release:
+    name: iOS Release (TestFlight)
+    max_build_duration: 60
+    instance_type: mac_mini_m2
+    environment:
+      flutter: stable
+      xcode: latest
+      cocoapods: default
+      groups:
+        - firebase
+        - app_store_connect
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.akkafood.akka_food
+    scripts:
+      - name: Get dependencies
+        script: flutter pub get
+      - name: Install CocoaPods
+        script: |
+          cd ios
+          pod install
+      - name: Set up code signing
+        script: xcode-project use-profiles
+      - name: Build IPA
+        script: flutter build ipa --release --export-options-plist=/Users/builder/export_options.plist
+    artifacts:
+      - build/ios/ipa/*.ipa
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true

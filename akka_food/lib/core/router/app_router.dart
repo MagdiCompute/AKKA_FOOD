@@ -213,6 +213,7 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class HomeScreenState extends ConsumerState<HomeScreen> {
   int _selectedIndex = 0;
+  late final PageController _pageController;
 
   /// Allows child widgets to switch tabs programmatically.
   static HomeScreenState? of(BuildContext context) {
@@ -222,6 +223,23 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
   /// Switches to the given tab index.
   void switchTab(int index) {
     setState(() => _selectedIndex = index);
+    _pageController.animateToPage(
+      index,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController();
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
   }
 
   @override
@@ -230,6 +248,15 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
     final isAdmin = currentUser?.isAdmin ?? false;
     final cart = ref.watch(cartNotifierProvider);
     final itemCount = cart.itemCount;
+
+    // Build pages list
+    final pages = <Widget>[
+      const CatalogScreen(),
+      const CartScreen(),
+      const LeaderboardScreen(),
+      const ProfileScreen(),
+      if (isAdmin) const AdminHomeScreen(),
+    ];
 
     // Build navigation destinations dynamically based on user role.
     final destinations = <NavigationDestination>[
@@ -270,36 +297,27 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
     ];
 
     return Scaffold(
-      body: _buildBody(context, isAdmin),
+      body: PageView(
+        controller: _pageController,
+        onPageChanged: (index) {
+          setState(() => _selectedIndex = index);
+        },
+        children: pages,
+      ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _selectedIndex,
         destinations: destinations,
         onDestinationSelected: (index) {
-          setState(() => _selectedIndex = index);
+          _pageController.animateToPage(
+            index,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+          );
         },
       ),
     );
   }
 
-  Widget _buildBody(BuildContext context, bool isAdmin) {
-    switch (_selectedIndex) {
-      case 0:
-        return const CatalogScreen();
-      case 1:
-        return const CartScreen();
-      case 2:
-        return const LeaderboardScreen();
-      case 3:
-        return const ProfileScreen();
-      case 4:
-        if (isAdmin) {
-          return const AdminHomeScreen();
-        }
-        return const CatalogScreen();
-      default:
-        return const CatalogScreen();
-    }
-  }
 }
 
 // ---------------------------------------------------------------------------

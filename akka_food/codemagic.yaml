@@ -1,5 +1,11 @@
+definitions:
+  scripts:
+    - &flutter_get
+      name: Get dependencies
+      script: flutter pub get
+      working_directory: akka_food
+
 workflows:
-  # ─── iOS Debug Build ────────────────────────────────────────────────────────
   ios-build:
     name: iOS Build
     max_build_duration: 60
@@ -8,26 +14,23 @@ workflows:
       flutter: stable
       xcode: latest
       cocoapods: default
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: main
+          include: true
     scripts:
-      - name: Set working directory
-        script: cd $CM_BUILD_DIR/akka_food
-      - name: Get dependencies
-        script: |
-          cd $CM_BUILD_DIR/akka_food
-          flutter pub get
+      - *flutter_get
       - name: Install CocoaPods
-        script: |
-          cd $CM_BUILD_DIR/akka_food/ios
-          pod install
+        script: pod install
+        working_directory: akka_food/ios
       - name: Build iOS
-        script: |
-          cd $CM_BUILD_DIR/akka_food
-          flutter build ios --debug --no-codesign
+        script: flutter build ios --debug --no-codesign
+        working_directory: akka_food
     artifacts:
       - akka_food/build/ios/iphoneos/*.app
-      - akka_food/build/**/outputs/**/*.apk
 
-  # ─── Android Debug Build ────────────────────────────────────────────────────
   android-build:
     name: Android Build
     max_build_duration: 30
@@ -35,46 +38,9 @@ workflows:
     environment:
       flutter: stable
     scripts:
-      - name: Get dependencies
-        script: |
-          cd $CM_BUILD_DIR/akka_food
-          flutter pub get
+      - *flutter_get
       - name: Build APK
-        script: |
-          cd $CM_BUILD_DIR/akka_food
-          flutter build apk --debug
+        script: flutter build apk --debug
+        working_directory: akka_food
     artifacts:
       - akka_food/build/**/outputs/**/*.apk
-
-  # ─── iOS Release (TestFlight) ───────────────────────────────────────────────
-  ios-release:
-    name: iOS Release (TestFlight)
-    max_build_duration: 60
-    instance_type: mac_mini_m2
-    working_directory: akka_food
-    environment:
-      flutter: stable
-      xcode: latest
-      cocoapods: default
-      groups:
-        - app_store_connect
-      ios_signing:
-        distribution_type: app_store
-        bundle_identifier: com.akkafood.akka_food
-    scripts:
-      - name: Get dependencies
-        script: flutter pub get
-      - name: Install CocoaPods
-        script: |
-          cd ios
-          pod install
-      - name: Set up code signing
-        script: xcode-project use-profiles
-      - name: Build IPA
-        script: flutter build ipa --release --export-options-plist=/Users/builder/export_options.plist
-    artifacts:
-      - akka_food/build/ios/ipa/*.ipa
-    publishing:
-      app_store_connect:
-        auth: integration
-        submit_to_testflight: true
